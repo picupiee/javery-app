@@ -3,10 +3,10 @@ import useAuthStore from "@/store/auth.store";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
 
 export default function RootLayout() {
-
-  const {isLoading, fetchAuthenticatedUser} = useAuthStore();
+  const { isLoading, fetchAuthenticatedUser } = useAuthStore();
 
   const [fontsLoaded, error] = useFonts({
     "QuickSand-Bold": require("../assets/fonts/Quicksand-Bold.ttf"),
@@ -21,9 +21,17 @@ export default function RootLayout() {
   }, [fontsLoaded, error]);
   useEffect(() => {
     fetchAuthenticatedUser();
-  })
-  
-  if(!fontsLoaded || isLoading) return null;
+  }, []);
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  if (!fontsLoaded || isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#0000ff" className="scale-150" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false, statusBarStyle: "inverted" }} />
+  );
 }

@@ -1,6 +1,7 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
 import { signIn } from "@/lib/appwrite";
+import useAuthStore from "@/store/auth.store";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
@@ -8,6 +9,7 @@ import { Alert, Text, View } from "react-native";
 const SignIn = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
+  const { fetchAuthenticatedUser } = useAuthStore();
 
   const submit = async () => {
     const { email, password } = form;
@@ -19,8 +21,7 @@ const SignIn = () => {
     try {
       // AppWrite signin logic
       await signIn({ email, password });
-
-      Alert.alert("Sukses", "Berhasil masuk !");
+      await fetchAuthenticatedUser();
       router.replace("/");
     } catch (error) {
       Alert.alert("Error", `Gagal masuk. : ${error}`);

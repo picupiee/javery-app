@@ -84,7 +84,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
 export const getCurrentUser = async () => {
   try {
     const currentAccount = await account.get();
-    if (!currentAccount) throw Error("No current user found");
+    if (!currentAccount) return null;
 
     const currentUser = await database.listRows<User>({
       databaseId: appwriteConfig.databaseId,
@@ -98,7 +98,26 @@ export const getCurrentUser = async () => {
 
     return currentUser.rows[0];
   } catch (e) {
-    console.log(e);
-    throw new Error(e as string);
+    const errorMessage = (e as any).message || String(e);
+    if (
+      errorMessage.includes('missing scopes (["account"])') ||
+      errorMessage.includes("User (role: guest)")
+    ) {
+      console.log("No active session found (expected for guest users)");
+      return null;
+    }
+    console.error("Unexpected error during session check : ", e);
+    throw e;
+  }
+};
+
+export const signOut = async () => {
+  try {
+    // Deletes the active session from the server
+    await account.deleteSession({sessionId: 'current'});
+  } catch (e) {
+    console.error("Appwrite Sign Out Error:", e);
+    // It's generally safer to ignore errors here and proceed
+    // to clear local state, as the session might already be expired.
   }
 };
