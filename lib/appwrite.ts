@@ -15,7 +15,9 @@ export const appwriteConfig = {
   platform: "com.picupiee.javery",
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!,
   databaseId: "68e235ca00020d98e7c0",
-  userCollectionId: "68e237490015e276f322",
+  userProfileCollectionId: "68e237490015e276f322",
+  categoriesCollectionId: "68e29064002d64f5cc65",
+  sellerProfileCollectionId: "68e29264002c6089c4ff",
 };
 
 export const client = new Client();
@@ -50,7 +52,7 @@ export const createUser = async ({
 
     const newUser = await database.createRow({
       databaseId: appwriteConfig.databaseId,
-      tableId: appwriteConfig.userCollectionId,
+      tableId: appwriteConfig.userProfileCollectionId,
       rowId: ID.unique(),
       data: {
         accountId: newAccount.$id,
@@ -88,7 +90,7 @@ export const getCurrentUser = async () => {
 
     const currentUser = await database.listRows<User>({
       databaseId: appwriteConfig.databaseId,
-      tableId: appwriteConfig.userCollectionId,
+      tableId: appwriteConfig.userProfileCollectionId,
       queries: [Query.equal("accountId", currentAccount.$id)],
     });
 
@@ -114,7 +116,7 @@ export const getCurrentUser = async () => {
 export const signOut = async () => {
   try {
     // Deletes the active session from the server
-    await account.deleteSession({sessionId: 'current'});
+    await account.deleteSession({ sessionId: "current" });
   } catch (e) {
     console.error("Appwrite Sign Out Error:", e);
     // It's generally safer to ignore errors here and proceed
