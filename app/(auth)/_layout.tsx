@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-export default function _layout() {
+export default function AuthLayout() {
   const { isAuthenticated } = useAuthStore();
 
   if (isAuthenticated) return <Redirect href="/" />;
