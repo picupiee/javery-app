@@ -1,12 +1,12 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-const search = () => {
+const order = () => {
   return (
     <View>
-      <Text>search</Text>
+      <Text>order</Text>
     </View>
   );
 };
 
-export default search;
+export default order;

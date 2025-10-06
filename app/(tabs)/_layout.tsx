@@ -52,7 +52,6 @@ export default function TabLayout() {
             shadowRadius: 4,
             elevation: 5,
           },
-          animation: "shift",
         }}
       >
         <Tabs.Screen
@@ -65,12 +64,12 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="search"
+          name="categories"
           options={{
-            title: "Search",
+            title: "Kategori",
             tabBarIcon: ({ focused }) => (
               <TabBarIcon
-                title="Search"
+                title="Kategori"
                 icon={images.search}
                 focused={focused}
               />
@@ -78,25 +77,29 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="cart"
+          name="order"
           options={{
-            title: "Cart",
+            title: "Pesanan",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon title="Cart" icon={images.bag} focused={focused} />
+              <TabBarIcon title="Pesanan" icon={images.bag} focused={focused} />
             ),
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="account"
           options={{
-            title: "Profile",
+            title: "Akun",
             tabBarIcon: ({ focused }) => (
-              <TabBarIcon
-                title="Profile"
-                icon={images.person}
-                focused={focused}
-              />
+              <TabBarIcon title="Akun" icon={images.person} focused={focused} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="cart/index"
+          options={{
+            href: null,
+            headerShown: true,
+            title: "Keranjang",
           }}
         />
       </Tabs>

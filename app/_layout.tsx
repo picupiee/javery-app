@@ -1,19 +1,28 @@
 import "@/global.css";
 import useAuthStore from "@/store/auth.store";
-import { useFonts } from "expo-font";
+import {
+  Quicksand_300Light,
+  Quicksand_400Regular,
+  Quicksand_500Medium,
+  Quicksand_600SemiBold,
+  Quicksand_700Bold,
+  useFonts,
+} from "@expo-google-fonts/quicksand";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { isLoading, fetchAuthenticatedUser } = useAuthStore();
 
   const [fontsLoaded, error] = useFonts({
-    "QuickSand-Bold": require("../assets/fonts/Quicksand-Bold.ttf"),
-    "QuickSand-Medium": require("../assets/fonts/Quicksand-Medium.ttf"),
-    "QuickSand-Regular": require("../assets/fonts/Quicksand-Regular.ttf"),
-    "QuickSand-SemiBold": require("../assets/fonts/Quicksand-SemiBold.ttf"),
-    "QuickSand-Light": require("../assets/fonts/Quicksand-Light.ttf"),
+    "Quicksand-Regular": Quicksand_400Regular,
+    "Quicksand-Bold": Quicksand_700Bold,
+    "Quicksand-SemiBold": Quicksand_600SemiBold,
+    "Quicksand-Light": Quicksand_300Light,
+    "Quicksand-Medium": Quicksand_500Medium,
   });
   useEffect(() => {
     if (error) throw error;
