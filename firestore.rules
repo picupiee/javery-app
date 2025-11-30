@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document (checks auth.uid against a target uid)
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+    
+    // --- Users Collection (Buyers) ---
+    // [NEW] Required for Stage 1 (Sign Up) and Stage 4 (Profile)
+    match /users/{userId} {
+      // Users can read and write their own profile data
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // --- Sellers Collection ---
+    match /sellers/{sellerId} {
+      // Anyone can read seller profiles (needed for Stage 2: Browsing)
+      allow read: if true;
+      
+      // Only the seller can manage their own profile
+      allow create: if isAuthenticated() 
+                    && isOwner(sellerId)
+                    && isOwner(request.resource.data.uid);
+      
+      allow update, delete: if isAuthenticated() && isOwner(sellerId);
+    }
+    
+    // --- Orders Collection ---
+    match /orders/{orderId} {
+      // [NEW] Create: Buyers can create orders (Stage 3)
+      // Must be authenticated and the order's buyerUid must match their auth uid
+      allow create: if isAuthenticated() && request.resource.data.buyerUid == request.auth.uid;
+
+      // [UPDATED] Read: 
+      // - Buyers can read their own orders (Stage 4: History)
+      // - Sellers can read orders assigned to them
+      allow read: if isAuthenticated() && (
+        resource.data.buyerUid == request.auth.uid || 
+        resource.data.sellerUid == request.auth.uid
+      );
+
+      // Update: 
+      // - Sellers can update status (e.g. pending -> processing)
+      // - Buyers currently NOT allowed to update (unless we add cancellation logic later)
+      allow update: if isAuthenticated() && resource.data.sellerUid == request.auth.uid;
+      
+      // Delete: Deny for now to preserve history
+      allow delete: if false; 
+    }
+    
+    // --- Products Collection ---
+    match /products/{productId} {
+      // Anyone can read products (Stage 2: Browsing)
+      allow read: if true;
+      
+      // Only the product owner (seller) can manage products
+      allow create: if isAuthenticated() 
+                    && isOwner(request.resource.data.ownerUid);
+      
+      allow update, delete: if isAuthenticated() 
+                    && isOwner(resource.data.ownerUid);
+    }
+  }
+}

@@ -1,69 +1,96 @@
-import CustomButton from "@/components/CustomButton";
-import CustomInput from "@/components/CustomInput";
 import { auth } from "@/lib/firebase";
-import useAuthStore from "@/store/auth.store";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const SignIn = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "" });
-  const { fetchAuthenticatedUser } = useAuthStore();
+export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = async () => {
-    const { email, password } = form;
+  const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Mohon isi email dan kata sandi yang tepat !");
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
-    setIsSubmitting(true);
+
+    setLoading(true);
     try {
-      // Firebase signin logic
       await signInWithEmailAndPassword(auth, email, password);
-      await fetchAuthenticatedUser();
-      router.replace("/");
+      // Router replace is handled in _layout.tsx
     } catch (error: any) {
-      Alert.alert("Error", `Gagal masuk. : ${error.message}`);
+      Alert.alert("Error", error.message);
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <View className="gap-10 bg-white rounded-lg p-5 mt-5">
-      <CustomInput
-        placeholder="Alamat Email"
-        value={form.email}
-        onChangeText={(text) => setForm((prev) => ({ ...prev, email: text }))}
-        label="Email"
-        keyboardType="email-address"
-      />
-      <CustomInput
-        placeholder="Masukkan Kata Sandi"
-        value={form.password}
-        onChangeText={(text) =>
-          setForm((prev) => ({ ...prev, password: text }))
-        }
-        label="Password"
-        keyboardType="default"
-        secureTextEntry={true}
-      />
-      <CustomButton
-        title="Masuk"
-        isLoading={isSubmitting}
-        onPress={submit}
-        textStyle="text-white base-bold"
-      />
-      <View className="flex justify-center mt-5 flex-row gap-2">
-        <Text className="base-regular text-gray-100">Belum terdaftar ?</Text>
-        <Link href="/sign-up" className="base-bold text-primary">
-          Daftar
-        </Link>
+    <SafeAreaView className="flex-1 bg-white justify-center px-6">
+      <View className="items-center mb-10">
+        <Text className="text-3xl font-bold text-primary mb-2 font-quicksand-bold">
+          Javery
+        </Text>
+        <Text className="text-gray-500 font-quicksand-medium">
+          Sign in to continue shopping
+        </Text>
       </View>
-    </View>
-  );
-};
 
-export default SignIn;
+      <View className="space-y-4">
+        <View>
+          <Text className="text-gray-700 mb-2 font-quicksand-medium">
+            Email
+          </Text>
+          <TextInput
+            className="w-full bg-gray-100 p-4 rounded-xl font-quicksand-medium"
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+        </View>
+
+        <View>
+          <Text className="text-gray-700 mb-2 font-quicksand-medium">
+            Password
+          </Text>
+          <TextInput
+            className="w-full bg-gray-100 p-4 rounded-xl font-quicksand-medium"
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
+
+        <TouchableOpacity
+          onPress={handleSignIn}
+          disabled={loading}
+          className={`w-full bg-black p-4 rounded-xl items-center ${
+            loading ? "opacity-70" : ""
+          }`}
+        >
+          <Text className="text-white font-bold text-lg font-quicksand-bold">
+            {loading ? "Signing In..." : "Sign In"}
+          </Text>
+        </TouchableOpacity>
+
+        <View className="flex-row justify-center mt-4">
+          <Text className="text-gray-500 font-quicksand-medium">
+            Don't have an account?{" "}
+          </Text>
+          <Link href="/(auth)/sign-up" asChild>
+            <TouchableOpacity>
+              <Text className="text-primary font-bold font-quicksand-bold">
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}

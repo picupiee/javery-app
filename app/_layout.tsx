@@ -1,46 +1,64 @@
 import "@/global.css";
-import useAuthStore from "@/store/auth.store";
 import {
   Quicksand_300Light,
   Quicksand_400Regular,
   Quicksand_500Medium,
   Quicksand_600SemiBold,
   Quicksand_700Bold,
-  useFonts,
 } from "@expo-google-fonts/quicksand";
-import { SplashScreen, Stack } from "expo-router";
+import { useFonts } from "expo-font";
+import { router, Slot, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const { isLoading, fetchAuthenticatedUser } = useAuthStore();
+  return (
+    <AuthProvider>
+      <AppLayout />
+    </AuthProvider>
+  );
+}
 
-  const [fontsLoaded, error] = useFonts({
-    "Quicksand-Regular": Quicksand_400Regular,
-    "Quicksand-Bold": Quicksand_700Bold,
-    "Quicksand-SemiBold": Quicksand_600SemiBold,
-    "Quicksand-Light": Quicksand_300Light,
-    "Quicksand-Medium": Quicksand_500Medium,
+function AppLayout() {
+  const { user, isLoading } = useAuth();
+  const segments = useSegments();
+
+  const [fontsLoaded, fontError] = useFonts({
+    Quicksand_300Light,
+    Quicksand_400Regular,
+    Quicksand_500Medium,
+    Quicksand_600SemiBold,
+    Quicksand_700Bold,
   });
+
   useEffect(() => {
-    if (error) throw error;
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded, error]);
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+    if (fontError) throw fontError;
+  }, [fontsLoaded, fontError]);
+
+  const inAuthGroup = segments[0] === "(auth)";
+
   useEffect(() => {
-    fetchAuthenticatedUser();
-  }, []);
+    if (isLoading) return;
+
+    console.log("RootLayout Effect:", { user: !!user, inAuthGroup, segments });
+
+    if (user && inAuthGroup) {
+      console.log("Redirecting to /");
+      router.replace("/");
+    } else if (!user && !inAuthGroup) {
+      console.log("Redirecting to /sign-in");
+      router.replace("/(auth)/sign-in");
+    }
+  }, [user, isLoading, inAuthGroup]);
 
   if (!fontsLoaded || isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#0000ff" className="scale-150" />
-      </View>
-    );
+    return null; // Or a loading spinner
   }
 
-  return (
-    <Stack screenOptions={{ headerShown: false, statusBarStyle: "inverted" }} />
-  );
+  return <Slot />;
 }

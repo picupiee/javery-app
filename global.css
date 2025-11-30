@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@media (min-width: 640px) {
+  body {
+    background-color: #f3f4f6;
+  }
+}
+
 @layer utilities {
   .flex-center {
     @apply flex items-center justify-center;
