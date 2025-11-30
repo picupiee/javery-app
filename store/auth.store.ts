@@ -1,5 +1,6 @@
-import { getCurrentUser, signOut } from "@/lib/appwrite";
+import { auth } from "@/lib/firebase";
 import { User } from "@/type";
+import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { create } from "zustand";
 
 type AuthState = {
@@ -11,7 +12,7 @@ type AuthState = {
   setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
 
-  fetchAuthenticatedUser: () => Promise<void>;
+  fetchAuthenticatedUser: () => void;
   logout: () => Promise<void>;
 };
 
@@ -23,24 +24,14 @@ const useAuthStore = create<AuthState>((set) => ({
   setIsAuthenticated: (value) => set({ isAuthenticated: value }),
   setUser: (user) => set({ user }),
   setLoading: (value) => set({ isLoading: value }),
-  fetchAuthenticatedUser: async () => {
-    set({ isLoading: true });
-    try {
-      const user = await getCurrentUser();
-
-      if (user) set({ isAuthenticated: true, user: user });
-      else set({ isAuthenticated: false, user: null });
-    } catch (e) {
-      console.log("fetchAuthenticatedUser error", e);
-      set({ isAuthenticated: false, user: null });
-    } finally {
-      set({ isLoading: false });
-    }
+  fetchAuthenticatedUser: () => {
+    // This will be set up once when the app loads
+    // The actual listener is set up below, outside the store
   },
   logout: async () => {
     set({ isLoading: true });
     try {
-      await signOut();
+      await firebaseSignOut(auth);
     } catch (e) {
       console.log("Logout process error: ", e);
     } finally {
@@ -48,4 +39,21 @@ const useAuthStore = create<AuthState>((set) => ({
     }
   },
 }));
+
+// Set up Firebase auth state listener once
+onAuthStateChanged(auth, (firebaseUser) => {
+  if (firebaseUser) {
+    // Convert Firebase user to app User type
+    const user: User = {
+      accountId: firebaseUser.uid,
+      name: firebaseUser.displayName || "",
+      email: firebaseUser.email || "",
+      avatar: firebaseUser.photoURL || "",
+    };
+    useAuthStore.setState({ isAuthenticated: true, user: user, isLoading: false });
+  } else {
+    useAuthStore.setState({ isAuthenticated: false, user: null, isLoading: false });
+  }
+});
+
 export default useAuthStore;

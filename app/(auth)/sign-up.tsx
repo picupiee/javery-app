@@ -1,7 +1,8 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
-import { createUser } from "@/lib/appwrite";
+import { auth } from "@/lib/firebase";
 import { Link, router } from "expo-router";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
 
@@ -20,18 +21,27 @@ const SignUp = () => {
     }
     setIsSubmitting(true);
     try {
-      // AppWrite signup logic
-      await createUser({ name, email, password });
+      // Firebase signup logic
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Update user profile with display name
+      await updateProfile(userCredential.user, {
+        displayName: name,
+      });
 
       Alert.alert(
         "Akun Berhasil Dibuat",
         `Selamat Datang di Javery, ${name} !`
       );
       router.replace("/");
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert(
         "Gagal Membuat Akun",
-        "Silahkan cek kembali email dan kata sandi anda."
+        error.message || "Silahkan cek kembali email dan kata sandi anda."
       );
     } finally {
       setIsSubmitting(false);

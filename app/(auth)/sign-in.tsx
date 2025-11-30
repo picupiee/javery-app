@@ -1,8 +1,9 @@
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
-import { signIn } from "@/lib/appwrite";
+import { auth } from "@/lib/firebase";
 import useAuthStore from "@/store/auth.store";
 import { Link, router } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
 
@@ -19,12 +20,12 @@ const SignIn = () => {
     }
     setIsSubmitting(true);
     try {
-      // AppWrite signin logic
-      await signIn({ email, password });
+      // Firebase signin logic
+      await signInWithEmailAndPassword(auth, email, password);
       await fetchAuthenticatedUser();
       router.replace("/");
-    } catch (error) {
-      Alert.alert("Error", `Gagal masuk. : ${error}`);
+    } catch (error: any) {
+      Alert.alert("Error", `Gagal masuk. : ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }

@@ -1,6 +1,37 @@
-import { Models } from "react-native-appwrite";
+export interface User {
+  accountId: string;
+  name: string;
+  email: string;
+  avatar: string;
+}
 
-export interface MenuItem extends AppwriteTablesRow {
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  imageUrl: string;
+  ownerUid: string;
+  sellerName: string; // Denormalized
+  createdAt: string;
+}
+
+export interface StoreStatus {
+  isOpen: boolean;
+  pingMessage: string;
+  lastPinged: string;
+}
+
+export interface Seller {
+  uid: string;
+  email: string;
+  storeName: string;
+  createdAt: string;
+  storeStatus: StoreStatus;
+}
+
+export interface MenuItem {
+
   name: string;
   price: number;
   image_url: string;
@@ -11,16 +42,9 @@ export interface MenuItem extends AppwriteTablesRow {
   type: string;
 }
 
-export interface Category extends AppwriteTablesRow {
+export interface Category {
   name: string;
   description: string;
-}
-
-export interface User extends AppwriteTablesRow {
-  accountId: string;
-  name: string;
-  email: string;
-  avatar: string;
 }
 
 export interface CartCustomization {
@@ -48,11 +72,6 @@ export interface CartStore {
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
-}
-
-interface AppwriteTablesRow extends Models.Document {
-  $tableId: string;
-  $databaseId: string;
 }
 
 interface TabBarIconProps {
