@@ -61,10 +61,10 @@ export default function SellerStore() {
 
   const renderProductItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
-      className="w-[48%] mb-4 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+      className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
       onPress={() => router.push(`/product/${item.id}`)}
     >
-      <View className="h-40 bg-gray-100 w-full">
+      <View className="h-36 bg-slate-50 w-full">
         {item.imageUrl ? (
           <Image
             source={{ uri: item.imageUrl }}
@@ -73,15 +73,18 @@ export default function SellerStore() {
           />
         ) : (
           <View className="w-full h-full items-center justify-center">
-            <FontAwesome name="image" size={40} color="#ccc" />
+            <FontAwesome name="image" size={36} color="#cbd5e1" />
           </View>
         )}
       </View>
       <View className="p-3">
-        <Text className="font-bold text-base mb-1" numberOfLines={1}>
+        <Text
+          className="font-bold text-sm text-slate-800 mb-1"
+          numberOfLines={1}
+        >
           {item.name}
         </Text>
-        <Text className="font-bold text-primary">
+        <Text className="font-bold text-primary text-base mb-1">
           Rp {item.price.toLocaleString()}
         </Text>
       </View>
@@ -92,56 +95,62 @@ export default function SellerStore() {
     return (
       <SafeAreaView className="flex-1 bg-white items-center justify-center">
         <ActivityIndicator size="large" color="#f97316" />
-        <Text className="mt-2 text-gray-600">Loading store...</Text>
+        <Text className="mt-2 text-slate-600">Loading store...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       {/* Header */}
-      <View className="px-5 py-4 flex-row items-center border-b border-gray-100">
+      <View className="px-5 py-4 bg-white border-b border-slate-200 flex-row items-center">
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <FontAwesome name="arrow-left" size={20} color="black" />
+          <FontAwesome name="arrow-left" size={20} color="#1e293b" />
         </TouchableOpacity>
-        <Text className="font-bold text-xl flex-1">Store</Text>
+        <Text className="font-bold text-xl text-slate-800">Store</Text>
       </View>
 
       <ScrollView className="flex-1">
         {/* Seller Info */}
-        <View className="px-5 py-6 bg-orange-50 border-b border-orange-100">
-          <View className="flex-row items-center">
-            <View className="w-20 h-20 bg-orange-200 rounded-full items-center justify-center mr-4">
-              <FontAwesome name="shopping-bag" size={32} color="#f97316" />
-            </View>
-            <View className="flex-1">
-              <Text className="font-bold text-2xl mb-1">
-                {seller?.storeName || "Store"}
-              </Text>
-              <Text className="text-gray-600 font-medium text-sm">
-                {seller?.email || ""}
-              </Text>
+        <View className="bg-orange-50 border-b border-orange-100">
+          <View className="px-5 py-6">
+            <View className="flex-row items-center">
+              <View className="w-16 h-16 bg-orange-200 rounded-full items-center justify-center mr-4">
+                <FontAwesome name="shopping-bag" size={28} color="#f97316" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-bold text-xl text-slate-800 mb-1">
+                  {seller?.storeName || "Store"}
+                </Text>
+                <Text className="text-slate-600 font-medium text-xs">
+                  {seller?.email || ""}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
 
         {/* Products Section */}
-        <View className="px-5 py-6">
-          <Text className="font-bold text-lg mb-4">
-            Products ({products.length})
-          </Text>
+        <View className="bg-white pt-5 pb-20">
+          <View className="px-5 mb-4">
+            <Text className="font-bold text-base text-slate-800">
+              Products ({products.length})
+            </Text>
+          </View>
           {products.length > 0 ? (
-            <View className="flex-row flex-wrap justify-between">
-              {products.map((item) => (
-                <View key={item.id} className="w-[48%]">
-                  {renderProductItem({ item })}
-                </View>
-              ))}
+            <View className="px-5">
+              <View className="flex-row flex-wrap justify-between">
+                {products.map((item) => (
+                  <View key={item.id} className="w-[48%] mb-3">
+                    {renderProductItem({ item })}
+                  </View>
+                ))}
+              </View>
             </View>
           ) : (
             <View className="items-center py-10">
-              <FontAwesome name="inbox" size={48} color="#ccc" />
-              <Text className="text-gray-400 mt-4 font-medium">
+              <FontAwesome name="inbox" size={48} color="#cbd5e1" />
+              <Text className="text-slate-400 mt-4 font-medium">
                 No products available
               </Text>
             </View>

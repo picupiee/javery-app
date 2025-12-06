@@ -5,8 +5,8 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
   Image,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -35,12 +35,12 @@ export default function Search() {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
-  const renderItem = ({ item }: { item: Product }) => (
+  const renderProductItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
-      className="flex-row bg-white p-3 mb-3 rounded-xl shadow-sm border border-gray-100"
+      className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
       onPress={() => router.push(`/product/${item.id}`)}
     >
-      <View className="w-20 h-20 bg-gray-100 rounded-lg mr-4 overflow-hidden">
+      <View className="h-36 bg-slate-50 w-full">
         {item.imageUrl ? (
           <Image
             source={{ uri: item.imageUrl }}
@@ -49,16 +49,21 @@ export default function Search() {
           />
         ) : (
           <View className="w-full h-full items-center justify-center">
-            <FontAwesome name="image" size={24} color="#ccc" />
+            <FontAwesome name="image" size={36} color="#cbd5e1" />
           </View>
         )}
       </View>
-      <View className="flex-1 justify-center">
-        <Text className="font-bold text-base mb-1">{item.name}</Text>
-        <Text className="font-bold text-primary">
+      <View className="p-3">
+        <Text
+          className="font-bold text-sm text-slate-800 mb-1"
+          numberOfLines={1}
+        >
+          {item.name}
+        </Text>
+        <Text className="font-bold text-primary text-base mb-1">
           Rp {item.price.toLocaleString()}
         </Text>
-        <Text className="text-xs text-gray-500 mt-1 font-medium">
+        <Text className="text-xs text-slate-400 font-medium" numberOfLines={1}>
           {item.category}
         </Text>
       </View>
@@ -66,56 +71,67 @@ export default function Search() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-5" edges={["top"]}>
-      <View className="py-4">
-        <Text className="font-bold text-2xl text-primary mb-4">
-          Search
-        </Text>
-        <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3">
-          <FontAwesome name="search" size={20} color="gray" />
+    <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
+      {/* Header */}
+      <View className="px-5 py-4 bg-white border-b border-slate-200">
+        <Text className="font-bold text-2xl text-primary">Search</Text>
+      </View>
+
+      {/* Search Bar */}
+      <View className="px-5 py-4 bg-white">
+        <View className="flex-row items-center bg-slate-100 rounded-xl px-4 py-3">
+          <FontAwesome name="search" size={18} color="#94a3b8" />
           <TextInput
-            className="flex-1 ml-3 font-medium text-base"
             placeholder="Search for products..."
+            placeholderTextColor="#94a3b8"
             value={query}
             onChangeText={setQuery}
-            autoCapitalize="none"
+            className="flex-1 ml-3 font-medium text-sm text-slate-800"
           />
-          {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery("")}>
-              <FontAwesome name="times-circle" size={20} color="gray" />
-            </TouchableOpacity>
-          )}
         </View>
       </View>
 
-      {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#000" />
-        </View>
-      ) : (
-        <FlatList
-          data={results}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          ListEmptyComponent={
-            query.length > 0 ? (
-              <View className="items-center mt-10">
-                <Text className="text-gray-500 font-medium">
-                  No products found for "{query}"
-                </Text>
+      {/* Results */}
+      <ScrollView className="flex-1">
+        {loading ? ( // Added loading state check
+          <View className="flex-1 items-center justify-center py-20">
+            <ActivityIndicator size="large" color="#000" />
+          </View>
+        ) : query.trim() === "" ? (
+          <View className="flex-1 items-center justify-center py-20">
+            <FontAwesome name="search" size={64} color="#cbd5e1" />
+            <Text className="text-slate-400 mt-4 font-medium text-center px-10">
+              Type to search for fresh products
+            </Text>
+          </View>
+        ) : (
+          <View className="bg-white pt-5 pb-20">
+            <View className="px-5 mb-4">
+              <Text className="font-bold text-base text-slate-800">
+                Results ({results.length})
+              </Text>
+            </View>
+            {results.length > 0 ? (
+              <View className="px-5">
+                <View className="flex-row flex-wrap justify-between">
+                  {results.map((item: Product) => (
+                    <View key={item.id} className="w-[48%] mb-3">
+                      {renderProductItem({ item })}
+                    </View>
+                  ))}
+                </View>
               </View>
             ) : (
-              <View className="items-center mt-10">
-                <FontAwesome name="search" size={50} color="#eee" />
-                <Text className="text-gray-400 mt-4 font-medium">
-                  Type to search for fresh products
+              <View className="items-center py-10">
+                <FontAwesome name="inbox" size={48} color="#cbd5e1" />
+                <Text className="text-slate-400 mt-4 font-medium">
+                  No products found
                 </Text>
               </View>
-            )
-          }
-        />
-      )}
+            )}
+          </View>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }

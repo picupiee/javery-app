@@ -2,7 +2,7 @@
   "expo": {
     "name": "javery-app",
     "slug": "javery-app",
-    "version": "1.1.0",
+    "version": "1.1.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "javeryapp",
@@ -51,6 +51,12 @@
       "eas": {
         "projectId": "e047301b-1c2d-4f59-a7b4-cdb88048315b"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e047301b-1c2d-4f59-a7b4-cdb88048315b"
     }
   }
 }

@@ -63,12 +63,11 @@ export default function Home() {
       className="mr-4 items-center"
       onPress={() => router.push(`/seller/${item.uid}` as any)}
     >
-      <View className="w-16 h-16 bg-gray-200 rounded-full items-center justify-center mb-2 overflow-hidden border border-gray-100">
-        {/* Placeholder for seller image if not available */}
-        <FontAwesome name="shopping-bag" size={24} color="white" />
+      <View className="w-16 h-16 bg-slate-100 rounded-full items-center justify-center mb-2 border border-slate-200">
+        <FontAwesome name="shopping-bag" size={24} color="#94a3b8" />
       </View>
       <Text
-        className="text-xs font-medium text-center w-20"
+        className="text-xs font-medium text-center w-20 text-slate-800"
         numberOfLines={1}
       >
         {item.storeName}
@@ -78,10 +77,10 @@ export default function Home() {
 
   const renderProductItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
-      className="w-[48%] mb-4 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+      className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
       onPress={() => router.push(`/product/${item.id}`)}
     >
-      <View className="h-40 bg-gray-100 w-full">
+      <View className="h-36 bg-slate-50 w-full">
         {item.imageUrl ? (
           <Image
             source={{ uri: item.imageUrl }}
@@ -90,41 +89,35 @@ export default function Home() {
           />
         ) : (
           <View className="w-full h-full items-center justify-center">
-            <FontAwesome name="image" size={40} color="#ccc" />
+            <FontAwesome name="image" size={36} color="#cbd5e1" />
           </View>
         )}
       </View>
       <View className="p-3">
-        <Text className="font-bold text-base mb-1" numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text className="font-bold text-primary">
-          Rp {item.price.toLocaleString()}
-        </Text>
         <Text
-          className="text-xs text-gray-500 mt-1 font-medium"
+          className="font-bold text-sm text-slate-800 mb-1"
           numberOfLines={1}
         >
-          {item.category || "Uncategorized"}
+          {item.name}
+        </Text>
+        <Text className="font-bold text-primary text-base mb-1">
+          Rp {item.price.toLocaleString()}
+        </Text>
+        <Text className="text-xs text-slate-400 font-medium" numberOfLines={1}>
+          {item.category}
         </Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
-      <View className="px-5 py-4 flex-row justify-between items-center">
-        <View>
-          <Text className="font-bold text-2xl text-primary">
-            Javery
-          </Text>
-          <Text className="font-medium text-gray-500 text-xs">
-            Fresh from the farm
-          </Text>
-        </View>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/cart")}>
-          <FontAwesome name="shopping-cart" size={24} color="black" />
-        </TouchableOpacity>
+    <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
+      {/* Header */}
+      <View className="px-5 py-4 bg-white border-b border-slate-200">
+        <Text className="font-bold text-2xl text-primary">Javery</Text>
+        <Text className="font-medium text-slate-500 text-xs mt-0.5">
+          Fresh from the farm
+        </Text>
       </View>
 
       <ScrollView
@@ -132,12 +125,13 @@ export default function Home() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
         }
+        showsVerticalScrollIndicator={false}
       >
         {/* Ping Notifications Section */}
         {pings.length > 0 && (
-          <View className="py-4 bg-orange-50">
-            <View className="px-5 flex-row justify-between items-center mb-3">
-              <Text className="font-bold text-lg">
+          <View className="bg-orange-50 border-b border-orange-100">
+            <View className="px-5 py-4 flex-row justify-between items-center">
+              <Text className="font-bold text-base text-slate-800">
                 🔔 Latest Updates
               </Text>
               <TouchableOpacity
@@ -147,14 +141,15 @@ export default function Home() {
                 }}
                 className="p-2"
               >
-                <FontAwesome name="refresh" size={18} color="#f97316" />
+                <FontAwesome name="refresh" size={16} color="#f97316" />
               </TouchableOpacity>
             </View>
             <FlatList
               data={pings}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  className="mr-3 bg-white rounded-xl p-4 shadow-sm border border-orange-200 w-72"
+                  className="mr-3 bg-white rounded-xl p-4 border border-orange-200"
+                  style={{ width: 280 }}
                   onPress={() =>
                     router.push(`/seller/${item.sellerUid}` as any)
                   }
@@ -169,18 +164,18 @@ export default function Home() {
                     </View>
                     <View className="flex-1">
                       <Text
-                        className="font-bold text-base"
+                        className="font-bold text-sm text-slate-800"
                         numberOfLines={1}
                       >
                         {item.storeName}
                       </Text>
-                      <Text className="text-xs text-gray-500 font-medium">
+                      <Text className="text-xs text-slate-400 font-medium">
                         {formatTimeAgo(item.createdAt)}
                       </Text>
                     </View>
                   </View>
                   <Text
-                    className="text-sm text-gray-700 font-medium"
+                    className="text-sm text-slate-600 font-medium leading-5"
                     numberOfLines={2}
                   >
                     {item.message}
@@ -190,16 +185,20 @@ export default function Home() {
               keyExtractor={(item) => item.sellerUid}
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 20 }}
+              contentContainerStyle={{
+                paddingHorizontal: 20,
+                paddingBottom: 16,
+              }}
             />
           </View>
         )}
 
         {/* Active Sellers Section */}
-        <View className="py-4">
-          <View className="px-5 flex-row justify-between items-center mb-3">
-            <Text className="font-bold text-lg">Active Sellers</Text>
-            {/* <Text className="text-primary font-medium text-sm">See All</Text> */}
+        <View className="bg-white py-5 mb-2">
+          <View className="px-5 mb-3">
+            <Text className="font-bold text-base text-slate-800">
+              Active Sellers
+            </Text>
           </View>
           <FlatList
             data={sellers}
@@ -208,25 +207,24 @@ export default function Home() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20 }}
-            ListEmptyComponent={
-              <Text className="text-gray-400 italic ml-5">
-                No active sellers found.
-              </Text>
-            }
           />
         </View>
 
         {/* Featured Products Section */}
-        <View className="px-5 pb-20">
-          <Text className="font-bold text-lg mb-3">
-            Featured Products
-          </Text>
-          <View className="flex-row flex-wrap justify-between">
-            {products.map((item) => (
-              <View key={item.id} className="w-[48%]">
-                {renderProductItem({ item })}
-              </View>
-            ))}
+        <View className="bg-white pt-5 pb-20">
+          <View className="px-5 mb-4">
+            <Text className="font-bold text-base text-slate-800">
+              Featured Products
+            </Text>
+          </View>
+          <View className="px-5">
+            <View className="flex-row flex-wrap justify-between">
+              {products.map((item) => (
+                <View key={item.id} className="w-[48%] mb-3">
+                  {renderProductItem({ item })}
+                </View>
+              ))}
+            </View>
           </View>
           {products.length === 0 && !refreshing && (
             <Text className="text-center text-gray-400 mt-10">

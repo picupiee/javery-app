@@ -8,6 +8,7 @@ import {
 import { useFonts } from "expo-font";
 import { router, Slot, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -43,19 +44,36 @@ function AppLayout() {
   useEffect(() => {
     if (isLoading) return;
 
-    console.log("RootLayout Effect:", { user: !!user, inAuthGroup, segments });
+    console.log("RootLayout Effect:", {
+      user: !!user,
+      inAuthGroup,
+      segments,
+      platform: Platform.OS,
+    });
 
+    // If user is authenticated and in auth screens, redirect to home
     if (user && inAuthGroup) {
-      console.log("Redirecting to /");
+      console.log("Redirecting authenticated user to home");
       router.replace("/");
-    } else if (!user && !inAuthGroup) {
-      console.log("Redirecting to /sign-in");
-      router.replace("/(auth)/sign-in");
+      return;
+    }
+
+    // Platform-specific behavior for unauthenticated users
+    if (!user && !inAuthGroup) {
+      if (Platform.OS === "web") {
+        // Web: Allow guest browsing, don't force redirect
+        console.log("Web guest browsing allowed");
+        // User can browse freely, auth will be required only for protected screens
+      } else {
+        // Native: Require authentication
+        console.log("Native: Redirecting to sign-in");
+        router.replace("/(auth)/sign-in");
+      }
     }
   }, [user, isLoading, inAuthGroup]);
 
   if (!fontsLoaded || isLoading) {
-    return null; // Or a loading spinner
+    return null;
   }
 
   return <Slot />;

@@ -46,9 +46,7 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-500 font-medium">
-          Product not found
-        </Text>
+        <Text className="text-gray-500 font-medium">Product not found</Text>
         <TouchableOpacity onPress={() => router.back()} className="mt-4">
           <Text className="text-primary font-bold">Go Back</Text>
         </TouchableOpacity>
@@ -110,9 +108,7 @@ export default function ProductDetails() {
               </View>
             </View>
 
-            <Text className="text-lg font-bold mb-2">
-              Description
-            </Text>
+            <Text className="text-lg font-bold mb-2">Description</Text>
             <Text className="text-gray-600 font-medium leading-6 mb-8">
               {product.description || "No description available."}
             </Text>
@@ -133,16 +129,13 @@ export default function ProductDetails() {
         >
           <TouchableOpacity
             onPress={handleAddToCart}
-            className="w-full bg-black py-4 rounded-xl items-center flex-row justify-center"
+            disabled={product.stock === 0}
+            className={`mx-6 mb-8 p-4 rounded-xl ${
+              product.stock === 0 ? "bg-gray-300" : "bg-primary"
+            }`}
           >
-            <FontAwesome
-              name="shopping-cart"
-              size={20}
-              color="white"
-              style={{ marginRight: 10 }}
-            />
-            <Text className="text-white font-bold text-lg font-bold">
-              Add to Cart
+            <Text className="text-white font-bold text-lg font-bold text-center">
+              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
             </Text>
           </TouchableOpacity>
         </SafeAreaView>
