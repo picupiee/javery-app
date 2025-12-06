@@ -17,9 +17,8 @@ export interface Product {
 }
 
 export interface StoreStatus {
-  isOpen: boolean;
   pingMessage: string;
-  lastPinged: string;
+  lastPingTime: any; // Firestore Timestamp
 }
 
 export interface Seller {
@@ -28,6 +27,13 @@ export interface Seller {
   storeName: string;
   createdAt: string;
   storeStatus: StoreStatus;
+}
+
+export interface Ping {
+  sellerUid: string;
+  storeName: string;
+  message: string;
+  createdAt: any; // Firestore Timestamp
 }
 
 export interface MenuItem {

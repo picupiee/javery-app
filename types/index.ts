@@ -52,3 +52,11 @@ export interface Order {
   createdAt: string;
   shippingAddress: string;
 }
+
+export interface Ping {
+  sellerUid: string;
+  storeName: string;
+  message: string;
+  createdAt: any; // Firestore Timestamp
+}
+

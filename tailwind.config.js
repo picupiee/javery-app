@@ -5,29 +5,39 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
-      colors: {
-        primary: "#FE8C00",
-        white: {
-          DEFAULT: "#ffffff",
-          100: "#fafafa",
-          200: "#FE8C00",
-        },
-        gray: {
-          100: "#878787",
-          200: "#878787",
-        },
-        dark: {
-          100: "#181C2E",
-        },
-        error: "#F14141",
-        success: "#2F9B65",
-      },
       fontFamily: {
-        quicksand: ["Quicksand-Regular", "sans-serif"],
-        "quicksand-bold": ["Quicksand-Bold", "sans-serif"],
-        "quicksand-semibold": ["Quicksand-SemiBold", "sans-serif"],
-        "quicksand-light": ["Quicksand-Light", "sans-serif"],
-        "quicksand-medium": ["Quicksand-Medium", "sans-serif"],
+        sans: ["PlusJakartaSans_400Regular", "sans-serif"],
+        medium: ["PlusJakartaSans_500Medium", "sans-serif"],
+        semibold: ["PlusJakartaSans_600SemiBold", "sans-serif"],
+        bold: ["PlusJakartaSans_700Bold", "sans-serif"],
+      },
+      colors: {
+        primary: {
+          DEFAULT: "#f97316", // orange-500
+          50: "#fff7ed",
+          100: "#ffedd5",
+          200: "#fed7aa",
+          300: "#fdba74",
+          400: "#fb923c",
+          500: "#f97316",
+          600: "#ea580c",
+          700: "#c2410c",
+          800: "#9a3412",
+          900: "#7c2d12",
+        },
+        secondary: {
+          DEFAULT: "#3b82f6", // blue-500
+        },
+        background: "#f8fafc", // slate-50
+        surface: "#ffffff",
+        text: {
+          primary: "#1e293b", // slate-800
+          secondary: "#64748b", // slate-500
+          muted: "#94a3b8", // slate-400
+        },
+        border: "#e2e8f0", // slate-200
+        error: "#ef4444",
+        success: "#22c55e",
       },
     },
   },
