@@ -53,21 +53,21 @@ export default function SignUp() {
   return (
     <SafeAreaView className="flex-1 bg-white justify-center px-6">
       <View className="items-center mb-10">
-        <Text className="text-3xl font-bold text-primary mb-2 font-quicksand-bold">
+        <Text className="text-3xl font-bold text-primary mb-2 font-bold">
           Create Account
         </Text>
-        <Text className="text-gray-500 font-quicksand-medium">
+        <Text className="text-gray-500 font-medium">
           Sign up to start shopping
         </Text>
       </View>
 
       <View className="space-y-4">
         <View>
-          <Text className="text-gray-700 mb-2 font-quicksand-medium">
+          <Text className="text-gray-700 mb-2 font-medium">
             Full Name
           </Text>
           <TextInput
-            className="w-full bg-gray-100 p-4 rounded-xl font-quicksand-medium"
+            className="w-full bg-gray-100 p-4 rounded-xl font-medium"
             placeholder="Enter your full name"
             value={name}
             onChangeText={setName}
@@ -75,11 +75,11 @@ export default function SignUp() {
         </View>
 
         <View>
-          <Text className="text-gray-700 mb-2 font-quicksand-medium">
+          <Text className="text-gray-700 mb-2 font-medium">
             Email
           </Text>
           <TextInput
-            className="w-full bg-gray-100 p-4 rounded-xl font-quicksand-medium"
+            className="w-full bg-gray-100 p-4 rounded-xl font-medium"
             placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
@@ -89,11 +89,11 @@ export default function SignUp() {
         </View>
 
         <View>
-          <Text className="text-gray-700 mb-2 font-quicksand-medium">
+          <Text className="text-gray-700 mb-2 font-medium">
             Password
           </Text>
           <TextInput
-            className="w-full bg-gray-100 p-4 rounded-xl font-quicksand-medium"
+            className="w-full bg-gray-100 p-4 rounded-xl font-medium"
             placeholder="Create a password"
             value={password}
             onChangeText={setPassword}
@@ -108,18 +108,18 @@ export default function SignUp() {
             loading ? "opacity-70" : ""
           }`}
         >
-          <Text className="text-white font-bold text-lg font-quicksand-bold">
+          <Text className="text-white font-bold text-lg font-bold">
             {loading ? "Creating Account..." : "Sign Up"}
           </Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-4">
-          <Text className="text-gray-500 font-quicksand-medium">
+          <Text className="text-gray-500 font-medium">
             Already have an account?{" "}
           </Text>
           <Link href="/(auth)/sign-in" asChild>
             <TouchableOpacity>
-              <Text className="text-primary font-bold font-quicksand-bold">
+              <Text className="text-primary font-bold font-bold">
                 Sign In
               </Text>
             </TouchableOpacity>

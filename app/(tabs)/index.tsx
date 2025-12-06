@@ -68,7 +68,7 @@ export default function Home() {
         <FontAwesome name="shopping-bag" size={24} color="white" />
       </View>
       <Text
-        className="text-xs font-quicksand-medium text-center w-20"
+        className="text-xs font-medium text-center w-20"
         numberOfLines={1}
       >
         {item.storeName}
@@ -95,14 +95,14 @@ export default function Home() {
         )}
       </View>
       <View className="p-3">
-        <Text className="font-quicksand-bold text-base mb-1" numberOfLines={1}>
+        <Text className="font-bold text-base mb-1" numberOfLines={1}>
           {item.name}
         </Text>
-        <Text className="font-quicksand-bold text-primary">
+        <Text className="font-bold text-primary">
           Rp {item.price.toLocaleString()}
         </Text>
         <Text
-          className="text-xs text-gray-500 mt-1 font-quicksand-medium"
+          className="text-xs text-gray-500 mt-1 font-medium"
           numberOfLines={1}
         >
           {item.category || "Uncategorized"}
@@ -115,10 +115,10 @@ export default function Home() {
     <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
       <View className="px-5 py-4 flex-row justify-between items-center">
         <View>
-          <Text className="font-quicksand-bold text-2xl text-primary">
+          <Text className="font-bold text-2xl text-primary">
             Javery
           </Text>
-          <Text className="font-quicksand-medium text-gray-500 text-xs">
+          <Text className="font-medium text-gray-500 text-xs">
             Fresh from the farm
           </Text>
         </View>
@@ -137,7 +137,7 @@ export default function Home() {
         {pings.length > 0 && (
           <View className="py-4 bg-orange-50">
             <View className="px-5 flex-row justify-between items-center mb-3">
-              <Text className="font-quicksand-bold text-lg">
+              <Text className="font-bold text-lg">
                 🔔 Latest Updates
               </Text>
               <TouchableOpacity
@@ -169,18 +169,18 @@ export default function Home() {
                     </View>
                     <View className="flex-1">
                       <Text
-                        className="font-quicksand-bold text-base"
+                        className="font-bold text-base"
                         numberOfLines={1}
                       >
                         {item.storeName}
                       </Text>
-                      <Text className="text-xs text-gray-500 font-quicksand-medium">
+                      <Text className="text-xs text-gray-500 font-medium">
                         {formatTimeAgo(item.createdAt)}
                       </Text>
                     </View>
                   </View>
                   <Text
-                    className="text-sm text-gray-700 font-quicksand-medium"
+                    className="text-sm text-gray-700 font-medium"
                     numberOfLines={2}
                   >
                     {item.message}
@@ -198,8 +198,8 @@ export default function Home() {
         {/* Active Sellers Section */}
         <View className="py-4">
           <View className="px-5 flex-row justify-between items-center mb-3">
-            <Text className="font-quicksand-bold text-lg">Active Sellers</Text>
-            {/* <Text className="text-primary font-quicksand-medium text-sm">See All</Text> */}
+            <Text className="font-bold text-lg">Active Sellers</Text>
+            {/* <Text className="text-primary font-medium text-sm">See All</Text> */}
           </View>
           <FlatList
             data={sellers}
@@ -218,7 +218,7 @@ export default function Home() {
 
         {/* Featured Products Section */}
         <View className="px-5 pb-20">
-          <Text className="font-quicksand-bold text-lg mb-3">
+          <Text className="font-bold text-lg mb-3">
             Featured Products
           </Text>
           <View className="flex-row flex-wrap justify-between">

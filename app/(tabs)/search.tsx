@@ -54,11 +54,11 @@ export default function Search() {
         )}
       </View>
       <View className="flex-1 justify-center">
-        <Text className="font-quicksand-bold text-base mb-1">{item.name}</Text>
-        <Text className="font-quicksand-bold text-primary">
+        <Text className="font-bold text-base mb-1">{item.name}</Text>
+        <Text className="font-bold text-primary">
           Rp {item.price.toLocaleString()}
         </Text>
-        <Text className="text-xs text-gray-500 mt-1 font-quicksand-medium">
+        <Text className="text-xs text-gray-500 mt-1 font-medium">
           {item.category}
         </Text>
       </View>
@@ -68,13 +68,13 @@ export default function Search() {
   return (
     <SafeAreaView className="flex-1 bg-white px-5" edges={["top"]}>
       <View className="py-4">
-        <Text className="font-quicksand-bold text-2xl text-primary mb-4">
+        <Text className="font-bold text-2xl text-primary mb-4">
           Search
         </Text>
         <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3">
           <FontAwesome name="search" size={20} color="gray" />
           <TextInput
-            className="flex-1 ml-3 font-quicksand-medium text-base"
+            className="flex-1 ml-3 font-medium text-base"
             placeholder="Search for products..."
             value={query}
             onChangeText={setQuery}
@@ -101,14 +101,14 @@ export default function Search() {
           ListEmptyComponent={
             query.length > 0 ? (
               <View className="items-center mt-10">
-                <Text className="text-gray-500 font-quicksand-medium">
+                <Text className="text-gray-500 font-medium">
                   No products found for "{query}"
                 </Text>
               </View>
             ) : (
               <View className="items-center mt-10">
                 <FontAwesome name="search" size={50} color="#eee" />
-                <Text className="text-gray-400 mt-4 font-quicksand-medium">
+                <Text className="text-gray-400 mt-4 font-medium">
                   Type to search for fresh products
                 </Text>
               </View>

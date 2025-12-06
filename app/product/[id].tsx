@@ -46,11 +46,11 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-500 font-quicksand-medium">
+        <Text className="text-gray-500 font-medium">
           Product not found
         </Text>
         <TouchableOpacity onPress={() => router.back()} className="mt-4">
-          <Text className="text-primary font-quicksand-bold">Go Back</Text>
+          <Text className="text-primary font-bold">Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -89,37 +89,37 @@ export default function ProductDetails() {
           {/* Content */}
           <View className="p-6 -mt-6 bg-white rounded-t-3xl flex-1">
             <View className="flex-row justify-between items-start mb-2">
-              <Text className="text-2xl font-quicksand-bold flex-1 mr-2">
+              <Text className="text-2xl font-bold flex-1 mr-2">
                 {product.name}
               </Text>
-              <Text className="text-xl font-quicksand-bold text-primary">
+              <Text className="text-xl font-bold text-primary">
                 Rp {product.price.toLocaleString()}
               </Text>
             </View>
 
             <View className="flex-row items-center mb-6">
               <View className="bg-gray-100 px-3 py-1 rounded-full mr-2">
-                <Text className="text-xs text-gray-600 font-quicksand-medium">
+                <Text className="text-xs text-gray-600 font-medium">
                   {product.category}
                 </Text>
               </View>
               <View className="bg-green-100 px-3 py-1 rounded-full">
-                <Text className="text-xs text-green-700 font-quicksand-medium">
+                <Text className="text-xs text-green-700 font-medium">
                   Stock: {product.stock}
                 </Text>
               </View>
             </View>
 
-            <Text className="text-lg font-quicksand-bold mb-2">
+            <Text className="text-lg font-bold mb-2">
               Description
             </Text>
-            <Text className="text-gray-600 font-quicksand-medium leading-6 mb-8">
+            <Text className="text-gray-600 font-medium leading-6 mb-8">
               {product.description || "No description available."}
             </Text>
 
             {/* Seller Info Placeholder */}
             <View className="border-t border-gray-100 pt-4 mb-4">
-              <Text className="text-sm text-gray-400 font-quicksand-medium">
+              <Text className="text-sm text-gray-400 font-medium">
                 Sold by Seller ID: {product.sellerUid}
               </Text>
             </View>
@@ -141,7 +141,7 @@ export default function ProductDetails() {
               color="white"
               style={{ marginRight: 10 }}
             />
-            <Text className="text-white font-bold text-lg font-quicksand-bold">
+            <Text className="text-white font-bold text-lg font-bold">
               Add to Cart
             </Text>
           </TouchableOpacity>

@@ -4,8 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Cart() {
   return (
     <SafeAreaView className="flex-1 bg-white items-center justify-center">
-      <Text className="text-xl font-quicksand-bold">Cart Screen</Text>
-      <Text className="text-gray-500 font-quicksand-medium">
+      <Text className="text-xl font-bold">Cart Screen</Text>
+      <Text className="text-gray-500 font-medium">
         Coming in Stage 3
       </Text>
     </SafeAreaView>

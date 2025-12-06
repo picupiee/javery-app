@@ -78,10 +78,10 @@ export default function SellerStore() {
         )}
       </View>
       <View className="p-3">
-        <Text className="font-quicksand-bold text-base mb-1" numberOfLines={1}>
+        <Text className="font-bold text-base mb-1" numberOfLines={1}>
           {item.name}
         </Text>
-        <Text className="font-quicksand-bold text-primary">
+        <Text className="font-bold text-primary">
           Rp {item.price.toLocaleString()}
         </Text>
       </View>
@@ -104,7 +104,7 @@ export default function SellerStore() {
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
           <FontAwesome name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
-        <Text className="font-quicksand-bold text-xl flex-1">Store</Text>
+        <Text className="font-bold text-xl flex-1">Store</Text>
       </View>
 
       <ScrollView className="flex-1">
@@ -115,10 +115,10 @@ export default function SellerStore() {
               <FontAwesome name="shopping-bag" size={32} color="#f97316" />
             </View>
             <View className="flex-1">
-              <Text className="font-quicksand-bold text-2xl mb-1">
+              <Text className="font-bold text-2xl mb-1">
                 {seller?.storeName || "Store"}
               </Text>
-              <Text className="text-gray-600 font-quicksand-medium text-sm">
+              <Text className="text-gray-600 font-medium text-sm">
                 {seller?.email || ""}
               </Text>
             </View>
@@ -127,7 +127,7 @@ export default function SellerStore() {
 
         {/* Products Section */}
         <View className="px-5 py-6">
-          <Text className="font-quicksand-bold text-lg mb-4">
+          <Text className="font-bold text-lg mb-4">
             Products ({products.length})
           </Text>
           {products.length > 0 ? (
@@ -141,7 +141,7 @@ export default function SellerStore() {
           ) : (
             <View className="items-center py-10">
               <FontAwesome name="inbox" size={48} color="#ccc" />
-              <Text className="text-gray-400 mt-4 font-quicksand-medium">
+              <Text className="text-gray-400 mt-4 font-medium">
                 No products available
               </Text>
             </View>
