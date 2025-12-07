@@ -2,7 +2,11 @@ import useUpdates from "@/hooks/useUpdate";
 import { auth } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -63,8 +67,11 @@ export default function SignIn() {
 
     setLoading(true);
     try {
+      if (Platform.OS === "web") {
+        await setPersistence(auth, browserLocalPersistence);
+      }
       await signInWithEmailAndPassword(auth, email, password);
-      // Router replace is handled in _layout.tsx
+      // Navigation is handled by _layout.tsx based on role
     } catch (error: any) {
       Alert.alert("Error", error.message);
     } finally {

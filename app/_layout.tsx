@@ -51,10 +51,17 @@ function AppLayout() {
       platform: Platform.OS,
     });
 
-    // If user is authenticated and in auth screens, redirect to home
+    // If user is authenticated and in auth screens
     if (user && inAuthGroup) {
-      console.log("Redirecting authenticated user to home");
-      router.replace("/");
+      console.log("Redirecting authenticated user");
+
+      // Check for buyer role
+      if (user.profile?.roles?.buyer) {
+        router.replace("/");
+      } else {
+        // Redirect to create profile if buyer role is missing
+        router.replace("/create-profile" as any);
+      }
       return;
     }
 

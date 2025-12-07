@@ -1,4 +1,5 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
     
@@ -7,65 +8,115 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Helper function to check if user owns the document (checks auth.uid against a target uid)
+    // Helper function to check if user owns the document
     function isOwner(uid) {
-      return request.auth.uid == uid;
+      return isAuthenticated() && request.auth.uid == uid;
     }
     
-    // --- Users Collection (Buyers) ---
-    // [NEW] Required for Stage 1 (Sign Up) and Stage 4 (Profile)
+    // Helper function to check if user has buyer role
+    function isBuyer() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.buyer == true;
+    }
+    
+    // Helper function to check if user has seller role
+    function isSeller() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.seller == true;
+    }
+    
+    // Users collection - stores all user profiles with roles
     match /users/{userId} {
-      // Users can read and write their own profile data
-      allow read, write: if isAuthenticated() && isOwner(userId);
+      // Anyone can read user profiles (for displaying seller info, etc.)
+      allow read: if true;
+      
+      // Only the user can create their own profile
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Only the user can update their own profile
+      allow update: if isOwner(userId);
+      
+      // Only the user can delete their own profile
+      allow delete: if isOwner(userId);
     }
-
-    // --- Sellers Collection ---
+    
+    // Sellers collection - stores seller-specific data
     match /sellers/{sellerId} {
-      // Anyone can read seller profiles (needed for Stage 2: Browsing)
+      // Anyone can read seller profiles (for buyer app)
       allow read: if true;
       
-      // Only the seller can manage their own profile
-      allow create: if isAuthenticated() 
-                    && isOwner(sellerId)
-                    && isOwner(request.resource.data.uid);
+      // Only authenticated users can create seller profiles
+      allow create: if isAuthenticated() && request.auth.uid == sellerId;
       
-      allow update, delete: if isAuthenticated() && isOwner(sellerId);
+      // Only the seller can update their own profile
+      allow update: if isOwner(sellerId);
+      
+      // Only the seller can delete their own profile
+      allow delete: if isOwner(sellerId);
     }
     
-    // --- Orders Collection ---
-    match /orders/{orderId} {
-      // [NEW] Create: Buyers can create orders (Stage 3)
-      // Must be authenticated and the order's buyerUid must match their auth uid
-      allow create: if isAuthenticated() && request.resource.data.buyerUid == request.auth.uid;
-
-      // [UPDATED] Read: 
-      // - Buyers can read their own orders (Stage 4: History)
-      // - Sellers can read orders assigned to them
-      allow read: if isAuthenticated() && (
-        resource.data.buyerUid == request.auth.uid || 
-        resource.data.sellerUid == request.auth.uid
-      );
-
-      // Update: 
-      // - Sellers can update status (e.g. pending -> processing)
-      // - Buyers currently NOT allowed to update (unless we add cancellation logic later)
-      allow update: if isAuthenticated() && resource.data.sellerUid == request.auth.uid;
-      
-      // Delete: Deny for now to preserve history
-      allow delete: if false; 
-    }
-    
-    // --- Products Collection ---
+    // Products collection
     match /products/{productId} {
-      // Anyone can read products (Stage 2: Browsing)
+      // Anyone can read products
       allow read: if true;
       
-      // Only the product owner (seller) can manage products
-      allow create: if isAuthenticated() 
-                    && isOwner(request.resource.data.ownerUid);
+      // Only sellers can create products
+      allow create: if isSeller() && request.resource.data.sellerUid == request.auth.uid;
       
-      allow update, delete: if isAuthenticated() 
-                    && isOwner(resource.data.ownerUid);
+      // Only the product owner (seller) can update
+      allow update: if isOwner(resource.data.sellerUid);
+      
+      // Only the product owner (seller) can delete
+      allow delete: if isOwner(resource.data.sellerUid);
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Buyers can read their own orders, sellers can read orders for their products
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == resource.data.buyerUid || 
+                      request.auth.uid == resource.data.sellerUid);
+      
+      // Only buyers can create orders
+      allow create: if isBuyer() && request.resource.data.buyerUid == request.auth.uid;
+      
+      // Buyers and sellers can update orders (for status changes)
+      allow update: if isAuthenticated() && 
+                       (request.auth.uid == resource.data.buyerUid || 
+                        request.auth.uid == resource.data.sellerUid);
+      
+      // Only buyers can delete their orders (before processing)
+      allow delete: if isOwner(resource.data.buyerUid);
+    }
+    
+    // Pings collection
+    match /pings/{pingId} {
+      // Anyone can read pings (for buyer app notifications)
+      allow read: if true;
+      
+      // Only sellers can create pings
+      allow create: if isSeller() && request.resource.data.sellerUid == request.auth.uid;
+      
+      // Only the ping owner can update
+      allow update: if isOwner(resource.data.sellerUid);
+      
+      // Only the ping owner can delete
+      allow delete: if isOwner(resource.data.sellerUid);
+    }
+    
+    // Cart items (if stored in Firestore)
+    match /carts/{userId}/items/{itemId} {
+      // Only the user can read their cart
+      allow read: if isOwner(userId);
+      
+      // Only the user can add to their cart
+      allow create: if isOwner(userId);
+      
+      // Only the user can update their cart
+      allow update: if isOwner(userId);
+      
+      // Only the user can delete from their cart
+      allow delete: if isOwner(userId);
     }
   }
 }

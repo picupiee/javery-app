@@ -2,7 +2,7 @@ import useUpdates from "@/hooks/useUpdate";
 import { auth, db } from "@/lib/firebase";
 import { UserProfile } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
@@ -77,19 +77,46 @@ export default function SignUp() {
       // 2. Update Display Name
       await updateProfile(user, { displayName: name });
 
-      // 3. Create Firestore Profile
+      // 3. Create Firestore Profile with buyer role
       const userProfile: UserProfile = {
         uid: user.uid,
         email: user.email!,
         displayName: name,
         createdAt: new Date().toISOString(),
+        roles: {
+          buyer: true,
+          seller: false,
+        },
       };
 
       await setDoc(doc(db, "users", user.uid), userProfile);
 
       // Router replace is handled in _layout.tsx
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      if (error.code === "auth/email-already-in-use") {
+        if (Platform.OS === "web") {
+          const confirm = window.confirm(
+            "This email is already registered. Please sign in to complete your buyer profile."
+          );
+          if (confirm) {
+            router.push("/(auth)/sign-in");
+          }
+        } else {
+          Alert.alert(
+            "Account Exists",
+            "This email is already registered. Please sign in to complete your buyer profile.",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Sign In",
+                onPress: () => router.push("/(auth)/sign-in"),
+              },
+            ]
+          );
+        }
+      } else {
+        Alert.alert("Error", error.message);
+      }
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,13 @@ export interface UserProfile {
   email: string;
   displayName: string;
   createdAt: string;
+  roles: {
+    buyer: boolean;
+    seller: boolean;
+  };
+  // Seller-specific fields (only if seller role is true)
+  storeName?: string;
+  // Optional buyer/seller fields
   photoURL?: string;
   address?: string;
   phoneNumber?: string;

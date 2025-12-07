@@ -79,19 +79,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             };
             setUser(augmentedUser);
           } else {
-            // If no profile exists yet (e.g. just signed up), we might still want to allow them in
-            // or handle it differently. For now, let's assume profile creation happens at signup.
-            // If we want to be strict:
-            // auth.signOut();
-
-            // But let's be lenient for now and just set the user without profile if needed,
-            // OR better, wait for profile creation.
-            // Let's stick to the pattern: if logged in, should have profile.
             console.warn(
               "Logged in user has no profile data. Waiting for creation..."
             );
-            // Do NOT sign out here. The profile might be in the process of being created (Sign Up flow).
-            // The onSnapshot listener will fire again when the document is created.
+            // Allow user to stay logged in so they can create profile
+            const augmentedUser: AugmentedUser = {
+              ...firebaseUser,
+              profile: null as any,
+            };
+            setUser(augmentedUser);
           }
           setIsLoading(false);
         },
