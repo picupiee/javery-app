@@ -7,6 +7,17 @@ interface GuestPromptProps {
 }
 
 export default function GuestPrompt({ screen }: GuestPromptProps) {
+  const getScreenName = (s: string) => {
+    switch (s.toLowerCase()) {
+      case "cart":
+        return "keranjang";
+      case "account":
+        return "akun";
+      default:
+        return s.toLowerCase();
+    }
+  };
+
   return (
     <View className="flex-1 bg-slate-50 items-center justify-center px-6">
       <View className="bg-white p-8 rounded-3xl border border-slate-200 max-w-md w-full">
@@ -17,13 +28,13 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
 
         {/* Title */}
         <Text className="text-2xl font-bold text-slate-800 text-center mb-3">
-          Sign In Required
+          Masuk Diperlukan
         </Text>
 
         {/* Description */}
         <Text className="text-slate-600 text-center mb-8 font-medium">
-          To access your {screen.toLowerCase()}, please sign in or create an
-          account.
+          Untuk mengakses {getScreenName(screen)} anda, silakan masuk atau buat
+          akun.
         </Text>
 
         {/* Benefits */}
@@ -33,7 +44,7 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
               <FontAwesome name="check" size={12} color="#22c55e" />
             </View>
             <Text className="text-slate-700 font-medium flex-1">
-              Save your favorite items
+              Simpan item favorit anda
             </Text>
           </View>
           <View className="flex-row items-center">
@@ -41,7 +52,7 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
               <FontAwesome name="check" size={12} color="#22c55e" />
             </View>
             <Text className="text-slate-700 font-medium flex-1">
-              Track your orders
+              Lacak pesanan anda
             </Text>
           </View>
           <View className="flex-row items-center">
@@ -49,7 +60,7 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
               <FontAwesome name="check" size={12} color="#22c55e" />
             </View>
             <Text className="text-slate-700 font-medium flex-1">
-              Get personalized recommendations
+              Dapatkan rekomendasi personal
             </Text>
           </View>
         </View>
@@ -60,7 +71,7 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
           className="bg-primary p-4 rounded-xl mb-3"
         >
           <Text className="text-white font-bold text-center text-base">
-            Sign In
+            Masuk
           </Text>
         </TouchableOpacity>
 
@@ -69,7 +80,7 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
           className="bg-slate-100 p-4 rounded-xl"
         >
           <Text className="text-slate-800 font-bold text-center text-base">
-            Create Account
+            Buat Akun
           </Text>
         </TouchableOpacity>
 
@@ -77,7 +88,7 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
         {Platform.OS === "web" && (
           <TouchableOpacity onPress={() => router.back()} className="mt-4">
             <Text className="text-slate-500 font-medium text-center text-sm">
-              Continue Browsing
+              Lanjut Menjelajah
             </Text>
           </TouchableOpacity>
         )}

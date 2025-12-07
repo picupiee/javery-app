@@ -74,7 +74,7 @@ export default function Search() {
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       {/* Header */}
       <View className="px-5 py-4 bg-white border-b border-slate-200">
-        <Text className="font-bold text-2xl text-primary">Search</Text>
+        <Text className="font-bold text-2xl text-primary">Cari</Text>
       </View>
 
       {/* Search Bar */}
@@ -82,7 +82,7 @@ export default function Search() {
         <View className="flex-row items-center bg-slate-100 rounded-xl px-4 py-3">
           <FontAwesome name="search" size={18} color="#94a3b8" />
           <TextInput
-            placeholder="Search for products..."
+            placeholder="Cari produk..."
             placeholderTextColor="#94a3b8"
             value={query}
             onChangeText={setQuery}
@@ -101,14 +101,14 @@ export default function Search() {
           <View className="flex-1 items-center justify-center py-20">
             <FontAwesome name="search" size={64} color="#cbd5e1" />
             <Text className="text-slate-400 mt-4 font-medium text-center px-10">
-              Type to search for fresh products
+              Ketik untuk mencari produk segar
             </Text>
           </View>
         ) : (
           <View className="bg-white pt-5 pb-20">
             <View className="px-5 mb-4">
               <Text className="font-bold text-base text-slate-800">
-                Results ({results.length})
+                Hasil ({results.length})
               </Text>
             </View>
             {results.length > 0 ? (
@@ -125,7 +125,7 @@ export default function Search() {
               <View className="items-center py-10">
                 <FontAwesome name="inbox" size={48} color="#cbd5e1" />
                 <Text className="text-slate-400 mt-4 font-medium">
-                  No products found
+                  Produk tidak ditemukan
                 </Text>
               </View>
             )}

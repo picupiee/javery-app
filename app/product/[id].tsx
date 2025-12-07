@@ -46,13 +46,18 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-500 font-medium">Product not found</Text>
+        <Text className="text-gray-500 font-medium">
+          Produk tidak ditemukan
+        </Text>
         <TouchableOpacity onPress={() => router.back()} className="mt-4">
-          <Text className="text-primary font-bold">Go Back</Text>
+          <Text className="text-primary font-bold">Kembali</Text>
         </TouchableOpacity>
       </View>
     );
   }
+
+  const isUnlimited = product.isUnlimited;
+  const isOutOfStock = !isUnlimited && product.stock === 0;
 
   return (
     <>
@@ -101,22 +106,30 @@ export default function ProductDetails() {
                   {product.category}
                 </Text>
               </View>
-              <View className="bg-green-100 px-3 py-1 rounded-full">
-                <Text className="text-xs text-green-700 font-medium">
-                  Stock: {product.stock}
+              <View
+                className={`${
+                  isOutOfStock ? "bg-red-100" : "bg-green-100"
+                } px-3 py-1 rounded-full`}
+              >
+                <Text
+                  className={`text-xs ${
+                    isOutOfStock ? "text-red-700" : "text-green-700"
+                  } font-medium`}
+                >
+                  Stok: {isUnlimited ? "Tersedia" : product.stock}
                 </Text>
               </View>
             </View>
 
-            <Text className="text-lg font-bold mb-2">Description</Text>
+            <Text className="text-lg font-bold mb-2">Deskripsi</Text>
             <Text className="text-gray-600 font-medium leading-6 mb-8">
-              {product.description || "No description available."}
+              {product.description || "Tidak ada deskripsi."}
             </Text>
 
             {/* Seller Info Placeholder */}
             <View className="border-t border-gray-100 pt-4 mb-4">
               <Text className="text-sm text-gray-400 font-medium">
-                Sold by Seller ID: {product.sellerUid}
+                Dijual oleh: {product.sellerName || "Toko"}
               </Text>
             </View>
           </View>
@@ -129,13 +142,13 @@ export default function ProductDetails() {
         >
           <TouchableOpacity
             onPress={handleAddToCart}
-            disabled={product.stock === 0}
+            disabled={isOutOfStock}
             className={`mx-6 mb-8 p-4 rounded-xl ${
-              product.stock === 0 ? "bg-gray-300" : "bg-primary"
+              isOutOfStock ? "bg-gray-300" : "bg-primary"
             }`}
           >
             <Text className="text-white font-bold text-lg font-bold text-center">
-              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+              {isOutOfStock ? "Habis" : "Tambah ke Keranjang"}
             </Text>
           </TouchableOpacity>
         </SafeAreaView>

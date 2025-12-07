@@ -116,7 +116,7 @@ export default function Home() {
       <View className="px-5 py-4 bg-white border-b border-slate-200">
         <Text className="font-bold text-2xl text-primary">Javery</Text>
         <Text className="font-medium text-slate-500 text-xs mt-0.5">
-          Fresh from the farm
+          Segar dari Toko
         </Text>
       </View>
 
@@ -132,7 +132,7 @@ export default function Home() {
           <View className="bg-orange-50 border-b border-orange-100">
             <View className="px-5 py-4 flex-row justify-between items-center">
               <Text className="font-bold text-base text-slate-800">
-                🔔 Latest Updates
+                🔔 Pembaruan Terbaru
               </Text>
               <TouchableOpacity
                 onPress={async () => {
@@ -197,7 +197,7 @@ export default function Home() {
         <View className="bg-white py-5 mb-2">
           <View className="px-5 mb-3">
             <Text className="font-bold text-base text-slate-800">
-              Active Sellers
+              Penjual Aktif
             </Text>
           </View>
           <FlatList
@@ -214,7 +214,7 @@ export default function Home() {
         <View className="bg-white pt-5 pb-20">
           <View className="px-5 mb-4">
             <Text className="font-bold text-base text-slate-800">
-              Featured Products
+              Produk Pilihan
             </Text>
           </View>
           <View className="px-5">
@@ -228,7 +228,7 @@ export default function Home() {
           </View>
           {products.length === 0 && !refreshing && (
             <Text className="text-center text-gray-400 mt-10">
-              No products available.
+              Tidak ada produk tersedia.
             </Text>
           )}
         </View>

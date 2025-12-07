@@ -95,7 +95,7 @@ export default function SellerStore() {
     return (
       <SafeAreaView className="flex-1 bg-white items-center justify-center">
         <ActivityIndicator size="large" color="#f97316" />
-        <Text className="mt-2 text-slate-600">Loading store...</Text>
+        <Text className="mt-2 text-slate-600">Memuat toko...</Text>
       </SafeAreaView>
     );
   }
@@ -107,7 +107,7 @@ export default function SellerStore() {
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
           <FontAwesome name="arrow-left" size={20} color="#1e293b" />
         </TouchableOpacity>
-        <Text className="font-bold text-xl text-slate-800">Store</Text>
+        <Text className="font-bold text-xl text-slate-800">Toko</Text>
       </View>
 
       <ScrollView className="flex-1">
@@ -120,11 +120,9 @@ export default function SellerStore() {
               </View>
               <View className="flex-1">
                 <Text className="font-bold text-xl text-slate-800 mb-1">
-                  {seller?.storeName || "Store"}
+                  {seller?.storeName || "Toko"}
                 </Text>
-                <Text className="text-slate-600 font-medium text-xs">
-                  {seller?.email || ""}
-                </Text>
+                {/* Email address removed as requested */}
               </View>
             </View>
           </View>
@@ -134,7 +132,7 @@ export default function SellerStore() {
         <View className="bg-white pt-5 pb-20">
           <View className="px-5 mb-4">
             <Text className="font-bold text-base text-slate-800">
-              Products ({products.length})
+              Produk ({products.length})
             </Text>
           </View>
           {products.length > 0 ? (
@@ -151,7 +149,7 @@ export default function SellerStore() {
             <View className="items-center py-10">
               <FontAwesome name="inbox" size={48} color="#cbd5e1" />
               <Text className="text-slate-400 mt-4 font-medium">
-                No products available
+                Tidak ada produk tersedia
               </Text>
             </View>
           )}

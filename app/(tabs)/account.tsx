@@ -51,8 +51,8 @@ export default function Account() {
         }
       } else {
         Alert.alert(
-          "Install App",
-          "To install the app, tap the browser menu (three dots) then select 'Install App' or 'Add to Home Screen'."
+          "Instal Aplikasi",
+          "Untuk menginstal aplikasi, ketuk menu browser (tiga titik) lalu pilih 'Instal Aplikasi' atau 'Tambahkan ke Layar Utama'."
         );
       }
       return;
@@ -60,14 +60,14 @@ export default function Account() {
 
     await activeCheckAndApplyUpdate();
     if (updateStatus === "idle") {
-      Alert.alert("Up to Date", "App is already on the latest version.");
+      Alert.alert("Versi Terbaru", "Aplikasi sudah versi terbaru.");
     }
   };
 
   const handleLogout = async () => {
     if (Platform.OS === "web") {
       const confirm = window.confirm(
-        "Are you sure you want to logout from Javery?"
+        "Apakah anda yakin ingin keluar dari Javery?"
       );
       if (confirm) {
         logout();
@@ -75,10 +75,10 @@ export default function Account() {
       return;
     }
 
-    Alert.alert("Logout from Javery", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert("Keluar dari Javery", "Apakah anda yakin ingin keluar?", [
+      { text: "Batal", style: "cancel" },
       {
-        text: "Logout",
+        text: "Keluar",
         onPress: async () => {
           setLoading(true);
           try {
@@ -87,8 +87,8 @@ export default function Account() {
           } catch (error) {
             console.error("Logout error: ", error);
             Alert.alert(
-              "Error",
-              "Something went wrong. Please force close the app!"
+              "Gagal",
+              "Terjadi kesalahan. Silakan tutup paksa aplikasi!"
             );
           } finally {
             setLoading(false);
@@ -103,9 +103,9 @@ export default function Account() {
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       {/* Header */}
       <View className="px-5 py-4 bg-white border-b border-slate-200">
-        <Text className="font-bold text-2xl text-primary">My Account</Text>
+        <Text className="font-bold text-2xl text-primary">Akun Saya</Text>
         <Text className="text-slate-500 text-xs mt-0.5">
-          Manage your profile and app settings
+          Kelola profil dan pengaturan aplikasi
         </Text>
       </View>
 
@@ -128,11 +128,11 @@ export default function Account() {
 
           <View className="border-t border-slate-200 pt-4">
             <Text className="text-slate-500 text-xs font-medium mb-1">
-              Account Status
+              Status Akun
             </Text>
             <View className="flex-row items-center">
               <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-              <Text className="text-slate-800 text-sm font-medium">Active</Text>
+              <Text className="text-slate-800 text-sm font-medium">Aktif</Text>
             </View>
           </View>
         </View>
@@ -140,7 +140,7 @@ export default function Account() {
         {/* App Settings */}
         <View className="bg-white mx-5 mb-5 p-5 rounded-2xl border border-slate-200">
           <Text className="text-lg font-bold text-slate-800 mb-4">
-            App Settings
+            Pengaturan Aplikasi
           </Text>
 
           <TouchableOpacity
@@ -156,28 +156,28 @@ export default function Account() {
               <View className="flex-row items-center justify-center">
                 <ActivityIndicator color="#ffffff" size="small" />
                 <Text className="text-white font-semibold ml-2">
-                  Checking & Downloading...
+                  Memeriksa & Mengunduh...
                 </Text>
               </View>
             ) : (
               <Text className="text-white text-center font-semibold">
                 {updateStatus === "ready"
-                  ? "Update Ready (Tap!)"
+                  ? "Pembaruan Siap (Ketuk!)"
                   : Platform.OS === "web"
-                    ? "Install App"
-                    : "Check for Updates"}
+                    ? "Instal Aplikasi"
+                    : "Periksa Pembaruan"}
               </Text>
             )}
           </TouchableOpacity>
 
           {updateStatus === "error" && (
             <Text className="text-red-500 text-xs text-center mb-2">
-              {error || "Failed to check. Try again later."}
+              {error || "Gagal memeriksa. Coba lagi nanti."}
             </Text>
           )}
 
           <Text className="text-slate-400 text-xs text-center mt-2">
-            App Version 1.1.5
+            Versi Aplikasi 1.1.5
           </Text>
         </View>
 
@@ -191,13 +191,11 @@ export default function Account() {
             {loading ? (
               <View className="flex-row items-center justify-center">
                 <ActivityIndicator color="#dc2626" size="small" />
-                <Text className="text-red-600 font-bold ml-2">
-                  Logging out...
-                </Text>
+                <Text className="text-red-600 font-bold ml-2">Keluar...</Text>
               </View>
             ) : (
               <Text className="text-red-600 text-center font-bold text-base">
-                Logout
+                Keluar
               </Text>
             )}
           </TouchableOpacity>

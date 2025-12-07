@@ -37,13 +37,13 @@ export default function CreateProfile() {
 
   const handleCreateProfile = async () => {
     if (!name) {
-      Alert.alert("Error", "Please enter your full name");
+      Alert.alert("Error", "Mohon isi nama lengkap anda");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert("Error", "Session expired. Please sign in again.");
+      Alert.alert("Error", "Sesi berakhir. Silakan masuk kembali.");
       setTimeout(() => {
         router.replace("/(auth)/sign-in");
       }, 1500);
@@ -70,18 +70,16 @@ export default function CreateProfile() {
       );
 
       if (Platform.OS === "web") {
-        window.alert("Your buyer profile has been created successfully.");
+        window.alert("Profil pembeli berhasil dibuat.");
         router.replace("/");
       } else {
-        Alert.alert(
-          "Welcome!",
-          "Your buyer profile has been created successfully.",
-          [{ text: "OK", onPress: () => router.replace("/") }]
-        );
+        Alert.alert("Selamat Datang!", "Profil pembeli berhasil dibuat.", [
+          { text: "OK", onPress: () => router.replace("/") },
+        ]);
       }
     } catch (error: any) {
       console.error("Create Profile error:", error.code, error.message);
-      Alert.alert("Error", "Failed to create profile. Please try again.");
+      Alert.alert("Error", "Gagal membuat profil. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -92,7 +90,7 @@ export default function CreateProfile() {
     return (
       <SafeAreaView className="flex-1 bg-slate-50 items-center justify-center">
         <ActivityIndicator size="large" color="#f97316" />
-        <Text className="text-slate-600 mt-4">Loading...</Text>
+        <Text className="text-slate-600 mt-4">Memuat...</Text>
       </SafeAreaView>
     );
   }
@@ -108,30 +106,30 @@ export default function CreateProfile() {
             </View>
             <Text className="text-3xl font-bold text-primary mb-2">Javery</Text>
             <Text className="text-slate-500 font-medium text-center">
-              Fresh from the farm
+              Segar dari Toko
             </Text>
           </View>
 
           {/* Welcome Text */}
           <View className="mb-8">
             <Text className="text-2xl font-bold text-slate-800 mb-2">
-              Complete Your Profile
+              Lengkapi Profil Anda
             </Text>
             <Text className="text-slate-600 font-medium">
-              You already have an account. Enter your name to start shopping!
+              Anda sudah punya akun. Isi nama untuk mulai belanja!
             </Text>
           </View>
 
           {/* Form */}
           <View className="mb-6">
             <Text className="text-slate-700 mb-2 font-semibold text-sm">
-              Full Name
+              Nama Lengkap
             </Text>
             <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-4 py-3">
               <FontAwesome name="user" size={18} color="#94a3b8" />
               <TextInput
                 className="flex-1 ml-3 font-medium text-slate-800"
-                placeholder="Your full name"
+                placeholder="Nama lengkap anda"
                 placeholderTextColor="#94a3b8"
                 value={name}
                 onChangeText={setName}
@@ -151,12 +149,12 @@ export default function CreateProfile() {
               <View className="flex-row items-center">
                 <ActivityIndicator color="#ffffff" size="small" />
                 <Text className="text-white font-bold text-base ml-2">
-                  Creating Profile...
+                  Membuat Profil...
                 </Text>
               </View>
             ) : (
               <Text className="text-white font-bold text-base">
-                Complete Profile →
+                Lengkapi Profil →
               </Text>
             )}
           </TouchableOpacity>

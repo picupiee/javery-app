@@ -35,12 +35,14 @@ export interface AugmentedUser extends User {
 export interface Product {
   id: string;
   sellerUid: string;
+  sellerName?: string;
   name: string;
   price: number;
   description: string;
   imageUrl: string;
   category: string;
   stock: number;
+  isUnlimited?: boolean;
   createdAt: string;
   updatedAt: string;
 }

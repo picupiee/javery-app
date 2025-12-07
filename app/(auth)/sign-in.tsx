@@ -61,7 +61,7 @@ export default function SignIn() {
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("Gagal", "Mohon isi semua kolom");
       return;
     }
 
@@ -73,7 +73,7 @@ export default function SignIn() {
       await signInWithEmailAndPassword(auth, email, password);
       // Navigation is handled by _layout.tsx based on role
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Gagal Masuk", "Email atau kata sandi salah");
     } finally {
       setLoading(false);
     }
@@ -90,17 +90,17 @@ export default function SignIn() {
             </View>
             <Text className="text-3xl font-bold text-primary mb-2">Javery</Text>
             <Text className="text-slate-500 font-medium text-center">
-              Fresh from the farm
+              Segar dari Toko
             </Text>
           </View>
 
           {/* Welcome Text */}
           <View className="mb-8">
             <Text className="text-2xl font-bold text-slate-800 mb-2">
-              Welcome Back!
+              Selamat Datang!
             </Text>
             <Text className="text-slate-600 font-medium">
-              Sign in to continue shopping
+              Masuk untuk mulai berbelanja
             </Text>
           </View>
 
@@ -109,13 +109,13 @@ export default function SignIn() {
             {/* Email */}
             <View>
               <Text className="text-slate-700 mb-2 font-semibold text-sm">
-                Email Address
+                Alamat Email
               </Text>
               <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-4 py-3">
                 <FontAwesome name="envelope" size={18} color="#94a3b8" />
                 <TextInput
                   className="flex-1 ml-3 font-medium text-slate-800"
-                  placeholder="your@email.com"
+                  placeholder="nama@email.com"
                   placeholderTextColor="#94a3b8"
                   value={email}
                   onChangeText={setEmail}
@@ -128,13 +128,13 @@ export default function SignIn() {
             {/* Password */}
             <View>
               <Text className="text-slate-700 mb-2 font-semibold text-sm">
-                Password
+                Kata Sandi
               </Text>
               <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-4 py-3">
                 <FontAwesome name="lock" size={18} color="#94a3b8" />
                 <TextInput
                   className="flex-1 ml-3 font-medium text-slate-800"
-                  placeholder="Enter your password"
+                  placeholder="Masukkan kata sandi"
                   placeholderTextColor="#94a3b8"
                   value={password}
                   onChangeText={setPassword}
@@ -156,11 +156,11 @@ export default function SignIn() {
               <View className="flex-row items-center">
                 <ActivityIndicator color="#ffffff" size="small" />
                 <Text className="text-white font-bold text-base ml-2">
-                  Signing In...
+                  Masuk...
                 </Text>
               </View>
             ) : (
-              <Text className="text-white font-bold text-base">Sign In →</Text>
+              <Text className="text-white font-bold text-base">Masuk →</Text>
             )}
           </TouchableOpacity>
 
@@ -175,14 +175,14 @@ export default function SignIn() {
                 <View className="flex-row items-center">
                   <ActivityIndicator color="#1e293b" size="small" />
                   <Text className="text-slate-800 font-semibold ml-2">
-                    Checking...
+                    Memeriksa...
                   </Text>
                 </View>
               ) : (
                 <View className="flex-row items-center">
                   <FontAwesome name="download" size={16} color="#1e293b" />
                   <Text className="text-slate-800 font-semibold ml-2">
-                    Install App
+                    Instal Aplikasi
                   </Text>
                 </View>
               )}
@@ -201,7 +201,7 @@ export default function SignIn() {
               className="p-4"
             >
               <Text className="text-slate-500 font-medium text-center">
-                Continue as Guest
+                Lanjut sebagai Tamu
               </Text>
             </TouchableOpacity>
           )}
@@ -209,11 +209,11 @@ export default function SignIn() {
           {/* Sign Up Link */}
           <View className="flex-row justify-center mt-4">
             <Text className="text-slate-600 font-medium">
-              Don't have an account?{" "}
+              Belum punya akun?{" "}
             </Text>
             <Link href="/(auth)/sign-up" asChild>
               <TouchableOpacity>
-                <Text className="text-primary font-bold">Sign Up</Text>
+                <Text className="text-primary font-bold">Daftar</Text>
               </TouchableOpacity>
             </Link>
           </View>

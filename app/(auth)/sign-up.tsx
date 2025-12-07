@@ -60,7 +60,7 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     if (!name || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("Gagal", "Mohon isi semua kolom");
       return;
     }
 
@@ -96,26 +96,26 @@ export default function SignUp() {
       if (error.code === "auth/email-already-in-use") {
         if (Platform.OS === "web") {
           const confirm = window.confirm(
-            "This email is already registered. Please sign in to complete your buyer profile."
+            "Email ini sudah terdaftar. Silakan masuk sebagai pembeli."
           );
           if (confirm) {
             router.push("/(auth)/sign-in");
           }
         } else {
           Alert.alert(
-            "Account Exists",
-            "This email is already registered. Please sign in to complete your buyer profile.",
+            "Akun Sudah Ada",
+            "Email ini sudah terdaftar. Silakan masuk.",
             [
-              { text: "Cancel", style: "cancel" },
+              { text: "Batal", style: "cancel" },
               {
-                text: "Sign In",
+                text: "Masuk",
                 onPress: () => router.push("/(auth)/sign-in"),
               },
             ]
           );
         }
       } else {
-        Alert.alert("Error", error.message);
+        Alert.alert("Gagal", error.message);
       }
     } finally {
       setLoading(false);
@@ -133,17 +133,17 @@ export default function SignUp() {
             </View>
             <Text className="text-3xl font-bold text-primary mb-2">Javery</Text>
             <Text className="text-slate-500 font-medium text-center">
-              Fresh from the farm
+              Segar dari Toko
             </Text>
           </View>
 
           {/* Welcome Text */}
           <View className="mb-8">
             <Text className="text-2xl font-bold text-slate-800 mb-2">
-              Create Account
+              Buat Akun
             </Text>
             <Text className="text-slate-600 font-medium">
-              Sign up to start shopping fresh products
+              Daftar untuk mulai belanja produk segar
             </Text>
           </View>
 
@@ -152,13 +152,13 @@ export default function SignUp() {
             {/* Name */}
             <View>
               <Text className="text-slate-700 mb-2 font-semibold text-sm">
-                Full Name
+                Nama Lengkap
               </Text>
               <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-4 py-3">
                 <FontAwesome name="user" size={18} color="#94a3b8" />
                 <TextInput
                   className="flex-1 ml-3 font-medium text-slate-800"
-                  placeholder="Your full name"
+                  placeholder="Nama lengkap anda"
                   placeholderTextColor="#94a3b8"
                   value={name}
                   onChangeText={setName}
@@ -169,13 +169,13 @@ export default function SignUp() {
             {/* Email */}
             <View>
               <Text className="text-slate-700 mb-2 font-semibold text-sm">
-                Email Address
+                Alamat Email
               </Text>
               <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-4 py-3">
                 <FontAwesome name="envelope" size={18} color="#94a3b8" />
                 <TextInput
                   className="flex-1 ml-3 font-medium text-slate-800"
-                  placeholder="your@email.com"
+                  placeholder="nama@email.com"
                   placeholderTextColor="#94a3b8"
                   value={email}
                   onChangeText={setEmail}
@@ -188,13 +188,13 @@ export default function SignUp() {
             {/* Password */}
             <View>
               <Text className="text-slate-700 mb-2 font-semibold text-sm">
-                Password
+                Kata Sandi
               </Text>
               <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-4 py-3">
                 <FontAwesome name="lock" size={18} color="#94a3b8" />
                 <TextInput
                   className="flex-1 ml-3 font-medium text-slate-800"
-                  placeholder="Create a password"
+                  placeholder="Buat kata sandi"
                   placeholderTextColor="#94a3b8"
                   value={password}
                   onChangeText={setPassword}
@@ -216,12 +216,12 @@ export default function SignUp() {
               <View className="flex-row items-center">
                 <ActivityIndicator color="#ffffff" size="small" />
                 <Text className="text-white font-bold text-base ml-2">
-                  Creating Account...
+                  Mendaftar...
                 </Text>
               </View>
             ) : (
               <Text className="text-white font-bold text-base">
-                Create Account →
+                Buat Akun →
               </Text>
             )}
           </TouchableOpacity>
@@ -237,14 +237,14 @@ export default function SignUp() {
                 <View className="flex-row items-center">
                   <ActivityIndicator color="#1e293b" size="small" />
                   <Text className="text-slate-800 font-semibold ml-2">
-                    Checking...
+                    Memeriksa...
                   </Text>
                 </View>
               ) : (
                 <View className="flex-row items-center">
                   <FontAwesome name="download" size={16} color="#1e293b" />
                   <Text className="text-slate-800 font-semibold ml-2">
-                    Install App
+                    Instal Aplikasi
                   </Text>
                 </View>
               )}
@@ -263,7 +263,7 @@ export default function SignUp() {
               className="p-4"
             >
               <Text className="text-slate-500 font-medium text-center">
-                Continue as Guest
+                Lanjut sebagai Tamu
               </Text>
             </TouchableOpacity>
           )}
@@ -271,11 +271,11 @@ export default function SignUp() {
           {/* Sign In Link */}
           <View className="flex-row justify-center mt-4">
             <Text className="text-slate-600 font-medium">
-              Already have an account?{" "}
+              Sudah punya akun?{" "}
             </Text>
             <Link href="/(auth)/sign-in" asChild>
               <TouchableOpacity>
-                <Text className="text-primary font-bold">Sign In</Text>
+                <Text className="text-primary font-bold">Masuk</Text>
               </TouchableOpacity>
             </Link>
           </View>
