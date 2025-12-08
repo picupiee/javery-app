@@ -1,11 +1,17 @@
+import { showConfirm } from "@/lib/alert";
+import { db } from "@/lib/firebase";
+import { useCart } from "@/services/cartService";
 import { getProductById } from "@/services/productService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -17,28 +23,76 @@ export default function ProductDetails() {
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sellerPhone, setSellerPhone] = useState<string | null>(null);
+  const { addToCart } = useCart();
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
       if (typeof id === "string") {
         const data = await getProductById(id);
         setProduct(data);
+        if (data?.sellerUid) {
+          fetchSellerPhone(data.sellerUid);
+        }
       }
       setLoading(false);
     };
     fetchProduct();
   }, [id]);
 
-  const handleAddToCart = () => {
-    // Stage 3: Implement Cart Logic
-    console.log("Add to cart:", product?.name);
-    router.push("/(tabs)/cart");
+  const fetchSellerPhone = async (uid: string) => {
+    try {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        if (data.profile?.phoneNumber) {
+          setSellerPhone(data.profile.phoneNumber);
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching seller phone:", e);
+    }
+  };
+
+  const handleChatSeller = () => {
+    if (!sellerPhone) return;
+    const url = `https://wa.me/${sellerPhone}`;
+    Linking.openURL(url);
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    setAdding(true);
+    try {
+      await addToCart({
+        id: product.id,
+        productName: product.name,
+        productPrice: product.price,
+        productImage: product.imageUrl,
+        quantity: 1, // Default 1
+        sellerUid: product.sellerUid,
+        sellerName: product.sellerName || "Toko",
+      });
+      showConfirm(
+        "Berhasil",
+        "Produk ditambahkan ke keranjang!",
+        () => router.push("/(tabs)/cart"),
+        undefined,
+        "Lihat Keranjang",
+        "Lanjut Belanja"
+      );
+    } catch (e) {
+      Alert.alert("Gagal", "Tidak dapat menambahkan ke keranjang.");
+    } finally {
+      setAdding(false);
+    }
   };
 
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator size="large" color="#f97316" />
       </View>
     );
   }
@@ -126,11 +180,28 @@ export default function ProductDetails() {
               {product.description || "Tidak ada deskripsi."}
             </Text>
 
-            {/* Seller Info Placeholder */}
-            <View className="border-t border-gray-100 pt-4 mb-4">
-              <Text className="text-sm text-gray-400 font-medium">
-                Dijual oleh: {product.sellerName || "Toko"}
-              </Text>
+            {/* Seller Info */}
+            <View className="border-t border-gray-100 pt-4 mb-4 flex-row justify-between items-center">
+              <View>
+                <Text className="text-xs text-gray-400 font-medium">
+                  Dijual oleh:
+                </Text>
+                <Text className="text-base font-bold text-slate-700">
+                  {product.sellerName || "Toko"}
+                </Text>
+              </View>
+
+              {sellerPhone && (
+                <TouchableOpacity
+                  onPress={handleChatSeller}
+                  className="bg-green-100 px-3 py-2 rounded-full flex-row items-center border border-green-200"
+                >
+                  <FontAwesome name="whatsapp" size={16} color="#16a34a" />
+                  <Text className="text-green-700 font-bold ml-1 text-xs">
+                    Chat Penjual
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </ScrollView>
@@ -142,14 +213,18 @@ export default function ProductDetails() {
         >
           <TouchableOpacity
             onPress={handleAddToCart}
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || adding}
             className={`mx-6 mb-8 p-4 rounded-xl ${
-              isOutOfStock ? "bg-gray-300" : "bg-primary"
+              isOutOfStock || adding ? "bg-gray-300" : "bg-primary"
             }`}
           >
-            <Text className="text-white font-bold text-lg font-bold text-center">
-              {isOutOfStock ? "Habis" : "Tambah ke Keranjang"}
-            </Text>
+            {adding ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text className="text-white font-bold text-lg font-bold text-center">
+                {isOutOfStock ? "Habis" : "Tambah ke Keranjang"}
+              </Text>
+            )}
           </TouchableOpacity>
         </SafeAreaView>
       </View>
