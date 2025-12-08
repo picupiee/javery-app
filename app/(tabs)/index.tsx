@@ -1,7 +1,7 @@
 import {
-  formatTimeAgo,
-  getRecentPings,
-  subscribeToRecentPings,
+    formatTimeAgo,
+    getRecentPings,
+    subscribeToRecentPings,
 } from "@/services/pingService";
 import { getFeaturedProducts } from "@/services/productService";
 import { getActiveSellers, Seller } from "@/services/sellerService";
@@ -10,13 +10,13 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  FlatList,
-  Image,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    Image,
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -116,7 +116,7 @@ export default function Home() {
       <View className="px-5 py-4 bg-white border-b border-slate-200">
         <Text className="font-bold text-2xl text-primary">Javery</Text>
         <Text className="font-medium text-slate-500 text-xs mt-0.5">
-          Segar dari Toko
+          Japri Ahlinya !
         </Text>
       </View>
 

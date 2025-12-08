@@ -7,14 +7,14 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -133,7 +133,7 @@ export default function SignUp() {
             </View>
             <Text className="text-3xl font-bold text-primary mb-2">Javery</Text>
             <Text className="text-slate-500 font-medium text-center">
-              Segar dari Toko
+              Japri Ahlinya !
             </Text>
           </View>
 

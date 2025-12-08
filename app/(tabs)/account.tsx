@@ -5,13 +5,13 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -155,6 +155,12 @@ export default function Account() {
               </Text>
               <Text className="text-slate-600 text-sm">{email}</Text>
             </View>
+            <TouchableOpacity 
+              onPress={() => router.push("/edit-profile")}
+              className="p-2 -mr-2"
+            >
+              <FontAwesome name="pencil" size={20} color="#94a3b8" />
+            </TouchableOpacity>
           </View>
 
           <View className="border-t border-slate-200 pt-4">

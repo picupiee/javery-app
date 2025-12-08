@@ -55,24 +55,17 @@ export default function CartScreen() {
   if (cartItems.length === 0) {
     return (
       <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
-        <Image
-          source={{
-            uri: "https://img.freepik.com/free-vector/shopping-cart-realistic_1284-6011.jpg",
-          }} // Placeholder or use an icon
-          className="w-48 h-48 mb-6"
-          resizeMode="contain"
-        />
         <View className="w-24 h-24 bg-orange-50 rounded-full items-center justify-center mb-6">
           <FontAwesome name="shopping-basket" size={40} color="#f97316" />
         </View>
         <Text className="text-xl font-bold text-slate-800 mb-2">
-          Keranjang Kosong
+          Masih kosong nih ...
         </Text>
-        <Text className="text-slate-500 text-center mb-8">
-          Belum ada produk yang ditambahkan. Yuk mulai belanja sayur segar!
+        <Text className="text-slate-500 text-lg text-center mb-8 mx-2">
+          Yuk mulai order
         </Text>
         <TouchableOpacity
-          onPress={() => router.push("/(tabs)/search")}
+          onPress={() => router.push("/")}
           className="bg-primary px-8 py-3 rounded-full"
         >
           <Text className="text-white font-bold">Mulai Belanja</Text>
