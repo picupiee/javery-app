@@ -88,7 +88,8 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}>
+      {/* Header - Fixed at Top */}
       <View className="p-4 bg-white border-b border-gray-100 flex-row items-center">
         <TouchableOpacity onPress={() => router.back()} className="mr-4">
           <FontAwesome name="arrow-left" size={20} color="black" />
@@ -96,7 +97,11 @@ export default function CheckoutScreen() {
         <Text className="text-xl font-bold">Checkout</Text>
       </View>
 
-      <ScrollView className="flex-1">
+      {/* Scrollable Content */}
+      <ScrollView
+        className="flex-1 mb-30"
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
         {/* Address Section */}
         <View className="bg-white p-4 mb-3">
           <Text className="font-bold text-lg mb-2">Alamat Pengiriman</Text>
@@ -193,42 +198,42 @@ export default function CheckoutScreen() {
         </View>
 
         <View className="h-4" />
+
+        {/* Footer Content */}
+        <View className="bg-white p-4 border-t border-gray-100 pb-10">
+          <View className="flex-row justify-between mb-2">
+            <Text className="text-slate-500">Subtotal Produk</Text>
+            <Text className="font-medium">
+              Rp {subtotal.toLocaleString("id-ID")}
+            </Text>
+          </View>
+          <View className="flex-row justify-between mb-4">
+            <Text className="text-slate-500">Ongkos Kirim</Text>
+            <Text className="font-medium text-green-600">Gratis</Text>
+          </View>
+
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-bold text-slate-800">
+              Total Pembayaran
+            </Text>
+            <Text className="text-xl font-bold text-primary">
+              Rp {total.toLocaleString("id-ID")}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={handlePlaceOrder}
+            disabled={placingOrder || !selectedAddress}
+            className={`p-4 rounded-xl items-center mb-8 ${placingOrder || !selectedAddress ? "bg-gray-300" : "bg-primary"}`}
+          >
+            {placingOrder ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text className="text-white font-bold text-lg">Buat Pesanan</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </ScrollView>
-
-      {/* Footer */}
-      <View className="bg-white p-4 border-t border-gray-100">
-        <View className="flex-row justify-between mb-2">
-          <Text className="text-slate-500">Subtotal Produk</Text>
-          <Text className="font-medium">
-            Rp {subtotal.toLocaleString("id-ID")}
-          </Text>
-        </View>
-        <View className="flex-row justify-between mb-4">
-          <Text className="text-slate-500">Ongkos Kirim</Text>
-          <Text className="font-medium text-green-600">Gratis</Text>
-        </View>
-
-        <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-lg font-bold text-slate-800">
-            Total Pembayaran
-          </Text>
-          <Text className="text-xl font-bold text-primary">
-            Rp {total.toLocaleString("id-ID")}
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          onPress={handlePlaceOrder}
-          disabled={placingOrder || !selectedAddress}
-          className={`p-4 rounded-xl items-center ${placingOrder || !selectedAddress ? "bg-gray-300" : "bg-primary"}`}
-        >
-          {placingOrder ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-white font-bold text-lg">Buat Pesanan</Text>
-          )}
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }

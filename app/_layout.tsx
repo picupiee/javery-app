@@ -5,10 +5,11 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from "@expo-google-fonts/plus-jakarta-sans";
+import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { router, Slot, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -30,6 +31,7 @@ function AppLayout() {
     PlusJakartaSans_500Medium,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
+    ...FontAwesome.font,
   });
 
   useEffect(() => {
@@ -83,5 +85,9 @@ function AppLayout() {
     return null;
   }
 
-  return <Slot />;
+  return (
+    <View style={{ flex: 1 }}>
+      <Slot />
+    </View>
+  );
 }

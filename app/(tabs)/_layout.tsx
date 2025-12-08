@@ -1,5 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -11,8 +12,8 @@ export default function TabLayout() {
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: "#e2e8f0",
-          height: 60,
-          paddingBottom: 8,
+          height: Platform.OS === "web" ? 70 : 60,
+          paddingBottom: Platform.OS === "web" ? 12 : 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
@@ -55,6 +56,41 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <FontAwesome name="user" size={24} color={color} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="checkout"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="address"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="orders"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="product"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="seller"
+        options={{
+          href: null,
+          tabBarStyle: { display: "none" },
         }}
       />
     </Tabs>

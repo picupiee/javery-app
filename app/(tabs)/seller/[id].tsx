@@ -1,4 +1,5 @@
 import { db } from "@/lib/firebase";
+import { getProductsBySeller } from "@/services/productService";
 import { Seller } from "@/services/sellerService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
@@ -38,16 +39,7 @@ export default function SellerStore() {
         }
 
         // Fetch seller's products
-        const productsQuery = query(
-          collection(db, "products"),
-          where("ownerUid", "==", id)
-        );
-        const productsSnapshot = await getDocs(productsQuery);
-        const productsData = productsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Product[];
-
+        const productsData = await getProductsBySeller(id);
         setProducts(productsData);
       } catch (error) {
         console.error("Error fetching seller data:", error);
