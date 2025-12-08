@@ -4,18 +4,18 @@ import { useCart } from "@/services/cartService";
 import { getProductById } from "@/services/productService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Linking,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Linking,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -123,8 +123,9 @@ export default function ProductDetails() {
             {product.imageUrl ? (
               <Image
                 source={{ uri: product.imageUrl }}
-                className="w-full h-full"
-                resizeMode="cover"
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+                transition={500}
               />
             ) : (
               <View className="w-full h-full items-center justify-center">

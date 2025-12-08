@@ -1,3 +1,5 @@
+import ProductCard from "@/components/ProductCard";
+import SellerCard from "@/components/SellerCard";
 import {
     formatTimeAgo,
     getRecentPings,
@@ -11,7 +13,6 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
     FlatList,
-    Image,
     RefreshControl,
     ScrollView,
     Text,
@@ -49,7 +50,6 @@ export default function Home() {
 
     // Subscribe to real-time ping updates
     const unsubscribe = subscribeToRecentPings((updatedPings) => {
-      console.log("Pings updated:", updatedPings.length);
       setPings(updatedPings);
     });
 
@@ -57,58 +57,6 @@ export default function Home() {
       unsubscribe();
     };
   }, []);
-
-  const renderSellerItem = ({ item }: { item: Seller }) => (
-    <TouchableOpacity
-      className="mr-4 items-center"
-      onPress={() => router.push(`/seller/${item.uid}` as any)}
-    >
-      <View className="w-16 h-16 bg-slate-100 rounded-full items-center justify-center mb-2 border border-slate-200">
-        <FontAwesome name="shopping-bag" size={24} color="#94a3b8" />
-      </View>
-      <Text
-        className="text-xs font-medium text-center w-20 text-slate-800"
-        numberOfLines={1}
-      >
-        {item.storeName}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderProductItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
-      onPress={() => router.push(`/product/${item.id}`)}
-    >
-      <View className="h-36 bg-slate-50 w-full">
-        {item.imageUrl ? (
-          <Image
-            source={{ uri: item.imageUrl }}
-            className="w-full h-full"
-            resizeMode="cover"
-          />
-        ) : (
-          <View className="w-full h-full items-center justify-center">
-            <FontAwesome name="image" size={36} color="#cbd5e1" />
-          </View>
-        )}
-      </View>
-      <View className="p-3">
-        <Text
-          className="font-bold text-sm text-slate-800 mb-1"
-          numberOfLines={1}
-        >
-          {item.name}
-        </Text>
-        <Text className="font-bold text-primary text-base mb-1">
-          Rp {item.price.toLocaleString()}
-        </Text>
-        <Text className="text-xs text-slate-400 font-medium" numberOfLines={1}>
-          {item.category}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
@@ -202,7 +150,7 @@ export default function Home() {
           </View>
           <FlatList
             data={sellers}
-            renderItem={renderSellerItem}
+            renderItem={({ item }) => <SellerCard item={item} />}
             keyExtractor={(item) => item.uid}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -221,7 +169,7 @@ export default function Home() {
             <View className="flex-row flex-wrap justify-between">
               {products.map((item) => (
                 <View key={item.id} className="w-[48%] mb-3">
-                  {renderProductItem({ item })}
+                  <ProductCard item={item} />
                 </View>
               ))}
             </View>
