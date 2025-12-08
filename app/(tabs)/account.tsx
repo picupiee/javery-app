@@ -1,6 +1,7 @@
 import GuestPrompt from "@/components/GuestPrompt";
 import { useAuth } from "@/context/AuthContext";
 import useUpdates from "@/hooks/useUpdate";
+import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -13,6 +14,36 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const SettingsItem = ({
+  icon,
+  title,
+  onPress,
+  subtitle,
+}: {
+  icon: any;
+  title: string;
+  onPress: () => void;
+  subtitle?: string;
+}) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className="flex-row items-center justify-between p-4 border-b border-gray-50 active:bg-gray-50"
+  >
+    <View className="flex-row items-center">
+      <View className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center mr-3">
+        <FontAwesome name={icon} size={20} color="#f97316" />
+      </View>
+      <View>
+        <Text className="text-slate-800 font-medium text-base">{title}</Text>
+        {subtitle && (
+          <Text className="text-slate-400 text-xs mt-0.5">{subtitle}</Text>
+        )}
+      </View>
+    </View>
+    <FontAwesome name="angle-right" size={16} color="#cbd5e1" />
+  </TouchableOpacity>
+);
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -111,7 +142,7 @@ export default function Account() {
 
       <ScrollView className="flex-1">
         {/* Profile Card */}
-        <View className="bg-white m-5 p-5 rounded-2xl border border-slate-200">
+        <View className="bg-white m-5 p-5 rounded-2xl border border-slate-200 shadow-sm">
           <View className="flex-row items-center mb-4">
             <View className="w-16 h-16 bg-orange-100 rounded-full items-center justify-center mr-4">
               <Text className="text-2xl font-bold text-primary">
@@ -138,45 +169,47 @@ export default function Account() {
         </View>
 
         {/* App Settings */}
-        <View className="bg-white mx-5 mb-5 p-5 rounded-2xl border border-slate-200">
-          <Text className="text-lg font-bold text-slate-800 mb-4">
-            Pengaturan Aplikasi
+        <View className="mx-5 mb-5">
+          <Text className="text-base font-bold text-slate-700 mb-2 ml-1">
+            Pengaturan
           </Text>
+          <View className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <SettingsItem
+              icon="map-marker"
+              title="Alamat Saya"
+              subtitle="Kelola alamat pengiriman"
+              onPress={() => router.push("/address")}
+            />
 
-          <TouchableOpacity
-            onPress={handleCheckUpdate}
-            disabled={isChecking}
-            className={`p-4 rounded-xl mb-2 ${
-              updateStatus === "ready"
-                ? "bg-green-600"
-                : "bg-primary active:bg-primary-600"
-            }`}
-          >
-            {isChecking ? (
-              <View className="flex-row items-center justify-center">
-                <ActivityIndicator color="#ffffff" size="small" />
-                <Text className="text-white font-semibold ml-2">
-                  Memeriksa & Mengunduh...
-                </Text>
-              </View>
-            ) : (
-              <Text className="text-white text-center font-semibold">
-                {updateStatus === "ready"
-                  ? "Pembaruan Siap (Ketuk!)"
-                  : Platform.OS === "web"
-                    ? "Instal Aplikasi"
-                    : "Periksa Pembaruan"}
-              </Text>
-            )}
-          </TouchableOpacity>
+            <SettingsItem
+              icon="history"
+              title="Riwayat Pesanan"
+              subtitle="Lihat status dan histori belanja"
+              onPress={() => router.push("/orders")}
+            />
+
+            <SettingsItem
+              icon={isChecking ? "spinner" : "cloud-download"}
+              title={
+                isChecking
+                  ? "Memeriksa..."
+                  : updateStatus === "ready"
+                    ? "Pembaruan Siap!"
+                    : Platform.OS === "web"
+                      ? "Instal Aplikasi"
+                      : "Periksa Pembaruan"
+              }
+              onPress={handleCheckUpdate}
+            />
+          </View>
 
           {updateStatus === "error" && (
-            <Text className="text-red-500 text-xs text-center mb-2">
-              {error || "Gagal memeriksa. Coba lagi nanti."}
+            <Text className="text-red-500 text-xs text-center mt-2">
+              {error}
             </Text>
           )}
 
-          <Text className="text-slate-400 text-xs text-center mt-2">
+          <Text className="text-slate-400 text-xs text-center mt-4">
             Versi Aplikasi 1.1.5
           </Text>
         </View>
@@ -186,16 +219,13 @@ export default function Account() {
           <TouchableOpacity
             onPress={handleLogout}
             disabled={loading}
-            className="p-4 bg-red-50 border border-red-100 rounded-xl active:bg-red-100"
+            className="p-4 bg-white border border-red-100 rounded-2xl active:bg-red-50 flex-row justify-center items-center shadow-sm"
           >
             {loading ? (
-              <View className="flex-row items-center justify-center">
-                <ActivityIndicator color="#dc2626" size="small" />
-                <Text className="text-red-600 font-bold ml-2">Keluar...</Text>
-              </View>
+              <ActivityIndicator color="#dc2626" size="small" />
             ) : (
               <Text className="text-red-600 text-center font-bold text-base">
-                Keluar
+                Keluar Aplikasi
               </Text>
             )}
           </TouchableOpacity>

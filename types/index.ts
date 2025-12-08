@@ -28,6 +28,42 @@ export interface SellerProfile {
   createdAt: string;
 }
 
+export interface Address {
+  id: string;
+  name: string; // e.g. "Home", "Office"
+  recipientName: string;
+  phoneNumber: string;
+  fullAddress: string;
+  notes?: string;
+  isDefault?: boolean;
+}
+
+export interface CartItem {
+  id: string; // productId
+  productName: string;
+  productPrice: number;
+  productImage?: string;
+  quantity: number;
+  sellerUid: string;
+  sellerName: string;
+}
+
+export interface Order {
+  id: string;
+  buyerUid: string;
+  sellerUid: string;
+  sellerName: string;
+  sellerPhoneNumber?: string;
+  items: CartItem[];
+  totalAmount: number;
+  status: "waiting" | "processing" | "delivering" | "completed" | "cancelled";
+  shippingAddress: Address;
+  paymentMethod: "cod";
+  createdAt: any; // Timestamp
+  deliveryStartTime?: any; // Timestamp
+  completedAt?: any; // Timestamp
+}
+
 export interface AugmentedUser extends User {
   profile: UserProfile;
 }
@@ -45,21 +81,6 @@ export interface Product {
   isUnlimited?: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface CartItem extends Product {
-  quantity: number;
-}
-
-export interface Order {
-  id: string;
-  buyerUid: string;
-  sellerUid: string;
-  items: CartItem[];
-  totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  createdAt: string;
-  shippingAddress: string;
 }
 
 export interface Ping {
