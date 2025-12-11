@@ -5,13 +5,13 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -216,7 +216,7 @@ export default function Account() {
           )}
 
           <Text className="text-slate-400 text-xs text-center mt-4">
-            Versi Aplikasi 1.1.5
+            Versi Aplikasi 1.2.1
           </Text>
         </View>
 
