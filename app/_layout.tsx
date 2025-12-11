@@ -46,17 +46,8 @@ function AppLayout() {
   useEffect(() => {
     if (isLoading) return;
 
-    console.log("RootLayout Effect:", {
-      user: !!user,
-      inAuthGroup,
-      segments,
-      platform: Platform.OS,
-    });
-
     // If user is authenticated and in auth screens
     if (user && inAuthGroup) {
-      console.log("Redirecting authenticated user");
-
       // Check for buyer role
       if (user.profile?.roles?.buyer) {
         router.replace("/");
@@ -71,11 +62,9 @@ function AppLayout() {
     if (!user && !inAuthGroup) {
       if (Platform.OS === "web") {
         // Web: Allow guest browsing, don't force redirect
-        console.log("Web guest browsing allowed");
         // User can browse freely, auth will be required only for protected screens
       } else {
         // Native: Require authentication
-        console.log("Native: Redirecting to sign-in");
         router.replace("/(auth)/sign-in");
       }
     }
