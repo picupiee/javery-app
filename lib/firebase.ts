@@ -2,10 +2,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { initializeApp } from "firebase/app";
 import {
-    getAuth,
-    // @ts-ignore
-    getReactNativePersistence,
-    initializeAuth,
+  Auth,
+  getAuth,
+  // @ts-ignore
+  getReactNativePersistence,
+  initializeAuth,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { Platform } from "react-native";
@@ -24,7 +25,7 @@ const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 
 // Use platform-specific persistence
-let auth;
+let auth: Auth;
 if (Platform.OS === "web") {
   auth = getAuth(app);
 } else {

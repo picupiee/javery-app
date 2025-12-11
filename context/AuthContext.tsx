@@ -51,13 +51,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const logout = async () => {
-    await auth!.signOut();
+    await auth.signOut();
   };
 
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth!, (firebaseUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
       console.log("Got User :", firebaseUser?.uid);
       if (unsubscribeProfile) {
         unsubscribeProfile();
