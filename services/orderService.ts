@@ -1,15 +1,15 @@
 import { db } from "@/lib/firebase";
 import { Address, CartItem, Order } from "@/types";
 import {
-    addDoc,
-    collection,
-    doc,
-    getDocs,
-    orderBy,
-    query,
-    serverTimestamp,
-    where,
-    writeBatch
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 
 export const createOrder = async (
@@ -48,6 +48,31 @@ export const createOrder = async (
     });
     await batch.commit();
 
+    // Trigger Notification to Seller
+    try {
+      const { sendPushNotification } =
+        await import("@/utils/notificationHelper");
+      const { getDoc } = await import("firebase/firestore");
+      // fetch seller profile
+      const sellerRef = doc(db, "users", sellerUid);
+      const sellerSnap = await getDoc(sellerRef);
+
+      if (sellerSnap.exists()) {
+        const sellerData = sellerSnap.data() as any; // Using any to avoid circular deps if UserProfile is not easily satisfying
+        if (sellerData.expoPushToken) {
+          await sendPushNotification(
+            sellerData.expoPushToken,
+            "New Order Received!",
+            `You have a new order from ${buyerName} for Rp ${totalAmount.toLocaleString()}`,
+            { orderId: docRef.id }
+          );
+        }
+      }
+    } catch (noteError) {
+      console.error("Failed to send notification:", noteError);
+      // We don't block order creation for this
+    }
+
     return docRef.id;
   } catch (error) {
     console.error("Error creating order:", error);
@@ -76,7 +101,9 @@ export const getMyOrders = async (buyerUid: string): Promise<Order[]> => {
 export const getOrderById = async (orderId: string): Promise<Order | null> => {
   try {
     const docRef = doc(db, "orders", orderId);
-    const snapshot = await import("firebase/firestore").then(mod => mod.getDoc(docRef));
+    const snapshot = await import("firebase/firestore").then((mod) =>
+      mod.getDoc(docRef)
+    );
     if (snapshot.exists()) {
       const order = { id: snapshot.id, ...snapshot.data() } as Order;
       // Lazy Update Check
@@ -84,13 +111,15 @@ export const getOrderById = async (orderId: string): Promise<Order | null> => {
         const startTime = order.deliveryStartTime.toDate().getTime();
         const now = Date.now();
         const thirtyMinutes = 30 * 60 * 1000;
-        
+
         if (now - startTime > thirtyMinutes) {
           // Auto-complete
-          await import("firebase/firestore").then(mod => mod.updateDoc(docRef, {
-            status: "completed",
-            completedAt: mod.serverTimestamp()
-          }));
+          await import("firebase/firestore").then((mod) =>
+            mod.updateDoc(docRef, {
+              status: "completed",
+              completedAt: mod.serverTimestamp(),
+            })
+          );
           return { ...order, status: "completed" }; // Return updated state locally
         }
       }
@@ -102,4 +131,3 @@ export const getOrderById = async (orderId: string): Promise<Order | null> => {
     throw new Error("Gagal memuat detail pesanan.");
   }
 };
-

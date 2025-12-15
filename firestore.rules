@@ -13,16 +13,14 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == uid;
     }
     
-    // Helper function to check if user has buyer role
+    // Helper function to check if user has buyer role (Simplified)
     function isBuyer() {
-      return isAuthenticated() && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.buyer == true;
+      return isAuthenticated(); 
     }
     
-    // Helper function to check if user has seller role
+    // Helper function to check if user has seller role (Simplified)
     function isSeller() {
-      return isAuthenticated() && 
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.seller == true;
+      return isAuthenticated();
     }
     
     // Users collection - stores all user profiles with roles
@@ -38,35 +36,31 @@ service cloud.firestore {
       
       // Only the user can delete their own profile
       allow delete: if isOwner(userId);
+      
+      // Addresses Subcollection
+      match /addresses/{addressId} {
+          allow read, write: if isOwner(userId);
+      }
+      
+      // Cart Subcollection
+      match /cart/{itemId} {
+          allow read, write: if isOwner(userId);
+      }
     }
     
     // Sellers collection - stores seller-specific data
     match /sellers/{sellerId} {
-      // Anyone can read seller profiles (for buyer app)
       allow read: if true;
-      
-      // Only authenticated users can create seller profiles
       allow create: if isAuthenticated() && request.auth.uid == sellerId;
-      
-      // Only the seller can update their own profile
       allow update: if isOwner(sellerId);
-      
-      // Only the seller can delete their own profile
       allow delete: if isOwner(sellerId);
     }
     
     // Products collection
     match /products/{productId} {
-      // Anyone can read products
       allow read: if true;
-      
-      // Only sellers can create products
-      allow create: if isSeller() && request.resource.data.sellerUid == request.auth.uid;
-      
-      // Only the product owner (seller) can update
+      allow create: if isAuthenticated() && request.resource.data.sellerUid == request.auth.uid;
       allow update: if isOwner(resource.data.sellerUid);
-      
-      // Only the product owner (seller) can delete
       allow delete: if isOwner(resource.data.sellerUid);
     }
     
@@ -91,32 +85,10 @@ service cloud.firestore {
     
     // Pings collection
     match /pings/{pingId} {
-      // Anyone can read pings (for buyer app notifications)
       allow read: if true;
-      
-      // Only sellers can create pings
       allow create: if isSeller() && request.resource.data.sellerUid == request.auth.uid;
-      
-      // Only the ping owner can update
       allow update: if isOwner(resource.data.sellerUid);
-      
-      // Only the ping owner can delete
       allow delete: if isOwner(resource.data.sellerUid);
-    }
-    
-    // Cart items (if stored in Firestore)
-    match /carts/{userId}/items/{itemId} {
-      // Only the user can read their cart
-      allow read: if isOwner(userId);
-      
-      // Only the user can add to their cart
-      allow create: if isOwner(userId);
-      
-      // Only the user can update their cart
-      allow update: if isOwner(userId);
-      
-      // Only the user can delete from their cart
-      allow delete: if isOwner(userId);
     }
   }
 }

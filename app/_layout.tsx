@@ -70,6 +70,27 @@ function AppLayout() {
     }
   }, [user, isLoading, inAuthGroup]);
 
+  useEffect(() => {
+    if (user?.uid) {
+      import("@/utils/notificationHelper").then(
+        ({ registerForPushNotificationsAsync }) => {
+          registerForPushNotificationsAsync().then((token) => {
+            if (token) {
+              import("firebase/firestore").then(({ doc, updateDoc }) => {
+                import("@/lib/firebase").then(({ db }) => {
+                  const userRef = doc(db, "users", user.uid);
+                  updateDoc(userRef, { expoPushToken: token }).catch((err) =>
+                    console.error("Error updating push token:", err)
+                  );
+                });
+              });
+            }
+          });
+        }
+      );
+    }
+  }, [user?.uid]);
+
   if (!fontsLoaded || isLoading) {
     return null;
   }

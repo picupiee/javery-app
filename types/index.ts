@@ -15,6 +15,7 @@ export interface UserProfile {
   photoURL?: string;
   address?: string;
   phoneNumber?: string;
+  expoPushToken?: string;
 }
 
 export interface SellerProfile {
@@ -89,4 +90,3 @@ export interface Ping {
   message: string;
   createdAt: any; // Firestore Timestamp
 }
-
