@@ -43,3 +43,6 @@ app-example
 /android
 
 package-lock.json
+
+# Firebase/Google Services config
+google-services.json

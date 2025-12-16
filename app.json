@@ -20,7 +20,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.picupiee.javeryapp"
+      "package": "com.picupiee.javeryapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",
