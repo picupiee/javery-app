@@ -2,11 +2,10 @@ import { useAuth } from "@/context/AuthContext";
 import { deleteAddress, getAddresses } from "@/services/addressService";
 import { Address } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Text,
   TouchableOpacity,
@@ -16,6 +15,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AddressListScreen() {
   const { user } = useAuth();
+  const params = useLocalSearchParams();
+  const fromCheckout = params.source === "checkout";
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,22 +40,29 @@ export default function AddressListScreen() {
   );
 
   const handleDelete = (id: string) => {
-    Alert.alert("Hapus Alamat", "Anda yakin ingin menghapus alamat ini?", [
-      { text: "Batal", style: "cancel" },
-      {
-        text: "Hapus",
-        style: "destructive",
-        onPress: async () => {
-          if (!user) return;
-          await deleteAddress(user.uid, id);
-          loadAddresses();
-        },
-      },
-    ]);
+    if (window.confirm("Anda yakin ingin menghapus alamat ini?")) {
+      if (!user) return;
+      deleteAddress(user.uid, id);
+      loadAddresses();
+    }
+  };
+
+  const handleSelect = (address: Address) => {
+    if (fromCheckout) {
+      router.push({
+        pathname: "/checkout",
+        params: { selectedAddressId: address.id, sellerUid: params.sellerUid },
+      } as any);
+    }
   };
 
   const renderItem = ({ item }: { item: Address }) => (
-    <View className="bg-white p-4 rounded-xl border border-gray-100 mb-3 shadow-sm">
+    <TouchableOpacity
+      onPress={() => (fromCheckout ? handleSelect(item) : null)}
+      activeOpacity={fromCheckout ? 0.7 : 1}
+      className={`bg-white p-4 rounded-xl border mb-3 shadow-sm ${fromCheckout ? "border-primary" : "border-gray-100"
+        }`}
+    >
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-row items-center">
           <Text className="font-bold text-lg text-slate-800 mr-2">
@@ -82,12 +90,12 @@ export default function AddressListScreen() {
       <Text className="text-slate-500 text-sm leading-5">
         {item.fullAddress}
       </Text>
-      {item.notes && (
+      {!!item.notes && (
         <Text className="text-slate-400 text-xs mt-2 italic">
           Catatan: {item.notes}
         </Text>
       )}
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -122,7 +130,12 @@ export default function AddressListScreen() {
 
       <View className="p-4 border-t border-gray-100">
         <TouchableOpacity
-          onPress={() => router.push("/address/add")}
+          onPress={() =>
+            router.push({
+              pathname: "/address/add",
+              params: { source: fromCheckout ? "checkout" : undefined },
+            })
+          }
           className="bg-primary p-4 rounded-xl items-center"
         >
           <Text className="text-white font-bold text-lg">
