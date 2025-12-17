@@ -6,7 +6,9 @@ import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
+  Platform,
   Text,
   TouchableOpacity,
   View,
@@ -40,7 +42,19 @@ export default function AddressListScreen() {
   );
 
   const handleDelete = (id: string) => {
-    if (window.confirm("Anda yakin ingin menghapus alamat ini?")) {
+    if (Platform.OS !== "web") {
+      Alert.alert("Hapus Alamat", "Anda yakin ingin menghapus alamat ini?", [
+        {
+          text: "Batal",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Hapus",
+          onPress: () => handleDelete(id),
+        },
+      ]);
+    } else if (window.confirm("Anda yakin ingin menghapus alamat ini?")) {
       if (!user) return;
       deleteAddress(user.uid, id);
       loadAddresses();
@@ -133,7 +147,7 @@ export default function AddressListScreen() {
           onPress={() =>
             router.push({
               pathname: "/address/add",
-              params: { source: fromCheckout ? "checkout" : undefined },
+              params: { source: fromCheckout ? "checkout" : undefined, sellerUid: fromCheckout ? params.sellerUid : undefined },
             })
           }
           className="bg-primary p-4 rounded-xl items-center"

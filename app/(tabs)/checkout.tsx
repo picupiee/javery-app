@@ -5,8 +5,8 @@ import { useCart } from "@/services/cartService";
 import { createOrder } from "@/services/orderService";
 import { Address } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -18,7 +18,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CheckoutScreen() {
-  const { sellerUid } = useLocalSearchParams<{ sellerUid: string }>();
+  const params = useLocalSearchParams<{ sellerUid: string; selectedAddressId?: string }>();
+  const sellerUid = params.sellerUid;
   const { user } = useAuth();
   const { cartItems } = useCart();
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -37,21 +38,35 @@ export default function CheckoutScreen() {
   const shippingCost = 0;
   const total = subtotal + shippingCost;
 
-  useEffect(() => {
-    if (user) {
-      loadAddresses();
-    }
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        loadAddresses();
+      }
+    }, [user, params.selectedAddressId])
+  );
 
   const loadAddresses = async () => {
     try {
       setLoading(true);
       const data = await getAddresses(user!.uid);
       setAddresses(data);
-      // Auto select default or first
-      const def = data.find((a) => a.isDefault);
-      if (def) setSelectedAddress(def);
-      else if (data.length > 0) setSelectedAddress(data[0]);
+
+      // If manual selection exists in params
+      if (params.selectedAddressId) {
+        const manual = data.find(a => a.id === params.selectedAddressId);
+        if (manual) {
+          setSelectedAddress(manual);
+          return;
+        }
+      }
+
+      // Auto select logic
+      if (!selectedAddress || (selectedAddress && !data.find(a => a.id === selectedAddress.id))) {
+        const def = data.find((a) => a.isDefault);
+        if (def) setSelectedAddress(def);
+        else if (data.length > 0) setSelectedAddress(data[0]);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -109,7 +124,7 @@ export default function CheckoutScreen() {
             <ActivityIndicator />
           ) : addresses.length === 0 ? (
             <TouchableOpacity
-              onPress={() => router.push("/address/add" as any)}
+              onPress={() => router.push({ pathname: "/address/add", params: { source: "checkout", sellerUid } })}
               className="bg-orange-50 p-4 rounded-xl border border-dashed border-primary items-center"
             >
               <Text className="text-primary font-bold">+ Tambah Alamat</Text>
@@ -133,7 +148,7 @@ export default function CheckoutScreen() {
               )}
 
               <TouchableOpacity
-                onPress={() => router.push("/address" as any)}
+                onPress={() => router.push({ pathname: "/address", params: { source: "checkout", sellerUid } })}
                 className="mt-3"
               >
                 <Text className="text-primary font-bold text-center">

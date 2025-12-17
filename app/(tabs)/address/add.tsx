@@ -1,11 +1,12 @@
 import { useAuth } from "@/context/AuthContext";
 import { addAddress } from "@/services/addressService";
 import { FontAwesome } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   Switch,
   Text,
@@ -17,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AddAddressScreen() {
   const { user } = useAuth();
+  const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -27,6 +29,17 @@ export default function AddAddressScreen() {
     notes: "",
     isDefault: false,
   });
+
+  const handleBack = () => {
+    if (params.source === "checkout" && params.sellerUid) {
+      router.push({
+        pathname: "/checkout",
+        params: { sellerUid: params.sellerUid }
+      } as any);
+    } else {
+      router.back();
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -41,20 +54,30 @@ export default function AddAddressScreen() {
     }
 
     setLoading(true);
+
     try {
-      await addAddress(user.uid, form);
-      router.back();
+      const newId = await addAddress(user.uid, form);
+
+      if (params.source === "checkout") {
+        router.push({
+          pathname: "/checkout",
+          params: { selectedAddressId: newId, sellerUid: params.sellerUid }
+        } as any);
+      } else {
+        router.back();
+      }
     } catch (error) {
       Alert.alert("Error", "Gagal menyimpan alamat");
+      setLoading(false); // Only stop loading on error, success navigates away
     } finally {
-      setLoading(false);
+      if (Platform.OS === "web") setLoading(false);
     }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="p-4 border-b border-gray-100 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+        <TouchableOpacity onPress={handleBack} className="mr-4">
           <FontAwesome name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
         <Text className="text-xl font-bold">Tambah Alamat</Text>
@@ -126,16 +149,15 @@ export default function AddAddressScreen() {
           <Switch
             value={form.isDefault}
             onValueChange={(v) => setForm({ ...form, isDefault: v })}
-            trackColor={{ true: "#f97316" }}
+            trackColor={{ true: "#f97316", false: "#e5e7eb" }}
           />
         </View>
 
         <TouchableOpacity
           onPress={handleSave}
           disabled={loading}
-          className={`p-4 rounded-xl items-center mb-10 ${
-            loading ? "bg-gray-300" : "bg-primary"
-          }`}
+          className={`p-4 rounded-xl items-center mb-10 ${loading ? "bg-gray-300" : "bg-primary"
+            }`}
         >
           {loading ? (
             <ActivityIndicator color="white" />
