@@ -43,10 +43,12 @@ exports.sendOrderNotification = onDocumentCreated(
       }
 
       const sellerData = sellerDoc.data();
-      const pushToken = sellerData.expoPushToken;
+      const pushToken = sellerData.sellerPushToken;
 
       if (!pushToken || !Expo.isExpoPushToken(pushToken)) {
-        console.error(`Push token ${pushToken} is not a valid Expo push token`);
+        console.error(
+          `Seller ${sellerUid} has no valid sellerPushToken (token: ${pushToken})`
+        );
         return;
       }
 
@@ -131,10 +133,12 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
       }
 
       const buyerData = buyerDoc.data();
-      const pushToken = buyerData.expoPushToken;
+      const pushToken = buyerData.buyerPushToken;
 
       if (!pushToken || !Expo.isExpoPushToken(pushToken)) {
-        console.log(`Buyer ${buyerUid} has no valid push token`);
+        console.log(
+          `Buyer ${buyerUid} has no valid buyerPushToken (token: ${pushToken})`
+        );
         return;
       }
 

@@ -79,7 +79,7 @@ function AppLayout() {
               import("firebase/firestore").then(({ doc, updateDoc }) => {
                 import("@/lib/firebase").then(({ db }) => {
                   const userRef = doc(db, "users", user.uid);
-                  updateDoc(userRef, { expoPushToken: token }).catch((err) =>
+                  updateDoc(userRef, { buyerPushToken: token }).catch((err) =>
                     console.error("Error updating push token:", err)
                   );
                 });
