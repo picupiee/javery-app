@@ -44,5 +44,6 @@ app-example
 /android
 
 credentials.json
-
-
+/functions
+/functions/node_modules
+*.apk

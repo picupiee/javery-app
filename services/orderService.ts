@@ -1,15 +1,15 @@
 import { db } from "@/lib/firebase";
 import { Address, CartItem, Order } from "@/types";
 import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  where,
-  writeBatch,
+    addDoc,
+    collection,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
+    where,
+    writeBatch,
 } from "firebase/firestore";
 
 export const createOrder = async (
@@ -48,30 +48,8 @@ export const createOrder = async (
     });
     await batch.commit();
 
-    // Trigger Notification to Seller
-    try {
-      const { sendPushNotification } =
-        await import("@/utils/notificationHelper");
-      const { getDoc } = await import("firebase/firestore");
-      // fetch seller profile
-      const sellerRef = doc(db, "users", sellerUid);
-      const sellerSnap = await getDoc(sellerRef);
-
-      if (sellerSnap.exists()) {
-        const sellerData = sellerSnap.data() as any; // Using any to avoid circular deps if UserProfile is not easily satisfying
-        if (sellerData.expoPushToken) {
-          await sendPushNotification(
-            sellerData.expoPushToken,
-            "New Order Received!",
-            `You have a new order from ${buyerName} for Rp ${totalAmount.toLocaleString()}`,
-            { orderId: docRef.id }
-          );
-        }
-      }
-    } catch (noteError) {
-      console.error("Failed to send notification:", noteError);
-      // We don't block order creation for this
-    }
+    // Notification is now handled by Cloud Functions (backend)
+    // to avoid CORS issues on Web and unify logic.
 
     return docRef.id;
   } catch (error) {

@@ -45,3 +45,4 @@ app-example
 
 # Firebase/Google Services config
 google-services.json
+*.apk
