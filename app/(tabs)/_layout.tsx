@@ -1,8 +1,10 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
@@ -12,8 +14,8 @@ export default function TabLayout() {
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: "#e2e8f0",
-          height: Platform.OS === "web" ? 70 : 60,
-          paddingBottom: Platform.OS === "web" ? 12 : 8,
+          height: (Platform.OS === "web" ? 70 : 60) + insets.bottom,
+          paddingBottom: (Platform.OS === "web" ? 12 : 8) + insets.bottom,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
