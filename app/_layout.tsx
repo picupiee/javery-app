@@ -100,6 +100,8 @@ function AppLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="(auth)" />
+        <Stack.Screen name="create-profile" />
+        <Stack.Screen name="edit-profile" />
         <Stack.Screen name="product" />
         <Stack.Screen name="seller" />
         <Stack.Screen name="orders" />

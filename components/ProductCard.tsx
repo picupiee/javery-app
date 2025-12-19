@@ -1,9 +1,9 @@
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import ImageWithSkeleton from "./ImageWithSkeleton";
 
 interface ProductCardProps {
   item: Product;
@@ -18,7 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ item, className }) => {
     >
       <View className="h-36 bg-slate-50 w-full">
         {item.imageUrl ? (
-          <Image
+          <ImageWithSkeleton
             source={{ uri: item.imageUrl }}
             style={{ width: "100%", height: "100%" }}
             contentFit="cover"

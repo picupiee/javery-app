@@ -18,7 +18,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CheckoutScreen() {
-  const params = useLocalSearchParams<{ sellerUid: string; selectedAddressId?: string }>();
+  const params = useLocalSearchParams<{
+    sellerUid: string;
+    selectedAddressId?: string;
+    buyNowItem?: string;
+  }>();
   const sellerUid = params.sellerUid;
   const { user } = useAuth();
   const { cartItems } = useCart();
@@ -28,8 +32,14 @@ export default function CheckoutScreen() {
   const [placingOrder, setPlacingOrder] = useState(false);
 
   // Filter items for this seller
-  const checkoutItems = cartItems.filter((i) => i.sellerUid === sellerUid);
-  const sellerName = checkoutItems[0]?.sellerName || "Penjual";
+  const buyNowItem = params.buyNowItem ? JSON.parse(params.buyNowItem) : null;
+  const checkoutItems = buyNowItem
+    ? [buyNowItem]
+    : cartItems.filter((i) => i.sellerUid === sellerUid);
+  const sellerName =
+    checkoutItems[0]?.sellerName || params.sellerUid
+      ? buyNowItem?.sellerName || "Penjual"
+      : "Penjual";
   const subtotal = checkoutItems.reduce(
     (sum, item) => sum + item.productPrice * item.quantity,
     0
@@ -54,7 +64,7 @@ export default function CheckoutScreen() {
 
       // If manual selection exists in params
       if (params.selectedAddressId) {
-        const manual = data.find(a => a.id === params.selectedAddressId);
+        const manual = data.find((a) => a.id === params.selectedAddressId);
         if (manual) {
           setSelectedAddress(manual);
           return;
@@ -62,7 +72,10 @@ export default function CheckoutScreen() {
       }
 
       // Auto select logic
-      if (!selectedAddress || (selectedAddress && !data.find(a => a.id === selectedAddress.id))) {
+      if (
+        !selectedAddress ||
+        (selectedAddress && !data.find((a) => a.id === selectedAddress.id))
+      ) {
         const def = data.find((a) => a.isDefault);
         if (def) setSelectedAddress(def);
         else if (data.length > 0) setSelectedAddress(data[0]);
@@ -102,11 +115,19 @@ export default function CheckoutScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}>
       {/* Header - Fixed at Top */}
       <View className="p-4 bg-white border-b border-gray-100 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+        <TouchableOpacity onPress={handleBack} className="mr-4">
           <FontAwesome name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
         <Text className="text-xl font-bold">Checkout</Text>
@@ -124,7 +145,12 @@ export default function CheckoutScreen() {
             <ActivityIndicator />
           ) : addresses.length === 0 ? (
             <TouchableOpacity
-              onPress={() => router.push({ pathname: "/address/add", params: { source: "checkout", sellerUid } })}
+              onPress={() =>
+                router.push({
+                  pathname: "/address/add",
+                  params: { source: "checkout", sellerUid },
+                })
+              }
               className="bg-orange-50 p-4 rounded-xl border border-dashed border-primary items-center"
             >
               <Text className="text-primary font-bold">+ Tambah Alamat</Text>
@@ -148,7 +174,12 @@ export default function CheckoutScreen() {
               )}
 
               <TouchableOpacity
-                onPress={() => router.push({ pathname: "/address", params: { source: "checkout", sellerUid } })}
+                onPress={() =>
+                  router.push({
+                    pathname: "/address",
+                    params: { source: "checkout", sellerUid },
+                  })
+                }
                 className="mt-3"
               >
                 <Text className="text-primary font-bold text-center">

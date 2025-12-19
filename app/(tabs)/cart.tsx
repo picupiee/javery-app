@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CartScreen() {
@@ -95,11 +96,12 @@ export default function CartScreen() {
 
             {group.items.map((item) => (
               <View key={item.id} className="flex-row mb-4">
-                <Image
+                <ImageWithSkeleton
                   source={{
                     uri: item.productImage || "https://via.placeholder.com/100",
                   }}
                   className="w-16 h-16 rounded-lg bg-gray-100"
+                  borderRadius={8}
                 />
                 <View className="flex-1 ml-3 justify-between">
                   <View>

@@ -41,6 +41,14 @@ export default function AddressListScreen() {
     }, [user])
   );
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)/account");
+    }
+  };
+
   const handleDelete = (id: string) => {
     if (Platform.OS !== "web") {
       Alert.alert("Hapus Alamat", "Anda yakin ingin menghapus alamat ini?", [
@@ -63,7 +71,7 @@ export default function AddressListScreen() {
 
   const handleSelect = (address: Address) => {
     if (fromCheckout) {
-      router.push({
+      router.replace({
         pathname: "/checkout",
         params: { selectedAddressId: address.id, sellerUid: params.sellerUid },
       } as any);
@@ -74,8 +82,9 @@ export default function AddressListScreen() {
     <TouchableOpacity
       onPress={() => (fromCheckout ? handleSelect(item) : null)}
       activeOpacity={fromCheckout ? 0.7 : 1}
-      className={`bg-white p-4 rounded-xl border mb-3 shadow-sm ${fromCheckout ? "border-primary" : "border-gray-100"
-        }`}
+      className={`bg-white p-4 rounded-xl border mb-3 shadow-sm ${
+        fromCheckout ? "border-primary" : "border-gray-100"
+      }`}
     >
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-row items-center">
@@ -115,7 +124,7 @@ export default function AddressListScreen() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="p-4 border-b border-gray-100 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+        <TouchableOpacity onPress={handleBack} className="mr-4">
           <FontAwesome name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
         <Text className="text-xl font-bold">Alamat Saya</Text>
@@ -147,7 +156,10 @@ export default function AddressListScreen() {
           onPress={() =>
             router.push({
               pathname: "/address/add",
-              params: { source: fromCheckout ? "checkout" : undefined, sellerUid: fromCheckout ? params.sellerUid : undefined },
+              params: {
+                source: fromCheckout ? "checkout" : undefined,
+                sellerUid: fromCheckout ? params.sellerUid : undefined,
+              },
             })
           }
           className="bg-primary p-4 rounded-xl items-center"

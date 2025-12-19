@@ -27,6 +27,7 @@ export interface SellerProfile {
     pingMessage?: string;
   };
   createdAt: string;
+  photoURL?: string;
 }
 
 export interface Address {
@@ -89,4 +90,5 @@ export interface Ping {
   storeName: string;
   message: string;
   createdAt: any; // Firestore Timestamp
+  photoURL?: string;
 }

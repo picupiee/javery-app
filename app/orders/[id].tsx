@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OrderDetailScreen() {
@@ -57,6 +58,14 @@ export default function OrderDetailScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)/account");
+    }
+  };
+
   const handleChatSeller = () => {
     if (!sellerPhone) return;
     // Format: 628...
@@ -76,7 +85,7 @@ export default function OrderDetailScreen() {
     return (
       <SafeAreaView className="flex-1 justify-center items-center">
         <Text>Pesanan tidak ditemukan</Text>
-        <TouchableOpacity onPress={() => router.back()} className="mt-4">
+        <TouchableOpacity onPress={handleBack} className="mt-4">
           <Text className="text-primary font-bold">Kembali</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -94,7 +103,7 @@ export default function OrderDetailScreen() {
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       <View className="p-4 bg-white border-b border-gray-100 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+        <TouchableOpacity onPress={handleBack} className="mr-4">
           <FontAwesome name="arrow-left" size={20} color="black" />
         </TouchableOpacity>
         <Text className="text-xl font-bold">Detail Pesanan</Text>
@@ -138,11 +147,12 @@ export default function OrderDetailScreen() {
               key={idx}
               className="flex-row mb-3 border-b border-gray-50 pb-3 last:border-0 last:pb-0 last:mb-0"
             >
-              <Image
+              <ImageWithSkeleton
                 source={{
                   uri: item.productImage || "https://via.placeholder.com/60",
                 }}
                 className="w-12 h-12 rounded bg-gray-100 mr-3"
+                borderRadius={4}
               />
               <View className="flex-1">
                 <Text className="font-medium text-slate-700">

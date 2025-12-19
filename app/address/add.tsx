@@ -31,14 +31,7 @@ export default function AddAddressScreen() {
   });
 
   const handleBack = () => {
-    if (params.source === "checkout" && params.sellerUid) {
-      router.push({
-        pathname: "/checkout",
-        params: { sellerUid: params.sellerUid }
-      } as any);
-    } else {
-      router.back();
-    }
+    router.back();
   };
 
   const handleSave = async () => {
@@ -59,9 +52,9 @@ export default function AddAddressScreen() {
       const newId = await addAddress(user.uid, form);
 
       if (params.source === "checkout") {
-        router.push({
+        router.replace({
           pathname: "/checkout",
-          params: { selectedAddressId: newId, sellerUid: params.sellerUid }
+          params: { selectedAddressId: newId, sellerUid: params.sellerUid },
         } as any);
       } else {
         router.back();
@@ -156,8 +149,9 @@ export default function AddAddressScreen() {
         <TouchableOpacity
           onPress={handleSave}
           disabled={loading}
-          className={`p-4 rounded-xl items-center mb-10 ${loading ? "bg-gray-300" : "bg-primary"
-            }`}
+          className={`p-4 rounded-xl items-center mb-10 ${
+            loading ? "bg-gray-300" : "bg-primary"
+          }`}
         >
           {loading ? (
             <ActivityIndicator color="white" />

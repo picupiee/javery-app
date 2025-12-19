@@ -8,12 +8,12 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SellerStore() {
@@ -51,6 +51,14 @@ export default function SellerStore() {
     fetchSellerData();
   }, [id]);
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(tabs)/account");
+    }
+  };
+
   const renderProductItem = ({ item }: { item: Product }) => (
     <TouchableOpacity
       className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
@@ -58,10 +66,10 @@ export default function SellerStore() {
     >
       <View className="h-36 bg-slate-50 w-full">
         {item.imageUrl ? (
-          <Image
+          <ImageWithSkeleton
             source={{ uri: item.imageUrl }}
             className="w-full h-full"
-            resizeMode="cover"
+            contentFit="cover"
           />
         ) : (
           <View className="w-full h-full items-center justify-center">
@@ -96,7 +104,7 @@ export default function SellerStore() {
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       {/* Header */}
       <View className="px-5 py-4 bg-white border-b border-slate-200 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
+        <TouchableOpacity onPress={handleBack} className="mr-3">
           <FontAwesome name="arrow-left" size={20} color="#1e293b" />
         </TouchableOpacity>
         <Text className="font-bold text-xl text-slate-800">Toko</Text>
@@ -107,8 +115,16 @@ export default function SellerStore() {
         <View className="bg-orange-50 border-b border-orange-100">
           <View className="px-5 py-6">
             <View className="flex-row items-center">
-              <View className="w-16 h-16 bg-orange-200 rounded-full items-center justify-center mr-4">
-                <FontAwesome name="shopping-bag" size={28} color="#f97316" />
+              <View className="w-16 h-16 bg-orange-200 rounded-full items-center justify-center mr-4 overflow-hidden">
+                {seller?.photoURL ? (
+                  <ImageWithSkeleton
+                    source={{ uri: seller.photoURL }}
+                    style={{ width: "100%", height: "100%" }}
+                    borderRadius={32}
+                  />
+                ) : (
+                  <FontAwesome name="shopping-bag" size={28} color="#f97316" />
+                )}
               </View>
               <View className="flex-1">
                 <Text className="font-bold text-xl text-slate-800 mb-1">

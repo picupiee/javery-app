@@ -4,7 +4,7 @@ import { useCart } from "@/services/cartService";
 import { getProductById } from "@/services/productService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import { Image } from "expo-image";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -29,6 +29,7 @@ export default function ProductDetails() {
   const { addToCart } = useCart();
   const [adding, setAdding] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
+  const [sellerPhoto, setSellerPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -51,6 +52,9 @@ export default function ProductDetails() {
         const data = userDoc.data();
         if (data.profile?.phoneNumber) {
           setSellerPhone(data.profile.phoneNumber);
+        }
+        if (data.photoURL) {
+          setSellerPhoto(data.photoURL);
         }
       }
     } catch (e) {
@@ -92,6 +96,36 @@ export default function ProductDetails() {
     }
   };
 
+  const handleBuyNow = () => {
+    if (!product || isOutOfStock) return;
+
+    const buyNowItem = {
+      id: product.id,
+      productName: product.name,
+      productPrice: product.price,
+      productImage: product.imageUrl,
+      quantity: 1,
+      sellerUid: product.sellerUid,
+      sellerName: product.sellerName || "Toko",
+    };
+
+    router.push({
+      pathname: "/checkout" as any,
+      params: {
+        sellerUid: product.sellerUid,
+        buyNowItem: JSON.stringify(buyNowItem),
+      },
+    });
+  };
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
@@ -106,7 +140,7 @@ export default function ProductDetails() {
         <Text className="text-gray-500 font-medium">
           Produk tidak ditemukan
         </Text>
-        <TouchableOpacity onPress={() => router.back()} className="mt-4">
+        <TouchableOpacity onPress={handleBack} className="mt-4">
           <Text className="text-primary font-bold">Kembali</Text>
         </TouchableOpacity>
       </View>
@@ -128,7 +162,7 @@ export default function ProductDetails() {
             className="w-full h-80 bg-gray-100 relative"
           >
             {product.imageUrl ? (
-              <Image
+              <ImageWithSkeleton
                 source={{ uri: product.imageUrl }}
                 style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
@@ -145,7 +179,7 @@ export default function ProductDetails() {
               <TouchableOpacity
                 onPress={(e) => {
                   e.stopPropagation();
-                  router.back();
+                  handleBack();
                 }}
                 className="ml-4 mt-2 w-10 h-10 bg-white/80 rounded-full items-center justify-center"
               >
@@ -193,13 +227,29 @@ export default function ProductDetails() {
 
             {/* Seller Info */}
             <View className="border-t border-gray-100 pt-4 mb-4 flex-row justify-between items-center">
-              <View>
-                <Text className="text-xs text-gray-400 font-medium">
-                  Dijual oleh:
-                </Text>
-                <Text className="text-base font-bold text-slate-700">
-                  {product.sellerName || "Toko"}
-                </Text>
+              <View className="flex-row items-center">
+                <View className="w-10 h-10 bg-primary-100 rounded-full items-center justify-center mr-3 overflow-hidden">
+                  {sellerPhoto ? (
+                    <ImageWithSkeleton
+                      source={{ uri: sellerPhoto }}
+                      style={{ width: "100%", height: "100%" }}
+                      contentFit="cover"
+                      borderRadius={20}
+                    />
+                  ) : (
+                    <Text className="text-primary-600 font-bold">
+                      {(product.sellerName || "T").charAt(0).toUpperCase()}
+                    </Text>
+                  )}
+                </View>
+                <View>
+                  <Text className="text-xs text-gray-400 font-medium">
+                    Dijual oleh:
+                  </Text>
+                  <Text className="text-base font-bold text-slate-700">
+                    {product.sellerName || "Toko"}
+                  </Text>
+                </View>
               </View>
 
               {sellerPhone && (
@@ -217,26 +267,43 @@ export default function ProductDetails() {
           </View>
         </ScrollView>
 
-        {/* Bottom Action Bar */}
         <SafeAreaView
           edges={["bottom"]}
           className="bg-white border-t border-gray-100 p-4 shadow-lg"
         >
-          <TouchableOpacity
-            onPress={handleAddToCart}
-            disabled={isOutOfStock || adding}
-            className={`mx-6 mb-8 p-4 rounded-xl ${
-              isOutOfStock || adding ? "bg-gray-300" : "bg-primary"
-            }`}
-          >
-            {adding ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text className="text-white font-bold text-lg font-bold text-center">
-                {isOutOfStock ? "Habis" : "Tambah ke Keranjang"}
+          <View className="flex-row gap-2">
+            <TouchableOpacity
+              onPress={handleAddToCart}
+              disabled={isOutOfStock || adding}
+              className={` p-2 m-2 justify-center rounded-xl border border-primary-200 ${
+                isOutOfStock || adding
+                  ? "bg-gray-50 border-gray-200"
+                  : "bg-orange-50"
+              }`}
+            >
+              {adding ? (
+                <ActivityIndicator color="#f97316" />
+              ) : (
+                <FontAwesome
+                  name="shopping-cart"
+                  size={24}
+                  color={isOutOfStock || adding ? "gray" : "#f97316"}
+                />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleBuyNow}
+              disabled={isOutOfStock || adding}
+              className={`flex-[2] m-2 p-4 rounded-xl ${
+                isOutOfStock || adding ? "bg-gray-300" : "bg-primary"
+              }`}
+            >
+              <Text className="text-white font-bold text-center">
+                {isOutOfStock ? "Stok Habis" : "Beli Sekarang"}
               </Text>
-            )}
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
         </SafeAreaView>
       </View>
 
@@ -254,7 +321,7 @@ export default function ProductDetails() {
           />
 
           {product.imageUrl && (
-            <Image
+            <ImageWithSkeleton
               source={{ uri: product.imageUrl }}
               style={{
                 width: Dimensions.get("window").width,

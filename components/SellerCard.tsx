@@ -3,6 +3,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
 
 interface SellerCardProps {
   item: Seller;
@@ -14,8 +15,15 @@ const SellerCard: React.FC<SellerCardProps> = ({ item }) => {
       className="mr-4 items-center"
       onPress={() => router.push(`/seller/${item.uid}` as any)}
     >
-      <View className="w-16 h-16 bg-slate-100 rounded-full items-center justify-center mb-2 border border-slate-200">
-        <FontAwesome name="shopping-bag" size={24} color="#94a3b8" />
+      <View className="w-16 h-16 bg-slate-100 rounded-full items-center justify-center mb-2 border border-slate-200 overflow-hidden">
+        {item.photoURL ? (
+          <Image
+            source={{ uri: item.photoURL }}
+            style={{ width: "100%", height: "100%" }}
+          />
+        ) : (
+          <FontAwesome name="shopping-bag" size={24} color="#94a3b8" />
+        )}
       </View>
       <Text
         className="text-xs font-medium text-center w-20 text-slate-800"

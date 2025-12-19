@@ -1,23 +1,24 @@
 import ProductCard from "@/components/ProductCard";
 import SellerCard from "@/components/SellerCard";
 import {
-    formatTimeAgo,
-    getRecentPings,
-    subscribeToRecentPings,
+  formatTimeAgo,
+  getRecentPings,
+  subscribeToRecentPings,
 } from "@/services/pingService";
 import { getFeaturedProducts } from "@/services/productService";
 import { getActiveSellers, Seller } from "@/services/sellerService";
 import { Ping, Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    FlatList,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -103,12 +104,20 @@ export default function Home() {
                   }
                 >
                   <View className="flex-row items-center mb-2">
-                    <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center mr-3">
-                      <FontAwesome
-                        name="shopping-bag"
-                        size={18}
-                        color="#f97316"
-                      />
+                    <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center mr-3 overflow-hidden">
+                      {item.photoURL ? (
+                        <ImageWithSkeleton
+                          source={{ uri: item.photoURL }}
+                          style={{ width: "100%", height: "100%" }}
+                          borderRadius={20}
+                        />
+                      ) : (
+                        <FontAwesome
+                          name="shopping-bag"
+                          size={18}
+                          color="#f97316"
+                        />
+                      )}
                     </View>
                     <View className="flex-1">
                       <Text
