@@ -5,14 +5,14 @@ import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -32,13 +32,13 @@ export default function EditProfile() {
 
   const handleUpdateProfile = async () => {
     if (!name.trim()) {
-      Alert.alert("Error", "Nama tidak boleh kosong");
+      Alert.alert("Gagal", "Nama tidak boleh kosong");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert("Error", "Sesi berakhir. Silakan masuk kembali.");
+      Alert.alert("Gagal", "Sesi berakhir. Silakan masuk kembali.");
       router.replace("/(auth)/sign-in");
       return;
     }
@@ -64,7 +64,7 @@ export default function EditProfile() {
       }
     } catch (error: any) {
       console.error("Update Profile error:", error.code, error.message);
-      Alert.alert("Error", "Gagal memperbarui profil. Silakan coba lagi.");
+      Alert.alert("Gagal", "Gagal memperbarui profil. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -119,7 +119,9 @@ export default function EditProfile() {
             onPress={handleUpdateProfile}
             disabled={loading || !name.trim()}
             className={`bg-primary p-4 rounded-xl items-center ${
-              loading || !name.trim() ? "opacity-70 bg-slate-400" : "bg-orange-500"
+              loading || !name.trim()
+                ? "opacity-70 bg-slate-400"
+                : "bg-orange-500"
             }`}
           >
             {loading ? (

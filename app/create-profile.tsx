@@ -37,13 +37,13 @@ export default function CreateProfile() {
 
   const handleCreateProfile = async () => {
     if (!name) {
-      Alert.alert("Error", "Mohon isi nama lengkap anda");
+      Alert.alert("Gagal", "Mohon isi nama lengkap anda");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert("Error", "Sesi berakhir. Silakan masuk kembali.");
+      Alert.alert("Gagal", "Sesi berakhir. Silakan masuk kembali.");
       setTimeout(() => {
         router.replace("/(auth)/sign-in");
       }, 1500);
@@ -79,7 +79,7 @@ export default function CreateProfile() {
       }
     } catch (error: any) {
       console.error("Create Profile error:", error.code, error.message);
-      Alert.alert("Error", "Gagal membuat profil. Silakan coba lagi.");
+      Alert.alert("Gagal", "Gagal membuat profil. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }

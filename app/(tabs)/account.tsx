@@ -54,8 +54,8 @@ export default function Account() {
   }
 
   const userName =
-    user?.profile?.displayName || user?.email?.split("@")[0] || "User";
-  const email = user?.email || "Email not found";
+    user?.profile?.displayName || user?.email?.split("@")[0] || "Pengguna";
+  const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
   const { updateStatus, error, activeCheckAndApplyUpdate } = useUpdates();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -155,7 +155,7 @@ export default function Account() {
               </Text>
               <Text className="text-slate-600 text-sm">{email}</Text>
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.push("/edit-profile")}
               className="p-2 -mr-2"
             >

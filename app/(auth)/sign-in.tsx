@@ -50,8 +50,8 @@ export default function SignIn() {
         }
       } else {
         Alert.alert(
-          "Install App",
-          "To install the app, tap the browser menu (three dots) then select 'Install App' or 'Add to Home Screen'."
+          "Instal Aplikasi",
+          "Untuk menginstal aplikasi, ketuk menu browser (titik tiga) lalu pilih 'Instal App' atau 'Tambahkan ke Layar Utama'."
         );
       }
       return;
@@ -82,10 +82,7 @@ export default function SignIn() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        className="flex-1"
-      >
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
         <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
           <View className="flex-1 justify-center px-6 py-8">
             {/* Header */}
@@ -93,7 +90,9 @@ export default function SignIn() {
               <View className="w-20 h-20 bg-orange-100 rounded-full items-center justify-center mb-4">
                 <Text className="text-4xl">🍊</Text>
               </View>
-              <Text className="text-3xl font-bold text-primary mb-2">Javery</Text>
+              <Text className="text-3xl font-bold text-primary mb-2">
+                Javery
+              </Text>
               <Text className="text-slate-500 font-medium text-center">
                 Japri Ahlinya !
               </Text>
@@ -153,8 +152,9 @@ export default function SignIn() {
             <TouchableOpacity
               onPress={handleSignIn}
               disabled={loading}
-              className={`bg-primary p-4 rounded-xl items-center mb-3 ${loading ? "opacity-70" : ""
-                }`}
+              className={`bg-primary p-4 rounded-xl items-center mb-3 ${
+                loading ? "opacity-70" : ""
+              }`}
             >
               {loading ? (
                 <View className="flex-row items-center">
@@ -169,50 +169,46 @@ export default function SignIn() {
             </TouchableOpacity>
 
             {/* Install App Button (Web) */}
-            {
-              Platform.OS === "web" && (
-                <TouchableOpacity
-                  onPress={handleInstallApp}
-                  disabled={isChecking}
-                  className="bg-slate-100 border border-slate-200 p-4 rounded-xl items-center mb-3"
-                >
-                  {isChecking ? (
-                    <View className="flex-row items-center">
-                      <ActivityIndicator color="#1e293b" size="small" />
-                      <Text className="text-slate-800 font-semibold ml-2">
-                        Memeriksa...
-                      </Text>
-                    </View>
-                  ) : (
-                    <View className="flex-row items-center">
-                      <FontAwesome name="download" size={16} color="#1e293b" />
-                      <Text className="text-slate-800 font-semibold ml-2">
-                        Instal Aplikasi
-                      </Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              )
-            }
+            {Platform.OS === "web" && (
+              <TouchableOpacity
+                onPress={handleInstallApp}
+                disabled={isChecking}
+                className="bg-slate-100 border border-slate-200 p-4 rounded-xl items-center mb-3"
+              >
+                {isChecking ? (
+                  <View className="flex-row items-center">
+                    <ActivityIndicator color="#1e293b" size="small" />
+                    <Text className="text-slate-800 font-semibold ml-2">
+                      Memeriksa...
+                    </Text>
+                  </View>
+                ) : (
+                  <View className="flex-row items-center">
+                    <FontAwesome name="download" size={16} color="#1e293b" />
+                    <Text className="text-slate-800 font-semibold ml-2">
+                      Instal Aplikasi
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            )}
 
             {/* Continue as Guest (Web) */}
-            {
-              Platform.OS === "web" && (
-                <TouchableOpacity
-                  onPress={() => {
-                    // Just close the auth screen, user can browse
-                    if (window.history.length > 1) {
-                      window.history.back();
-                    }
-                  }}
-                  className="p-4"
-                >
-                  <Text className="text-slate-500 font-medium text-center">
-                    Lanjut sebagai Tamu
-                  </Text>
-                </TouchableOpacity>
-              )
-            }
+            {Platform.OS === "web" && (
+              <TouchableOpacity
+                onPress={() => {
+                  // Just close the auth screen, user can browse
+                  if (window.history.length > 1) {
+                    window.history.back();
+                  }
+                }}
+                className="p-4"
+              >
+                <Text className="text-slate-500 font-medium text-center">
+                  Lanjut sebagai Tamu
+                </Text>
+              </TouchableOpacity>
+            )}
 
             {/* Sign Up Link */}
             <View className="flex-row justify-center mt-4">

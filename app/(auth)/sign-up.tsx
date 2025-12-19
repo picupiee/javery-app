@@ -49,8 +49,8 @@ export default function SignUp() {
         }
       } else {
         Alert.alert(
-          "Install App",
-          "To install the app, tap the browser menu (three dots) then select 'Install App' or 'Add to Home Screen'."
+          "Instal Aplikasi",
+          "Untuk menginstal aplikasi, ketuk menu browser (titik tiga) lalu pilih 'Instal App' atau 'Tambahkan ke Layar Utama'."
         );
       }
       return;
@@ -125,10 +125,7 @@ export default function SignUp() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        className="flex-1"
-      >
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
         <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
           <View className="flex-1 justify-center px-6 py-8">
             {/* Header */}
@@ -136,7 +133,9 @@ export default function SignUp() {
               <View className="w-20 h-20 bg-orange-100 rounded-full items-center justify-center mb-4">
                 <Text className="text-4xl">🍊</Text>
               </View>
-              <Text className="text-3xl font-bold text-primary mb-2">Javery</Text>
+              <Text className="text-3xl font-bold text-primary mb-2">
+                Javery
+              </Text>
               <Text className="text-slate-500 font-medium text-center">
                 Japri Ahlinya !
               </Text>
@@ -213,8 +212,9 @@ export default function SignUp() {
             <TouchableOpacity
               onPress={handleSignUp}
               disabled={loading}
-              className={`bg-primary p-4 rounded-xl items-center mb-3 ${loading ? "opacity-70" : ""
-                }`}
+              className={`bg-primary p-4 rounded-xl items-center mb-3 ${
+                loading ? "opacity-70" : ""
+              }`}
             >
               {loading ? (
                 <View className="flex-row items-center">

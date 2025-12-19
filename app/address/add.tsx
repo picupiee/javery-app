@@ -42,7 +42,7 @@ export default function AddAddressScreen() {
       !form.phoneNumber ||
       !form.fullAddress
     ) {
-      Alert.alert("Error", "Mohon lengkapi semua data wajib.");
+      Alert.alert("Gagal", "Mohon lengkapi semua data wajib.");
       return;
     }
 
@@ -60,7 +60,7 @@ export default function AddAddressScreen() {
         router.back();
       }
     } catch (error) {
-      Alert.alert("Error", "Gagal menyimpan alamat");
+      Alert.alert("Gagal", "Gagal menyimpan alamat");
       setLoading(false); // Only stop loading on error, success navigates away
     } finally {
       if (Platform.OS === "web") setLoading(false);
