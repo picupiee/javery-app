@@ -60,41 +60,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="checkout"
-        options={{
-          href: null,
-          tabBarStyle: { display: "none" },
-        }}
-      />
-      <Tabs.Screen
-        name="address"
-        options={{
-          href: null,
-          tabBarStyle: { display: "none" },
-        }}
-      />
-      <Tabs.Screen
-        name="orders"
-        options={{
-          href: null,
-          tabBarStyle: { display: "none" },
-        }}
-      />
-      <Tabs.Screen
-        name="product"
-        options={{
-          href: null,
-          tabBarStyle: { display: "none" },
-        }}
-      />
-      <Tabs.Screen
-        name="seller"
-        options={{
-          href: null,
-          tabBarStyle: { display: "none" },
-        }}
-      />
     </Tabs>
   );
 }

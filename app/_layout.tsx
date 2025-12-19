@@ -7,7 +7,7 @@ import {
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import { router, Slot, SplashScreen, useSegments } from "expo-router";
+import { router, Stack, SplashScreen, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
@@ -97,7 +97,15 @@ function AppLayout() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="product" />
+        <Stack.Screen name="seller" />
+        <Stack.Screen name="orders" />
+        <Stack.Screen name="address" />
+        <Stack.Screen name="checkout" />
+      </Stack>
     </View>
   );
 }

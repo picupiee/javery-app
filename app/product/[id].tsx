@@ -9,13 +9,15 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Linking,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Linking,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -26,6 +28,7 @@ export default function ProductDetails() {
   const [sellerPhone, setSellerPhone] = useState<string | null>(null);
   const { addToCart } = useCart();
   const [adding, setAdding] = useState(false);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -119,7 +122,11 @@ export default function ProductDetails() {
       <View className="flex-1 bg-white">
         <ScrollView className="flex-1">
           {/* Image Header */}
-          <View className="w-full h-80 bg-gray-100 relative">
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => setIsImageModalVisible(true)}
+            className="w-full h-80 bg-gray-100 relative"
+          >
             {product.imageUrl ? (
               <Image
                 source={{ uri: product.imageUrl }}
@@ -136,13 +143,16 @@ export default function ProductDetails() {
             {/* Back Button Overlay */}
             <SafeAreaView className="absolute top-0 left-0 w-full">
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  router.back();
+                }}
                 className="ml-4 mt-2 w-10 h-10 bg-white/80 rounded-full items-center justify-center"
               >
                 <FontAwesome name="arrow-left" size={20} color="black" />
               </TouchableOpacity>
             </SafeAreaView>
-          </View>
+          </TouchableOpacity>
 
           {/* Content */}
           <View className="p-6 -mt-6 bg-white rounded-t-3xl flex-1">
@@ -229,6 +239,39 @@ export default function ProductDetails() {
           </TouchableOpacity>
         </SafeAreaView>
       </View>
+
+      {/* Full Screen Image Modal */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsImageModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/90 items-center justify-center relative">
+          <TouchableOpacity
+            style={{ width: "100%", height: "100%", position: "absolute" }}
+            onPress={() => setIsImageModalVisible(false)}
+          />
+
+          {product.imageUrl && (
+            <Image
+              source={{ uri: product.imageUrl }}
+              style={{
+                width: Dimensions.get("window").width,
+                height: Dimensions.get("window").height * 0.7,
+              }}
+              contentFit="contain"
+            />
+          )}
+
+          <TouchableOpacity
+            onPress={() => setIsImageModalVisible(false)}
+            className="absolute top-12 right-6 w-10 h-10 bg-white/20 rounded-full items-center justify-center"
+          >
+            <FontAwesome name="times" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </>
   );
 }
