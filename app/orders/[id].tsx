@@ -151,7 +151,7 @@ export default function OrderDetailScreen() {
                 source={{
                   uri: item.productImage || "https://via.placeholder.com/60",
                 }}
-                className="w-12 h-12 rounded bg-gray-100 mr-3"
+                style={{ width: 48, height: 48, marginRight: 12 }}
                 borderRadius={4}
               />
               <View className="flex-1">

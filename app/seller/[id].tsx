@@ -68,7 +68,7 @@ export default function SellerStore() {
         {item.imageUrl ? (
           <ImageWithSkeleton
             source={{ uri: item.imageUrl }}
-            className="w-full h-full"
+            style={{ width: "100%", height: "100%" }}
             contentFit="cover"
           />
         ) : (

@@ -100,7 +100,7 @@ export default function CartScreen() {
                   source={{
                     uri: item.productImage || "https://via.placeholder.com/100",
                   }}
-                  className="w-16 h-16 rounded-lg bg-gray-100"
+                  style={{ width: 64, height: 64 }}
                   borderRadius={8}
                 />
                 <View className="flex-1 ml-3 justify-between">
