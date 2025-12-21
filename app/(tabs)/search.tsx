@@ -1,4 +1,4 @@
-import { searchProducts } from "@/services/productService";
+import { getFeaturedProducts, searchProducts } from "@/services/productService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -22,14 +22,16 @@ export default function Search() {
   // Simple manual debounce for now since we don't have the hook file yet
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
+      setLoading(true);
       if (query.trim().length > 0) {
-        setLoading(true);
         const products = await searchProducts(query);
         setResults(products);
-        setLoading(false);
       } else {
-        setResults([]);
+        // Load default/recent products when search is empty (e.g. limit 24)
+        const products = await getFeaturedProducts(24);
+        setResults(products);
       }
+      setLoading(false);
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
@@ -93,22 +95,15 @@ export default function Search() {
 
       {/* Results */}
       <ScrollView className="flex-1">
-        {loading ? ( // Added loading state check
+        {loading ? (
           <View className="flex-1 items-center justify-center py-20">
             <ActivityIndicator size="large" color="#000" />
-          </View>
-        ) : query.trim() === "" ? (
-          <View className="flex-1 items-center justify-center py-20">
-            <FontAwesome name="search" size={64} color="#cbd5e1" />
-            <Text className="text-slate-400 mt-4 font-medium text-center px-10">
-              Ketik untuk mencari produk segar
-            </Text>
           </View>
         ) : (
           <View className="bg-white pt-5 pb-20">
             <View className="px-5 mb-4">
               <Text className="font-bold text-base text-slate-800">
-                Hasil ({results.length})
+                {query.trim() === "" ? "Produk Terbaru" : `Hasil (${results.length})`}
               </Text>
             </View>
             {results.length > 0 ? (
