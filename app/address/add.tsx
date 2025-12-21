@@ -31,7 +31,19 @@ export default function AddAddressScreen() {
   });
 
   const handleBack = () => {
-    router.back();
+    if (params.source === "checkout" && params.sellerUid) {
+      router.push({
+        pathname: "/checkout",
+        params: { sellerUid: params.sellerUid }
+      } as any);
+    } else if (params.source === "buyNow" && params.buyNowItem) {
+      router.push({
+        pathname: "/checkout",
+        params: { sellerUid: params.sellerUid, buyNowItem: params.buyNowItem }
+      } as any);
+    } else {
+      router.back();
+    }
   };
 
   const handleSave = async () => {
@@ -55,6 +67,11 @@ export default function AddAddressScreen() {
         router.replace({
           pathname: "/checkout",
           params: { selectedAddressId: newId, sellerUid: params.sellerUid },
+        } as any);
+      } else if (params.source === "buyNow") {
+        router.replace({
+          pathname: "/checkout",
+          params: { selectedAddressId: newId, sellerUid: params.sellerUid, buyNowItem: params.buyNowItem }
         } as any);
       } else {
         router.back();
@@ -149,9 +166,8 @@ export default function AddAddressScreen() {
         <TouchableOpacity
           onPress={handleSave}
           disabled={loading}
-          className={`p-4 rounded-xl items-center mb-10 ${
-            loading ? "bg-gray-300" : "bg-primary"
-          }`}
+          className={`p-4 rounded-xl items-center mb-10 ${loading ? "bg-gray-300" : "bg-primary"
+            }`}
         >
           {loading ? (
             <ActivityIndicator color="white" />

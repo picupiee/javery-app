@@ -124,7 +124,8 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "slate", paddingTop: 8 }} edges={["bottom"]}>
+      {/* <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}> */}
       {/* Header - Fixed at Top */}
       <View className="p-4 bg-white border-b border-gray-100 flex-row items-center">
         <TouchableOpacity onPress={handleBack} className="mr-4">
@@ -148,7 +149,11 @@ export default function CheckoutScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/address/add",
-                  params: { source: "checkout", sellerUid },
+                  params: {
+                    source: buyNowItem ? "buyNow" : "checkout",
+                    sellerUid,
+                    buyNowItem: buyNowItem ? JSON.stringify(buyNowItem) : undefined,
+                  },
                 })
               }
               className="bg-orange-50 p-4 rounded-xl border border-dashed border-primary items-center"
@@ -177,7 +182,11 @@ export default function CheckoutScreen() {
                 onPress={() =>
                   router.push({
                     pathname: "/address",
-                    params: { source: "checkout", sellerUid },
+                    params: {
+                      source: buyNowItem ? "buyNow" : "checkout",
+                      sellerUid,
+                      buyNowItem: buyNowItem ? JSON.stringify(buyNowItem) : undefined,
+                    },
                   })
                 }
                 className="mt-3"
