@@ -22,6 +22,7 @@ export interface SellerProfile {
   uid: string;
   email: string;
   storeName: string;
+  storeDescription: string;
   storeStatus: {
     isOpen: boolean;
     pingMessage?: string;

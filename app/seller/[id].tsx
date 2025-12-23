@@ -1,3 +1,4 @@
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { db } from "@/lib/firebase";
 import { getProductsBySeller } from "@/services/productService";
 import { Seller } from "@/services/sellerService";
@@ -13,7 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SellerStore() {
@@ -21,6 +21,7 @@ export default function SellerStore() {
   const [seller, setSeller] = useState<Seller | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     const fetchSellerData = async () => {
@@ -130,6 +131,25 @@ export default function SellerStore() {
                 <Text className="font-bold text-xl text-slate-800 mb-1">
                   {seller?.storeName || "Toko"}
                 </Text>
+                <View>
+                  <Text className="text-slate-600 text-sm leading-5 font-medium">
+                    {seller?.storeDescription
+                      ? (isDescriptionExpanded || seller.storeDescription.length <= 160
+                        ? seller.storeDescription
+                        : `${seller.storeDescription.substring(0, 160)}...`)
+                      : "Deskripsi toko"}
+                  </Text>
+                  {seller?.storeDescription && seller.storeDescription.length > 160 && (
+                    <TouchableOpacity
+                      onPress={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                      className="mt-1"
+                    >
+                      <Text className="text-primary font-bold text-xs">
+                        {isDescriptionExpanded ? "Sembunyikan" : "Lebih Lanjut"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 {/* Email address removed as requested */}
               </View>
             </View>
@@ -154,10 +174,10 @@ export default function SellerStore() {
               </View>
             </View>
           ) : (
-            <View className="items-center py-10">
+            <View className="flex-1 min-h-screen items-center py-10">
               <FontAwesome name="inbox" size={48} color="#cbd5e1" />
               <Text className="text-slate-400 mt-4 font-medium">
-                Tidak ada produk tersedia
+                Toko ini belum memiliki produk
               </Text>
             </View>
           )}
