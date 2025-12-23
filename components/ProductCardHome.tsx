@@ -1,10 +1,10 @@
+import { getSellerProfile } from "@/services/sellerService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import ImageWithSkeleton from "./ImageWithSkeleton";
-import { getSellerProfile } from "@/services/sellerService";
 
 interface ProductCardHomeProps {
   item: Product;
