@@ -7,7 +7,8 @@ import {
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import { router, Stack, SplashScreen, useSegments } from "expo-router";
+import { router, SplashScreen, Stack, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
@@ -108,6 +109,7 @@ function AppLayout() {
         <Stack.Screen name="address" />
         <Stack.Screen name="checkout" />
       </Stack>
+      <StatusBar style="dark" />
     </View>
   );
 }

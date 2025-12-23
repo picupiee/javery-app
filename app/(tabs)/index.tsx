@@ -1,3 +1,4 @@
+import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import ProductCard from "@/components/ProductCard";
 import SellerCard from "@/components/SellerCard";
 import {
@@ -9,7 +10,6 @@ import { getFeaturedProducts } from "@/services/productService";
 import { getActiveSellers, Seller } from "@/services/sellerService";
 import { Ping, Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
-import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -28,13 +28,14 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [pings, setPings] = useState<Ping[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [productLimit, setProductLimit] = useState(6);
 
   const fetchData = async () => {
     setRefreshing(true);
     try {
       const [sellersData, productsData, pingsData] = await Promise.all([
         getActiveSellers(),
-        getFeaturedProducts(),
+        getFeaturedProducts(productLimit),
         getRecentPings(),
       ]);
       setSellers(sellersData);
@@ -48,8 +49,10 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(); // Fetch whenever productLimit changes too (called inside fetchData logic if we used dependency, but here we call manually)
+  }, [productLimit]); // Re-fetch when limit changes
 
+  useEffect(() => {
     // Subscribe to real-time ping updates
     const unsubscribe = subscribeToRecentPings((updatedPings) => {
       setPings(updatedPings);
@@ -59,6 +62,14 @@ export default function Home() {
       unsubscribe();
     };
   }, []);
+
+  const handleLoadMore = () => {
+    if (products.length >= 8) {
+      router.push("/(tabs)/search");
+    } else {
+      setProductLimit((prev) => prev + 6);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
@@ -188,6 +199,17 @@ export default function Home() {
             <Text className="text-center text-gray-400 mt-10">
               Tidak ada produk tersedia.
             </Text>
+          )}
+
+          {products.length > 0 && (
+            <TouchableOpacity
+              onPress={handleLoadMore}
+              className="mx-5 mb-5 p-3 rounded-lg bg-gray-100 items-center active:bg-gray-200"
+            >
+              <Text className="text-slate-600 font-medium">
+                {products.length >= 8 ? "Lihat Semua di Pencarian" : "Lebih Banyak"}
+              </Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>

@@ -2,11 +2,11 @@ import { db } from "@/lib/firebase";
 import { Product } from "@/types";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 
-export const getFeaturedProducts = async (): Promise<Product[]> => {
+export const getFeaturedProducts = async (limitCount: number = 10): Promise<Product[]> => {
   try {
     const productsRef = collection(db, "products");
-    // For now, just get the latest 10 products
-    const q = query(productsRef, orderBy("createdAt", "desc"), limit(10));
+    
+    const q = query(productsRef, orderBy("createdAt", "desc"), limit(limitCount));
     
     const snapshot = await getDocs(q);
     const products: Product[] = [];

@@ -19,6 +19,7 @@ export default function AddressListScreen() {
   const { user } = useAuth();
   const params = useLocalSearchParams();
   const fromCheckout = params.source === "checkout";
+  const fromBuyNow = params.source === "buyNow";
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +60,7 @@ export default function AddressListScreen() {
         },
         {
           text: "Hapus",
-          onPress: () => handleDelete(id),
+          onPress: () => deleteAddress(user!.uid, id).then(() => loadAddresses()),
         },
       ]);
     } else if (window.confirm("Anda yakin ingin menghapus alamat ini?")) {
@@ -72,19 +73,22 @@ export default function AddressListScreen() {
   const handleSelect = (address: Address) => {
     if (fromCheckout) {
       router.replace({
-        pathname: "/checkout",
-        params: { selectedAddressId: address.id, sellerUid: params.sellerUid },
+        pathname: `/checkout?selectedAddressId=${address.id}&sellerUid=${params.sellerUid}`,
+      } as any);
+    }
+    if (fromBuyNow) {
+      router.replace({
+        pathname: `/checkout?selectedAddressId=${address.id}&sellerUid=${params.sellerUid}&buyNowItem=${params.buyNowItem}`,
       } as any);
     }
   };
 
   const renderItem = ({ item }: { item: Address }) => (
     <TouchableOpacity
-      onPress={() => (fromCheckout ? handleSelect(item) : null)}
-      activeOpacity={fromCheckout ? 0.7 : 1}
-      className={`bg-white p-4 rounded-xl border mb-3 shadow-sm ${
-        fromCheckout ? "border-primary" : "border-gray-100"
-      }`}
+      onPress={() => ((fromCheckout || fromBuyNow) ? handleSelect(item) : null)}
+      activeOpacity={(fromCheckout || fromBuyNow) ? 0.7 : 1}
+      className={`bg-white p-4 rounded-xl border mb-3 shadow-sm ${(fromCheckout || fromBuyNow) ? "border-primary" : "border-gray-100"
+        }`}
     >
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-row items-center">
@@ -157,8 +161,9 @@ export default function AddressListScreen() {
             router.push({
               pathname: "/address/add",
               params: {
-                source: fromCheckout ? "checkout" : undefined,
-                sellerUid: fromCheckout ? params.sellerUid : undefined,
+                source: fromCheckout ? "checkout" : fromBuyNow ? "buyNow" : undefined,
+                sellerUid: (fromCheckout || fromBuyNow) ? params.sellerUid : undefined,
+                buyNowItem: fromBuyNow ? params.buyNowItem : undefined,
               },
             })
           }
