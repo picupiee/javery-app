@@ -207,7 +207,9 @@ export default function Home() {
               className="mx-5 mb-5 p-3 rounded-lg bg-gray-100 items-center active:bg-gray-200"
             >
               <Text className="text-slate-600 font-medium">
-                {products.length >= 8 ? "Lihat Semua di Pencarian" : "Lebih Banyak"}
+                {products.length >= 8
+                  ? "Lihat Semua di Pencarian"
+                  : "Lebih Banyak"}
               </Text>
             </TouchableOpacity>
           )}

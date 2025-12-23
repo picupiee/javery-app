@@ -1,9 +1,10 @@
-import { Product, SellerProfile } from "@/types";
+import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import ImageWithSkeleton from "./ImageWithSkeleton";
+import { getSellerProfile } from "@/services/sellerService";
 
 interface ProductCardHomeProps {
   item: Product;
@@ -14,6 +15,22 @@ const ProductCardHome: React.FC<ProductCardHomeProps> = ({
   item,
   className,
 }) => {
+  const [sellerPhoto, setSellerPhoto] = useState<string | null>(
+    item.photoURL || null
+  );
+
+  useEffect(() => {
+    const fetchSellerPhoto = async () => {
+      if (!item.photoURL && item.sellerUid) {
+        const profile = await getSellerProfile(item.sellerUid);
+        if (profile?.photoURL) {
+          setSellerPhoto(profile.photoURL);
+        }
+      }
+    };
+    fetchSellerPhoto();
+  }, [item.sellerUid, item.photoURL]);
+
   return (
     <TouchableOpacity
       className={`bg-white rounded-xl overflow-hidden border border-slate-200 mb-3 ${className}`}
@@ -43,17 +60,20 @@ const ProductCardHome: React.FC<ProductCardHomeProps> = ({
         <Text className="font-bold text-primary text-base mb-1">
           Rp {item.price.toLocaleString()}
         </Text>
-        <View className="flex-row items-center gap-2">
-          {item.photoURL ? (
+        <Text className="text-xs font-medium text-slate-400 mb-1 border-t border-slate-200 pt-1">
+          Dijual Oleh
+        </Text>
+        <View className="flex-row items-center">
+          {sellerPhoto ? (
             <Image
-              source={{ uri: item.photoURL }}
+              source={{ uri: sellerPhoto }}
               className="w-6 h-6 rounded-full mr-2"
             />
           ) : (
             <FontAwesome name="shopping-bag" size={16} color="#94a3b8" />
           )}
           <Text
-            className="text-xs text-slate-400 font-medium"
+            className="text-xs text-slate-800 font-medium"
             numberOfLines={1}
           >
             {item.sellerName}
