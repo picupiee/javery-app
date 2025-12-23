@@ -21,6 +21,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ProductCardHome from "@/components/ProductCardHome";
 
 export default function Home() {
   const [sellers, setSellers] = useState<Seller[]>([]);
@@ -178,7 +179,7 @@ export default function Home() {
             <View className="flex-row flex-wrap justify-between">
               {products.map((item) => (
                 <View key={item.id} className="w-[48%] mb-3">
-                  <ProductCard item={item} />
+                  <ProductCardHome item={item} />
                 </View>
               ))}
             </View>

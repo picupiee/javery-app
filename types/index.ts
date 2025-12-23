@@ -83,6 +83,7 @@ export interface Product {
   isUnlimited?: boolean;
   createdAt: string;
   updatedAt: string;
+  photoURL?: string;
 }
 
 export interface Ping {
