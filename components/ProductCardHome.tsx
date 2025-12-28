@@ -3,33 +3,50 @@ import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Platform, Text, TouchableOpacity, View } from "react-native";
 import ImageWithSkeleton from "./ImageWithSkeleton";
+import { calculateDistance } from "../utils/geoUtils";
 
 interface ProductCardHomeProps {
   item: Product;
   className?: string;
+  userLocation: { latitude: number; longitude: number };
 }
 
 const ProductCardHome: React.FC<ProductCardHomeProps> = ({
   item,
   className,
+  userLocation,
 }) => {
   const [sellerPhoto, setSellerPhoto] = useState<string | null>(
     item.photoURL || null
   );
+  const [sellerLocation, setSellerLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(item.storeLocation || null);
 
   useEffect(() => {
-    const fetchSellerPhoto = async () => {
-      if (!item.photoURL && item.sellerUid) {
+    const fetchSellerProfile = async () => {
+      if ((!item.photoURL || !item.storeLocation) && item.sellerUid) {
         const profile = await getSellerProfile(item.sellerUid);
-        if (profile?.photoURL) {
-          setSellerPhoto(profile.photoURL);
+        if (profile) {
+          if (!item.photoURL && profile.photoURL) {
+            setSellerPhoto(profile.photoURL);
+          }
+          if (!item.storeLocation && profile.storeLocation) {
+            setSellerLocation(profile.storeLocation);
+          }
         }
       }
     };
-    fetchSellerPhoto();
+    fetchSellerProfile();
   }, [item.sellerUid, item.photoURL]);
+
+  const distance = calculateDistance(
+    userLocation,
+    item.storeLocation || sellerLocation
+  );
 
   return (
     <TouchableOpacity
@@ -60,24 +77,36 @@ const ProductCardHome: React.FC<ProductCardHomeProps> = ({
         <Text className="font-bold text-primary text-base mb-1">
           Rp {item.price.toLocaleString()}
         </Text>
-        <Text className="text-xs font-medium text-slate-400 mb-1 border-t border-slate-200 pt-1">
+        <Text className="text-[10px] font-medium text-slate-400 mb-1 border-t border-slate-200 pt-1">
           Dijual Oleh
         </Text>
         <View className="flex-row items-center">
-          {sellerPhoto ? (
-            <Image
-              source={{ uri: sellerPhoto }}
-              className="w-6 h-6 rounded-full mr-2"
-            />
-          ) : (
-            <FontAwesome name="shopping-bag" size={16} color="#94a3b8" />
+          <View className="flex-row items-center">
+            {sellerPhoto ? (
+              <Image
+                source={{ uri: sellerPhoto }}
+                className="w-6 h-6 rounded-full mr-1"
+              />
+            ) : (
+              <FontAwesome name="shopping-bag" size={16} color="#94a3b8" />
+            )}
+            <Text
+              className="text-xs text-slate-800 font-medium"
+              numberOfLines={1}
+            >
+              {item.sellerName}
+            </Text>
+          </View>
+          {Platform.OS !== "web" && (
+            <View className="absolute right-0">
+              <View className="flex-row items-center gap-1">
+                <FontAwesome name="location-arrow" size={10} color="#94a3b8" />
+                <Text className="text-[10px] text-slate-600 antialiased">
+                  {distance || "2 Km"}
+                </Text>
+              </View>
+            </View>
           )}
-          <Text
-            className="text-xs text-slate-800 font-medium"
-            numberOfLines={1}
-          >
-            {item.sellerName}
-          </Text>
         </View>
       </View>
     </TouchableOpacity>

@@ -43,7 +43,15 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationAlwaysPermission": "Izinkan Javery untuk selalu mengakses lokasi Anda agar kami dapat menghitung jarak ke toko terdekat.",
+          "locationWhenInUsePermission": "Izinkan Javery untuk mengakses lokasi Anda saat aplikasi digunakan agar kami dapat menghitung jarak ke toko terdekat.",
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

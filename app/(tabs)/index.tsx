@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProductCardHome from "@/components/ProductCardHome";
+import { useUserLocation } from "@/hooks/useLocation";
 
 export default function Home() {
   const [sellers, setSellers] = useState<Seller[]>([]);
@@ -29,6 +30,7 @@ export default function Home() {
   const [pings, setPings] = useState<Ping[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [productLimit, setProductLimit] = useState(6);
+  const { location: userLocation } = useUserLocation();
 
   const fetchData = async () => {
     setRefreshing(true);
@@ -190,7 +192,12 @@ export default function Home() {
             <View className="flex-row flex-wrap justify-between">
               {products.map((item) => (
                 <View key={item.id} className="w-[48%] mb-3">
-                  <ProductCardHome item={item} />
+                  <ProductCardHome
+                    item={item}
+                    userLocation={
+                      userLocation?.coords || { latitude: 0, longitude: 0 }
+                    }
+                  />
                 </View>
               ))}
             </View>

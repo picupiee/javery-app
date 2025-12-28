@@ -29,6 +29,7 @@ export interface SellerProfile {
   };
   createdAt: string;
   photoURL?: string;
+  storeLocation?: { latitude: number; longitude: number } | null;
 }
 
 export interface Address {
@@ -85,6 +86,7 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   photoURL?: string;
+  storeLocation?: { latitude: number; longitude: number } | null;
 }
 
 export interface Ping {
