@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -13,11 +14,15 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useUserLocation } from "@/hooks/useLocation";
+import { calculateDistance } from "@/utils/geoUtils";
+
 
 export default function Search() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const { location, error: locError } = useUserLocation()
 
   // Simple manual debounce for now since we don't have the hook file yet
   useEffect(() => {
@@ -37,40 +42,53 @@ export default function Search() {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
-  const renderProductItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
-      onPress={() => router.push(`/product/${item.id}`)}
-    >
-      <View className="h-36 bg-slate-50 w-full">
-        {item.imageUrl ? (
-          <Image
-            source={{ uri: item.imageUrl }}
-            className="w-full h-full"
-            resizeMode="cover"
-          />
-        ) : (
-          <View className="w-full h-full items-center justify-center">
-            <FontAwesome name="image" size={36} color="#cbd5e1" />
-          </View>
-        )}
-      </View>
-      <View className="p-3">
-        <Text
-          className="font-bold text-sm text-slate-800 mb-1"
-          numberOfLines={1}
-        >
-          {item.name}
-        </Text>
-        <Text className="font-bold text-primary text-base mb-1">
-          Rp {item.price.toLocaleString()}
-        </Text>
-        <Text className="text-xs text-slate-400 font-medium" numberOfLines={1}>
-          {item.category}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderProductItem = ({ item }: { item: Product }) => {
+    const userLocation = location ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null;
+    const displayDistance = calculateDistance(userLocation, item.storeLocation);
+    return (
+
+      <TouchableOpacity
+        className="bg-white rounded-xl overflow-hidden border border-slate-200 mb-3"
+        onPress={() => router.push(`/product/${item.id}`)}
+      >
+        <View className="h-36 bg-slate-50 w-full">
+          {item.imageUrl ? (
+            <Image
+              source={{ uri: item.imageUrl }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+          ) : (
+            <View className="w-full h-full items-center justify-center">
+              <FontAwesome name="image" size={36} color="#cbd5e1" />
+            </View>
+          )}
+        </View>
+        <View className="p-3">
+          <Text
+            className="font-bold text-sm text-slate-800 mb-1"
+            numberOfLines={1}
+          >
+            {item.name}
+          </Text>
+          <Text className="font-bold text-primary text-base mb-1">
+            Rp {item.price.toLocaleString()}
+          </Text>
+          <Text className="text-xs text-slate-400 font-medium" numberOfLines={1}>
+            {item.category}
+          </Text>
+          {Platform.OS !== 'web' && (
+            <View className="absolute bottom-2 right-2">
+              <View className="flex-row items-center gap-1">
+                <FontAwesome name="location-arrow" size={10} color="#94a3b8" />
+                <Text className="text-xs text-slate-400 antialiased">{displayDistance || "..Km"}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    )
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>

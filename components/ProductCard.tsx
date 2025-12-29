@@ -5,12 +5,14 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import ImageWithSkeleton from "./ImageWithSkeleton";
 
+
 interface ProductCardProps {
   item: Product;
   className?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ item, className }) => {
+
   return (
     <TouchableOpacity
       className={`bg-white rounded-xl overflow-hidden border border-slate-200 mb-3 ${className}`}
