@@ -1,9 +1,9 @@
 import { Seller } from "@/services/sellerService";
 import { FontAwesome } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { Image } from "expo-image";
 
 interface SellerCardProps {
   item: Seller;
@@ -31,6 +31,7 @@ const SellerCard: React.FC<SellerCardProps> = ({ item }) => {
       >
         {item.storeName}
       </Text>
+      <FontAwesome name="circle" size={16} color="#58e421ff" className="absolute top-1 right-3" />
     </TouchableOpacity>
   );
 };

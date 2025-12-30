@@ -116,15 +116,22 @@ export default function SellerStore() {
         <View className="bg-orange-50 border-b border-orange-100">
           <View className="px-5 py-6">
             <View className="flex-row items-center">
-              <View className="w-16 h-16 bg-orange-200 rounded-full items-center justify-center mr-4 overflow-hidden">
-                {seller?.photoURL ? (
-                  <ImageWithSkeleton
-                    source={{ uri: seller.photoURL }}
-                    style={{ width: "100%", height: "100%" }}
-                    borderRadius={32}
-                  />
+              <View>
+                <View className="w-16 h-16 bg-orange-200 rounded-full items-center justify-center mr-4 overflow-hidden">
+                  {seller?.photoURL ? (
+                    <ImageWithSkeleton
+                      source={{ uri: seller.photoURL }}
+                      style={{ width: "100%", height: "100%" }}
+                      borderRadius={32}
+                    />
+                  ) : (
+                    <FontAwesome name="shopping-bag" size={28} color="#f97316" />
+                  )}
+                </View>
+                {seller?.storeStatus.isOpen ? (
+                  <FontAwesome name="circle" size={18} color="#58e421ff" className="absolute top-0 right-4" />
                 ) : (
-                  <FontAwesome name="shopping-bag" size={28} color="#f97316" />
+                  <FontAwesome name="circle" size={18} color="#ff2a2aff" className="absolute top-1 right-4" />
                 )}
               </View>
               <View className="flex-1">

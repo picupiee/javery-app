@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase";
 import { SellerProfile } from "@/types";
-import { collection, getDocs, limit, query, where } from "firebase/firestore";
+import { collection, getDocs, limit, onSnapshot, query, where } from "firebase/firestore";
 
 export interface Seller extends SellerProfile {
   // Add any extra fields if needed
@@ -25,6 +25,29 @@ export const getActiveSellers = async (): Promise<Seller[]> => {
     console.error("Error fetching active sellers:", error);
     return [];
   }
+};
+
+export const subscribeToActiveSellers = (
+  callback: (sellers: Seller[]) => void
+) => {
+  const sellersRef = collection(db, "sellers");
+  const q = query(sellersRef, where("storeStatus.isOpen", "==", true));
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const sellers: Seller[] = [];
+      snapshot.forEach((doc) => {
+        sellers.push(doc.data() as Seller);
+      });
+      callback(sellers);
+    },
+    (error) => {
+      console.error("Error subscribing to active sellers:", error);
+    }
+  );
+
+  return unsubscribe;
 };
 
 export const getAllSellers = async (): Promise<Seller[]> => {

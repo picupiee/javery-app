@@ -1,13 +1,14 @@
 import ImageWithSkeleton from "@/components/ImageWithSkeleton";
-import ProductCard from "@/components/ProductCard";
+import ProductCardHome from "@/components/ProductCardHome";
 import SellerCard from "@/components/SellerCard";
+import { useUserLocation } from "@/hooks/useLocation";
 import {
   formatTimeAgo,
   getRecentPings,
   subscribeToRecentPings,
 } from "@/services/pingService";
 import { getFeaturedProducts } from "@/services/productService";
-import { getActiveSellers, Seller } from "@/services/sellerService";
+import { Seller, subscribeToActiveSellers } from "@/services/sellerService";
 import { Ping, Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -21,8 +22,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ProductCardHome from "@/components/ProductCardHome";
-import { useUserLocation } from "@/hooks/useLocation";
 
 export default function Home() {
   const [sellers, setSellers] = useState<Seller[]>([]);
@@ -35,12 +34,10 @@ export default function Home() {
   const fetchData = async () => {
     setRefreshing(true);
     try {
-      const [sellersData, productsData, pingsData] = await Promise.all([
-        getActiveSellers(),
+      const [productsData, pingsData] = await Promise.all([
         getFeaturedProducts(productLimit),
         getRecentPings(),
       ]);
-      setSellers(sellersData);
       setProducts(productsData);
       setPings(pingsData);
     } catch (error) {
@@ -56,12 +53,18 @@ export default function Home() {
 
   useEffect(() => {
     // Subscribe to real-time ping updates
-    const unsubscribe = subscribeToRecentPings((updatedPings) => {
+    const unsubscribePings = subscribeToRecentPings((updatedPings) => {
       setPings(updatedPings);
     });
 
+    // Subscribe to active sellers updates
+    const unsubscribeSellers = subscribeToActiveSellers((updatedSellers) => {
+      setSellers(updatedSellers);
+    });
+
     return () => {
-      unsubscribe();
+      unsubscribePings();
+      unsubscribeSellers();
     };
   }, []);
 
@@ -91,11 +94,11 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
       >
         {/* Ping Notifications Section */}
-        {pings.length > 0 && (
+        {pings.length > 0 ? (
           <View className="bg-orange-50 border-b border-orange-100">
             <View className="px-5 py-4 flex-row justify-between items-center">
               <Text className="font-bold text-base text-slate-800">
-                🔔 Pembaruan Terbaru
+                🔔 Promosi Terbaru
               </Text>
               <TouchableOpacity
                 onPress={async () => {
@@ -147,7 +150,7 @@ export default function Home() {
                   </View>
                   <Text
                     className="text-sm text-slate-600 font-medium leading-5"
-                    numberOfLines={2}
+                    numberOfLines={4}
                   >
                     {item.message}
                   </Text>
@@ -161,6 +164,25 @@ export default function Home() {
                 paddingBottom: 16,
               }}
             />
+          </View>
+        ) : (
+          <View className="bg-orange-50 border-b border-orange-100">
+            <View className="px-5 pt-4 flex-row justify-between items-center">
+              <Text className="font-bold text-base text-slate-800">
+                🔔 Promosi Terbaru
+              </Text>
+              <TouchableOpacity
+                onPress={async () => {
+                  const freshPings = await getRecentPings();
+                  setPings(freshPings);
+                }}
+                className="p-2"
+              >
+                <FontAwesome name="refresh" size={16} color="#f97316" />
+              </TouchableOpacity>
+            </View>
+            <Text className="text-center text-xl mt-6 font-medium text-slate-500">Belum ada promosi terbaru</Text>
+            <Text className="text-center text-slate-500 mb-6 mt-2 text-md items-center">Klik tombol <FontAwesome name="refresh" size={16} color="#f97316" /> untuk memuat ulang</Text>
           </View>
         )}
 
