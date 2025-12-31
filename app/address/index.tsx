@@ -55,7 +55,6 @@ export default function AddressListScreen() {
       Alert.alert("Hapus Alamat", "Anda yakin ingin menghapus alamat ini?", [
         {
           text: "Batal",
-          onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
         {

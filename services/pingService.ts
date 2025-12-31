@@ -1,14 +1,15 @@
 import { db } from "@/lib/firebase";
+import { getSellerProfile } from "@/services/sellerService";
 import { Ping } from "@/types";
 import {
-    collection,
-    getDocs,
-    limit,
-    onSnapshot,
-    orderBy,
-    query,
-    Timestamp,
-    where,
+  collection,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  Timestamp,
+  where,
 } from "firebase/firestore";
 
 const PING_VISIBILITY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
@@ -37,14 +38,26 @@ export const subscribeToRecentPings = (
 
   const unsubscribe = onSnapshot(
     pingsQuery,
-    (snapshot) => {
+    async (snapshot) => {
       const pings: Ping[] = snapshot.docs.map((doc) => ({
         sellerUid: doc.data().sellerUid,
         storeName: doc.data().storeName,
         message: doc.data().message,
         createdAt: doc.data().createdAt,
       }));
-      callback(pings);
+
+      // Fetch photos for each ping
+      const pingsWithPhotos = await Promise.all(
+        pings.map(async (ping) => {
+          const seller = await getSellerProfile(ping.sellerUid);
+          return {
+            ...ping,
+            photoURL: seller?.photoURL,
+          };
+        })
+      );
+
+      callback(pingsWithPhotos);
     },
     (error) => {
       console.error("Error subscribing to pings:", error);
@@ -76,12 +89,25 @@ export const getRecentPings = async (
     );
 
     const snapshot = await getDocs(pingsQuery);
-    return snapshot.docs.map((doc) => ({
+    const pings = snapshot.docs.map((doc) => ({
       sellerUid: doc.data().sellerUid,
       storeName: doc.data().storeName,
       message: doc.data().message,
       createdAt: doc.data().createdAt,
     }));
+
+    // Fetch photos for each ping
+    const pingsWithPhotos = await Promise.all(
+      pings.map(async (ping) => {
+        const seller = await getSellerProfile(ping.sellerUid);
+        return {
+          ...ping,
+          photoURL: seller?.photoURL,
+        };
+      })
+    );
+
+    return pingsWithPhotos;
   } catch (error) {
     console.error("Error fetching pings:", error);
     return [];

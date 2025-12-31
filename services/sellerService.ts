@@ -27,6 +27,19 @@ export const getActiveSellers = async (): Promise<Seller[]> => {
   }
 };
 
+export const isSellerActive = async (): Promise<boolean> => {
+  try {
+    const sellersRef = collection(db, "sellers");
+    const q = query(sellersRef, where("storeStatus.isOpen", "==", true));
+
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+  } catch (error) {
+    console.error("Error checking seller activity:", error);
+    return false;
+  }
+};
+
 export const subscribeToActiveSellers = (
   callback: (sellers: Seller[]) => void
 ) => {

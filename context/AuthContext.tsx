@@ -25,7 +25,7 @@ const subscribeToUserProfile = (
       if (docSnap.exists()) {
         onProfile(docSnap.data() as UserProfile);
       } else {
-        console.log("User profile not found in Firestore for UID: ", uid);
+        console.log("User profile not found");
         onProfile(null);
       }
     },
@@ -58,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let unsubscribeProfile: (() => void) | null = null;
 
     const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("Got User :", firebaseUser?.uid);
       if (unsubscribeProfile) {
         unsubscribeProfile();
         unsubscribeProfile = null;

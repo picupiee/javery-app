@@ -31,6 +31,8 @@ export default function CheckoutScreen() {
   const [loading, setLoading] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
 
+  const [isSellerActive, setIsSellerActive] = useState(false);
+
   // Filter items for this seller
   const buyNowItem = params.buyNowItem ? JSON.parse(params.buyNowItem) : null;
   const checkoutItems = buyNowItem
@@ -88,8 +90,12 @@ export default function CheckoutScreen() {
   };
 
   const handlePlaceOrder = async () => {
+    if (!isSellerActive) {
+      showAlert("Penjual Tidak Aktif", "Penjual ini tidak menerima pesanan");
+      return;
+    }
     if (!selectedAddress) {
-      Alert.alert("Alamat Kosong", "Silakan pilih alamat pengiriman.");
+      showAlert("Alamat Kosong", "Silakan pilih alamat pengiriman.");
       return;
     }
     if (!user) return;

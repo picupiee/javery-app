@@ -66,7 +66,7 @@ exports.sendOrderNotification = onDocumentCreated(
       for (let chunk of chunks) {
         try {
           let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-          console.log(ticketChunk);
+          console.log("Notification sent successfully");
         } catch (error) {
           console.error(error);
         }
@@ -137,7 +137,7 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
 
       if (!pushToken || !Expo.isExpoPushToken(pushToken)) {
         console.log(
-          `Buyer ${buyerUid} has no valid buyerPushToken (token: ${pushToken})`
+          `Buyer ${buyerUid.charAt(5).trim() + "..."} has no valid buyerPushToken (token: ${pushToken.charAt(5).trim() + "..."})`
         );
         return;
       }
