@@ -99,7 +99,10 @@ export default function ProductDetails() {
 
   const handleBuyNow = () => {
     if (!product || isOutOfStock) return;
-    if (!isSellerActive) return showAlert("Toko tidak aktif", "Toko sedang tidak aktif, silahkan hubungi pemilik toko via WhatsApp atau coba lagi nanti.", () => { });
+    if (!isSellerActive) {
+      showAlert("Toko tidak aktif", "Toko sedang tidak aktif, silahkan hubungi pemilik toko via WhatsApp atau coba lagi nanti.", () => { });
+      return;
+    }
 
     const buyNowItem = {
       id: product.id,
