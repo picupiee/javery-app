@@ -16,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getActiveSellers, isSellerActive } from "@/services/sellerService";
 
 export default function CheckoutScreen() {
   const params = useLocalSearchParams<{
@@ -30,8 +31,6 @@ export default function CheckoutScreen() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [loading, setLoading] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
-
-  const [isSellerActive, setIsSellerActive] = useState(false);
 
   // Filter items for this seller
   const buyNowItem = params.buyNowItem ? JSON.parse(params.buyNowItem) : null;
@@ -90,7 +89,8 @@ export default function CheckoutScreen() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!isSellerActive) {
+    const isActive = await isSellerActive(sellerUid);
+    if (!isActive) {
       showAlert("Penjual Tidak Aktif", "Penjual ini tidak menerima pesanan");
       return;
     }
@@ -130,7 +130,10 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "slate", paddingTop: 8 }} edges={["bottom"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "slate", paddingTop: 8 }}
+      edges={["bottom"]}
+    >
       {/* <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}> */}
       {/* Header - Fixed at Top */}
       <View className="p-4 bg-white border-b border-gray-100 flex-row items-center">
@@ -158,7 +161,9 @@ export default function CheckoutScreen() {
                   params: {
                     source: buyNowItem ? "buyNow" : "checkout",
                     sellerUid,
-                    buyNowItem: buyNowItem ? JSON.stringify(buyNowItem) : undefined,
+                    buyNowItem: buyNowItem
+                      ? JSON.stringify(buyNowItem)
+                      : undefined,
                   },
                 })
               }
@@ -191,7 +196,9 @@ export default function CheckoutScreen() {
                     params: {
                       source: buyNowItem ? "buyNow" : "checkout",
                       sellerUid,
-                      buyNowItem: buyNowItem ? JSON.stringify(buyNowItem) : undefined,
+                      buyNowItem: buyNowItem
+                        ? JSON.stringify(buyNowItem)
+                        : undefined,
                     },
                   })
                 }

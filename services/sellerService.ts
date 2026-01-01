@@ -1,6 +1,13 @@
 import { db } from "@/lib/firebase";
 import { SellerProfile } from "@/types";
-import { collection, getDocs, limit, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  limit,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 
 export interface Seller extends SellerProfile {
   // Add any extra fields if needed
@@ -27,10 +34,14 @@ export const getActiveSellers = async (): Promise<Seller[]> => {
   }
 };
 
-export const isSellerActive = async (): Promise<boolean> => {
+export const isSellerActive = async (uid: string): Promise<boolean> => {
   try {
     const sellersRef = collection(db, "sellers");
-    const q = query(sellersRef, where("storeStatus.isOpen", "==", true));
+    const q = query(
+      sellersRef,
+      where("uid", "==", uid),
+      where("storeStatus.isOpen", "==", true)
+    );
 
     const snapshot = await getDocs(q);
     return !snapshot.empty;

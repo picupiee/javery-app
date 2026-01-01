@@ -97,10 +97,16 @@ export default function ProductDetails() {
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!product || isOutOfStock) return;
-    if (!isSellerActive) {
-      showAlert("Toko tidak aktif", "Toko sedang tidak aktif, silahkan hubungi pemilik toko via WhatsApp atau coba lagi nanti.", () => { });
+
+    const isActive = await isSellerActive(product.sellerUid);
+    if (!isActive) {
+      showAlert(
+        "Toko tidak aktif",
+        "Toko sedang tidak aktif, silahkan hubungi pemilik toko via WhatsApp atau coba lagi nanti.",
+        () => {}
+      );
       return;
     }
 
@@ -211,12 +217,14 @@ export default function ProductDetails() {
                 </Text>
               </View>
               <View
-                className={`${isOutOfStock ? "bg-red-100" : "bg-green-100"
-                  } px-3 py-1 rounded-full`}
+                className={`${
+                  isOutOfStock ? "bg-red-100" : "bg-green-100"
+                } px-3 py-1 rounded-full`}
               >
                 <Text
-                  className={`text-xs ${isOutOfStock ? "text-red-700" : "text-green-700"
-                    } font-medium`}
+                  className={`text-xs ${
+                    isOutOfStock ? "text-red-700" : "text-green-700"
+                  } font-medium`}
                 >
                   Stok: {isUnlimited ? "Tersedia" : product.stock}
                 </Text>
@@ -278,10 +286,11 @@ export default function ProductDetails() {
             <TouchableOpacity
               onPress={handleAddToCart}
               disabled={isOutOfStock || adding}
-              className={` p-2 m-2 justify-center rounded-xl border border-primary-200 ${isOutOfStock || adding
-                ? "bg-gray-50 border-gray-200"
-                : "bg-orange-50"
-                }`}
+              className={` p-2 m-2 justify-center rounded-xl border border-primary-200 ${
+                isOutOfStock || adding
+                  ? "bg-gray-50 border-gray-200"
+                  : "bg-orange-50"
+              }`}
             >
               {adding ? (
                 <ActivityIndicator color="#f97316" />
@@ -297,8 +306,9 @@ export default function ProductDetails() {
             <TouchableOpacity
               onPress={handleBuyNow}
               disabled={isOutOfStock || adding}
-              className={`flex-[2] m-2 p-4 rounded-xl ${isOutOfStock || adding ? "bg-gray-300" : "bg-primary"
-                }`}
+              className={`flex-[2] m-2 p-4 rounded-xl ${
+                isOutOfStock || adding ? "bg-gray-300" : "bg-primary"
+              }`}
             >
               <Text className="text-white font-bold text-center">
                 {isOutOfStock ? "Stok Habis" : "Beli Sekarang"}
