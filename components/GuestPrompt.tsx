@@ -85,13 +85,6 @@ export default function GuestPrompt({ screen }: GuestPromptProps) {
         </TouchableOpacity>
 
         {/* Back to browsing */}
-        {Platform.OS === "web" && (
-          <TouchableOpacity onPress={() => router.back()} className="mt-4">
-            <Text className="text-slate-500 font-medium text-center text-sm">
-              Lanjut Menjelajah
-            </Text>
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );

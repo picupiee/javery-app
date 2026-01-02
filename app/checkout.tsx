@@ -115,7 +115,7 @@ export default function CheckoutScreen() {
         router.replace("/orders" as any);
       });
     } catch (error) {
-      Alert.alert("Gagal", "Terjadi kesalahan saat membuat pesanan.");
+      showAlert("Gagal", "Terjadi kesalahan saat membuat pesanan.");
     } finally {
       setPlacingOrder(false);
     }

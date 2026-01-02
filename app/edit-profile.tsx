@@ -1,3 +1,4 @@
+import { showAlert } from "@/lib/alert";
 import { auth, db } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -6,8 +7,6 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -32,13 +31,13 @@ export default function EditProfile() {
 
   const handleUpdateProfile = async () => {
     if (!name.trim()) {
-      Alert.alert("Gagal", "Nama tidak boleh kosong");
+      showAlert("Gagal", "Nama tidak boleh kosong");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert("Gagal", "Sesi berakhir. Silakan masuk kembali.");
+      showAlert("Gagal", "Sesi berakhir. Silakan masuk kembali.");
       router.replace("/(auth)/sign-in");
       return;
     }
@@ -54,17 +53,12 @@ export default function EditProfile() {
         displayName: name,
       });
 
-      if (Platform.OS === "web") {
-        window.alert("Profil berhasil diperbarui.");
+      showAlert("Sukses", "Profil berhasil diperbarui.", () => {
         router.back();
-      } else {
-        Alert.alert("Sukses", "Profil berhasil diperbarui.", [
-          { text: "OK", onPress: () => router.back() },
-        ]);
-      }
+      });
     } catch (error: any) {
       console.error("Update Profile error:", error.code, error.message);
-      Alert.alert("Gagal", "Gagal memperbarui profil. Silakan coba lagi.");
+      showAlert("Gagal", "Gagal memperbarui profil. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }

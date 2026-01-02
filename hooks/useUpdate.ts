@@ -1,13 +1,12 @@
+import { showConfirm } from "@/lib/alert";
 import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
-import { Alert, Platform } from "react-native";
 
 /**
  * Returns true if the app is running in a standalone/deployed environment
  * that supports OTA updates (i.e., not local Expo Go/Development Client).
  */
 export const isUpdateEnabledBuild = () => {
-  if (Platform.OS === "web") return false;
   // The updateId is null in development/Expo Go, but a UUID in deployed builds.
   return Updates.updateId !== null;
 };
@@ -39,10 +38,6 @@ const useUpdates = () => {
 
   // 2. Active Check: Used on the Account page (kept from before)
   const activeCheckAndApplyUpdate = async () => {
-    if (Platform.OS === "web") {
-      window.location.reload();
-      return;
-    }
     if (!Updates.isEnabled) return;
     setUpdateStatus("checking");
     setError(null);
@@ -57,13 +52,13 @@ const useUpdates = () => {
         setUpdateStatus("ready");
 
         // Prompt user ONLY after successful download
-        Alert.alert(
+        showConfirm(
           "Update Ready",
           "Update has been downloaded. Reload now to install?",
-          [
-            { text: "Reload", onPress: () => Updates.reloadAsync() },
-            { text: "Later", style: "cancel" },
-          ]
+          () => Updates.reloadAsync(),
+          undefined,
+          "Reload",
+          "Later"
         );
       } else {
         setUpdateStatus("idle");

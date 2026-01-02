@@ -1,3 +1,4 @@
+import { showAlert } from "@/lib/alert";
 import { auth, db } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -6,8 +7,6 @@ import { doc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -37,13 +36,13 @@ export default function CreateProfile() {
 
   const handleCreateProfile = async () => {
     if (!name) {
-      Alert.alert("Gagal", "Mohon isi nama lengkap anda");
+      showAlert("Gagal", "Mohon isi nama lengkap anda");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      Alert.alert("Gagal", "Sesi berakhir. Silakan masuk kembali.");
+      showAlert("Gagal", "Sesi berakhir. Silakan masuk kembali.");
       setTimeout(() => {
         router.replace("/(auth)/sign-in");
       }, 1500);
@@ -69,17 +68,12 @@ export default function CreateProfile() {
         { merge: true }
       );
 
-      if (Platform.OS === "web") {
-        window.alert("Profil pembeli berhasil dibuat.");
+      showAlert("Selamat Datang!", "Profil pembeli berhasil dibuat.", () => {
         router.replace("/");
-      } else {
-        Alert.alert("Selamat Datang!", "Profil pembeli berhasil dibuat.", [
-          { text: "OK", onPress: () => router.replace("/") },
-        ]);
-      }
+      });
     } catch (error: any) {
       console.error("Create Profile error:", error.code, error.message);
-      Alert.alert("Gagal", "Gagal membuat profil. Silakan coba lagi.");
+      showAlert("Gagal", "Gagal membuat profil. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }

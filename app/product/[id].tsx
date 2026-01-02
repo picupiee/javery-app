@@ -91,7 +91,7 @@ export default function ProductDetails() {
         "Lanjut Belanja"
       );
     } catch (e) {
-      Alert.alert("Gagal", "Tidak dapat menambahkan ke keranjang.");
+      showAlert("Gagal", "Tidak dapat menambahkan ke keranjang.");
     } finally {
       setAdding(false);
     }

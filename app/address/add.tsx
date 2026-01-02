@@ -1,3 +1,4 @@
+import { showAlert } from "@/lib/alert";
 import { useAuth } from "@/context/AuthContext";
 import { addAddress } from "@/services/addressService";
 import { FontAwesome } from "@expo/vector-icons";
@@ -5,8 +6,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
   ScrollView,
   Switch,
   Text,
@@ -34,12 +33,12 @@ export default function AddAddressScreen() {
     if (params.source === "checkout" && params.sellerUid) {
       router.push({
         pathname: "/checkout",
-        params: { sellerUid: params.sellerUid }
+        params: { sellerUid: params.sellerUid },
       } as any);
     } else if (params.source === "buyNow" && params.buyNowItem) {
       router.push({
         pathname: "/checkout",
-        params: { sellerUid: params.sellerUid, buyNowItem: params.buyNowItem }
+        params: { sellerUid: params.sellerUid, buyNowItem: params.buyNowItem },
       } as any);
     } else {
       router.back();
@@ -54,7 +53,7 @@ export default function AddAddressScreen() {
       !form.phoneNumber ||
       !form.fullAddress
     ) {
-      Alert.alert("Gagal", "Mohon lengkapi semua data wajib.");
+      showAlert("Gagal", "Mohon lengkapi semua data wajib.");
       return;
     }
 
@@ -71,16 +70,20 @@ export default function AddAddressScreen() {
       } else if (params.source === "buyNow") {
         router.replace({
           pathname: "/checkout",
-          params: { selectedAddressId: newId, sellerUid: params.sellerUid, buyNowItem: params.buyNowItem }
+          params: {
+            selectedAddressId: newId,
+            sellerUid: params.sellerUid,
+            buyNowItem: params.buyNowItem,
+          },
         } as any);
       } else {
         router.back();
       }
     } catch (error) {
-      Alert.alert("Gagal", "Gagal menyimpan alamat");
+      showAlert("Gagal", "Gagal menyimpan alamat");
       setLoading(false); // Only stop loading on error, success navigates away
     } finally {
-      if (Platform.OS === "web") setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -98,7 +101,7 @@ export default function AddAddressScreen() {
           <Text className="text-slate-600 font-medium mb-2">Label Alamat</Text>
           <TextInput
             placeholder="Contoh: Rumah, Kantor"
-            className="p-4 bg-gray-50 rounded-xl border border-gray-200"
+            className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-black"
             value={form.name}
             onChangeText={(t) => setForm({ ...form, name: t })}
           />
@@ -108,7 +111,7 @@ export default function AddAddressScreen() {
           <Text className="text-slate-600 font-medium mb-2">Nama Penerima</Text>
           <TextInput
             placeholder="Nama lengkap penerima"
-            className="p-4 bg-gray-50 rounded-xl border border-gray-200"
+            className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-black"
             value={form.recipientName}
             onChangeText={(t) => setForm({ ...form, recipientName: t })}
           />
@@ -119,7 +122,7 @@ export default function AddAddressScreen() {
           <TextInput
             placeholder="08xxxxxxxx"
             keyboardType="phone-pad"
-            className="p-4 bg-gray-50 rounded-xl border border-gray-200"
+            className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-black"
             value={form.phoneNumber}
             onChangeText={(t) => setForm({ ...form, phoneNumber: t })}
           />
@@ -133,7 +136,7 @@ export default function AddAddressScreen() {
             placeholder="Jalan, Nomor, RT/RW, Kelurahan, Kecamatan"
             multiline
             numberOfLines={3}
-            className="p-4 bg-gray-50 rounded-xl border border-gray-200 min-h-[100px]"
+            className="p-4 bg-gray-50 rounded-xl border border-gray-200 min-h-[100px] text-black"
             style={{ textAlignVertical: "top" }}
             value={form.fullAddress}
             onChangeText={(t) => setForm({ ...form, fullAddress: t })}
@@ -146,7 +149,7 @@ export default function AddAddressScreen() {
           </Text>
           <TextInput
             placeholder="Patokan, warna pagar, dll"
-            className="p-4 bg-gray-50 rounded-xl border border-gray-200"
+            className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-black"
             value={form.notes}
             onChangeText={(t) => setForm({ ...form, notes: t })}
           />
@@ -166,8 +169,9 @@ export default function AddAddressScreen() {
         <TouchableOpacity
           onPress={handleSave}
           disabled={loading}
-          className={`p-4 rounded-xl items-center mb-10 ${loading ? "bg-gray-300" : "bg-primary"
-            }`}
+          className={`p-4 rounded-xl items-center mb-10 ${
+            loading ? "bg-gray-300" : "bg-primary"
+          }`}
         >
           {loading ? (
             <ActivityIndicator color="white" />

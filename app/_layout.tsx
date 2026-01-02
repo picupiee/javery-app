@@ -60,15 +60,8 @@ function AppLayout() {
     }
 
     // Platform-specific behavior for unauthenticated users
-    if (!user && !inAuthGroup) {
-      if (Platform.OS === "web") {
-        // Web: Allow guest browsing, don't force redirect
-        // User can browse freely, auth will be required only for protected screens
-      } else {
-        // Native: Require authentication
-        router.replace("/(auth)/sign-in");
-      }
-    }
+    // Allow guest browsing, don't force redirect
+    // User can browse freely, auth will be required only for protected screens
   }, [user, isLoading, inAuthGroup]);
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { showAlert, showConfirm } from "@/lib/alert";
 import GuestPrompt from "@/components/GuestPrompt";
 import { useAuth } from "@/context/AuthContext";
 import useUpdates from "@/hooks/useUpdate";
@@ -6,8 +7,6 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -58,76 +57,39 @@ export default function Account() {
   const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
   const { updateStatus, error, activeCheckAndApplyUpdate } = useUpdates();
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-
-  React.useEffect(() => {
-    if (Platform.OS === "web") {
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        setDeferredPrompt(e);
-      });
-    }
-  }, []);
 
   const isChecking =
     updateStatus === "checking" || updateStatus === "downloading";
 
   const handleCheckUpdate = async () => {
-    if (Platform.OS === "web") {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === "accepted") {
-          setDeferredPrompt(null);
-        }
-      } else {
-        Alert.alert(
-          "Instal Aplikasi",
-          "Untuk menginstal aplikasi, ketuk menu browser (tiga titik) lalu pilih 'Instal Aplikasi' atau 'Tambahkan ke Layar Utama'."
-        );
-      }
-      return;
-    }
-
     await activeCheckAndApplyUpdate();
     if (updateStatus === "idle") {
-      Alert.alert("Versi Terbaru", "Aplikasi sudah versi terbaru.");
+      showAlert("Versi Terbaru", "Aplikasi sudah versi terbaru.");
     }
   };
 
   const handleLogout = async () => {
-    if (Platform.OS === "web") {
-      const confirm = window.confirm(
-        "Apakah anda yakin ingin keluar dari Javery?"
-      );
-      if (confirm) {
-        logout();
-      }
-      return;
-    }
-
-    Alert.alert("Keluar dari Javery", "Apakah anda yakin ingin keluar?", [
-      { text: "Batal", style: "cancel" },
-      {
-        text: "Keluar",
-        onPress: async () => {
-          setLoading(true);
-          try {
-            await logout();
-            router.replace("/");
-          } catch (error) {
-            console.error("Logout error: ", error);
-            Alert.alert(
-              "Gagal",
-              "Terjadi kesalahan. Silakan tutup paksa aplikasi!"
-            );
-          } finally {
-            setLoading(false);
-          }
-        },
-        style: "destructive",
+    showConfirm(
+      "Keluar dari Javery",
+      "Apakah anda yakin ingin keluar?",
+      async () => {
+        setLoading(true);
+        try {
+          await logout();
+          router.replace("/");
+        } catch (error) {
+          console.error("Logout error: ", error);
+          showAlert(
+            "Gagal",
+            "Terjadi kesalahan. Silakan tutup paksa aplikasi!"
+          );
+        } finally {
+          setLoading(false);
+        }
       },
-    ]);
+      undefined,
+      "Keluar"
+    );
   };
 
   return (
@@ -201,9 +163,7 @@ export default function Account() {
                   ? "Memeriksa..."
                   : updateStatus === "ready"
                     ? "Pembaruan Siap!"
-                    : Platform.OS === "web"
-                      ? "Instal Aplikasi"
-                      : "Periksa Pembaruan"
+                    : "Periksa Pembaruan"
               }
               onPress={handleCheckUpdate}
             />

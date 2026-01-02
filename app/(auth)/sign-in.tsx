@@ -1,18 +1,13 @@
+import { showAlert } from "@/lib/alert";
 import useUpdates from "@/hooks/useUpdate";
 import { auth } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import {
-  browserLocalPersistence,
-  setPersistence,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -25,56 +20,19 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { updateStatus, activeCheckAndApplyUpdate } = useUpdates();
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-
-  React.useEffect(() => {
-    if (Platform.OS === "web") {
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        setDeferredPrompt(e);
-      });
-    }
-  }, []);
-
-  const isChecking =
-    updateStatus === "checking" || updateStatus === "downloading";
-
-  const handleInstallApp = async () => {
-    if (Platform.OS === "web") {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === "accepted") {
-          setDeferredPrompt(null);
-        }
-      } else {
-        Alert.alert(
-          "Instal Aplikasi",
-          "Untuk menginstal aplikasi, ketuk menu browser (titik tiga) lalu pilih 'Instal App' atau 'Tambahkan ke Layar Utama'."
-        );
-      }
-      return;
-    }
-
-    await activeCheckAndApplyUpdate();
-  };
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert("Gagal", "Mohon isi semua kolom");
+      showAlert("Gagal", "Mohon isi semua kolom");
       return;
     }
 
     setLoading(true);
     try {
-      if (Platform.OS === "web") {
-        await setPersistence(auth, browserLocalPersistence);
-      }
       await signInWithEmailAndPassword(auth, email, password);
       // Navigation is handled by _layout.tsx based on role
     } catch (error: any) {
-      Alert.alert("Gagal Masuk", "Email atau kata sandi salah");
+      showAlert("Gagal Masuk", "Email atau kata sandi salah");
     } finally {
       setLoading(false);
     }
@@ -167,48 +125,6 @@ export default function SignIn() {
                 <Text className="text-white font-bold text-base">Masuk →</Text>
               )}
             </TouchableOpacity>
-
-            {/* Install App Button (Web) */}
-            {Platform.OS === "web" && (
-              <TouchableOpacity
-                onPress={handleInstallApp}
-                disabled={isChecking}
-                className="bg-slate-100 border border-slate-200 p-4 rounded-xl items-center mb-3"
-              >
-                {isChecking ? (
-                  <View className="flex-row items-center">
-                    <ActivityIndicator color="#1e293b" size="small" />
-                    <Text className="text-slate-800 font-semibold ml-2">
-                      Memeriksa...
-                    </Text>
-                  </View>
-                ) : (
-                  <View className="flex-row items-center">
-                    <FontAwesome name="download" size={16} color="#1e293b" />
-                    <Text className="text-slate-800 font-semibold ml-2">
-                      Instal Aplikasi
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            )}
-
-            {/* Continue as Guest (Web) */}
-            {Platform.OS === "web" && (
-              <TouchableOpacity
-                onPress={() => {
-                  // Just close the auth screen, user can browse
-                  if (window.history.length > 1) {
-                    window.history.back();
-                  }
-                }}
-                className="p-4"
-              >
-                <Text className="text-slate-500 font-medium text-center">
-                  Lanjut sebagai Tamu
-                </Text>
-              </TouchableOpacity>
-            )}
 
             {/* Sign Up Link */}
             <View className="flex-row justify-center mt-4">
