@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CustomInput from "@/components/CustomInput";
 
 export default function AddAddressScreen() {
   const { user } = useAuth();
@@ -99,9 +100,15 @@ export default function AddAddressScreen() {
       <ScrollView className="flex-1 p-6">
         <View className="mb-4">
           <Text className="text-slate-600 font-medium mb-2">Label Alamat</Text>
-          <TextInput
+          {/* <TextInput
             placeholder="Contoh: Rumah, Kantor"
             className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-black"
+            value={form.name}
+            onChangeText={(t) => setForm({ ...form, name: t })}
+          /> */}
+          <CustomInput
+            label="Label Alamat"
+            placeholder="Contoh: Rumah, Kantor"
             value={form.name}
             onChangeText={(t) => setForm({ ...form, name: t })}
           />
