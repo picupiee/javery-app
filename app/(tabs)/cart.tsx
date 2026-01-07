@@ -1,10 +1,12 @@
 import GuestPrompt from "@/components/GuestPrompt";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/services/cartService";
+import { getSellerProfile } from "@/services/sellerService";
 import { CartItem } from "@/types";
+import { Seller } from "@/services/sellerService";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -19,6 +21,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function CartScreen() {
   const { user } = useAuth();
   const { cartItems, loading, updateQuantity, removeFromCart } = useCart();
+  const [sellerProfiles, setSellerProfiles] = useState<Record<string, Seller>>({});
 
   // Group items by Seller
   const groupedItems = useMemo(() => {
@@ -35,6 +38,30 @@ export default function CartScreen() {
     });
     return groups;
   }, [cartItems]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      const uids = Object.keys(groupedItems);
+      const newProfiles: Record<string, Seller> = {};
+
+      await Promise.all(
+        uids.map(async (uid) => {
+          if (!sellerProfiles[uid]) {
+            const profile = await getSellerProfile(uid);
+            if (profile) {
+              newProfiles[uid] = profile;
+            }
+          }
+        })
+      );
+
+      if (Object.keys(newProfiles).length > 0) {
+        setSellerProfiles((prev) => ({ ...prev, ...newProfiles }));
+      }
+    };
+
+    fetchProfiles();
+  }, [groupedItems]);
 
   const handleCheckout = (sellerUid: string) => {
     // Pass the sellerUid to checkout to know which group to process
@@ -88,8 +115,18 @@ export default function CartScreen() {
             className="bg-white rounded-xl p-4 mb-4 border border-gray-100 shadow-sm"
           >
             <View className="flex-row items-center mb-4 border-b border-gray-50 pb-2">
-              <FontAwesome name="shopping-bag" size={16} color="#f97316" />
-              <Text className="font-bold text-lg ml-2 text-slate-700">
+              {sellerProfiles[sellerUid]?.photoURL ? (
+                <Image
+                  source={{ uri: sellerProfiles[sellerUid].photoURL }}
+                  className="w-8 h-8 rounded-full mr-2"
+                />
+              ) : (
+                <View className="w-8 h-8 rounded-full bg-orange-100 justify-center items-center mr-2">
+                  <FontAwesome name="shopping-bag" size={14} color="#f97316" />
+                </View>
+              )}
+
+              <Text className="font-bold text-lg text-slate-700">
                 {group.sellerName}
               </Text>
             </View>
