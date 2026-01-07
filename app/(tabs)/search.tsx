@@ -94,7 +94,7 @@ export default function Search() {
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       {/* Header */}
       <View className="px-5 py-4 bg-white border-b border-slate-200">
-        <Text className="font-bold text-2xl text-primary">Cari</Text>
+        <Text className="font-bold text-2xl text-primary">Cari Produk</Text>
       </View>
 
       {/* Search Bar */}

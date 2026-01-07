@@ -166,7 +166,7 @@ export default function Home() {
             />
           </View>
         ) : (
-          <View className="bg-orange-50 border-b border-orange-100">
+          <View className="bg-orange-50 border-b border-orange-100 pb-2">
             <View className="px-5 pt-4 flex-row justify-between items-center">
               <Text className="font-bold text-base text-slate-800">
                 🔔 Promosi Terbaru
@@ -181,7 +181,7 @@ export default function Home() {
                 <FontAwesome name="refresh" size={16} color="#f97316" />
               </TouchableOpacity>
             </View>
-            <Text className="text-center text-xl mt-6 font-medium text-slate-500">Belum ada promosi terbaru</Text>
+            <Text className="text-center text-xl mt-3 font-medium text-slate-500">Belum ada promosi terbaru</Text>
             <Text className="text-center text-slate-500 mb-6 mt-2 text-md items-center">Klik tombol <FontAwesome name="refresh" size={16} color="#f97316" /> untuk memuat ulang</Text>
           </View>
         )}

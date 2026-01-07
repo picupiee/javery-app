@@ -50,6 +50,7 @@ export interface CartItem {
   quantity: number;
   sellerUid: string;
   sellerName: string;
+  sellerPhotoURL?: string;
 }
 
 export interface Order {
