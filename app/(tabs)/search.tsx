@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useUserLocation } from "@/hooks/useLocation";
+import useLocationStore from "@/store/location.store";
 import { calculateDistance } from "@/utils/geoUtils";
 
 
@@ -22,7 +22,7 @@ export default function Search() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  const { location, error: locError } = useUserLocation()
+  const { location, error: locError } = useLocationStore()
 
   // Simple manual debounce for now since we don't have the hook file yet
   useEffect(() => {
