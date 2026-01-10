@@ -19,7 +19,8 @@ export const createOrder = async (
   sellerName: string,
   items: CartItem[],
   totalAmount: number,
-  shippingAddress: Address
+  shippingAddress: Address,
+  buyerLocation?: { latitude: number; longitude: number } | null
 ) => {
   try {
     const ordersRef = collection(db, "orders");
@@ -32,6 +33,7 @@ export const createOrder = async (
       totalAmount,
       status: "waiting",
       shippingAddress,
+      buyerLocation: buyerLocation || null,
       paymentMethod: "cod",
       createdAt: serverTimestamp(),
       // We should probably include sellerPhoneNumber if we want it in the order snapshot
