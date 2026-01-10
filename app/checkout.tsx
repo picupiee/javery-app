@@ -17,6 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getActiveSellers, isSellerActive } from "@/services/sellerService";
+import useLocationStore from "@/store/location.store";
 
 export default function CheckoutScreen() {
   const params = useLocalSearchParams<{
@@ -31,6 +32,7 @@ export default function CheckoutScreen() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [loading, setLoading] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const { location: userLocation, loading: locationLoading } = useLocationStore();
 
   // Filter items for this seller
   const buyNowItem = params.buyNowItem ? JSON.parse(params.buyNowItem) : null;
@@ -100,8 +102,25 @@ export default function CheckoutScreen() {
     }
     if (!user) return;
 
+    if (locationLoading) {
+      showAlert("Tunggu Sebentar", "Sedang mengambil lokasi terkini...");
+      return;
+    }
+
     setPlacingOrder(true);
     try {
+      // Ensure we have coordinates if available, otherwise proceed with null
+      const buyerLocation = userLocation
+        ? {
+          latitude: userLocation.coords.latitude,
+          longitude: userLocation.coords.longitude,
+        }
+        : null;
+
+      if (!buyerLocation) {
+        console.warn("User location not available at checkout");
+      }
+
       await createOrder(
         user.uid,
         user.profile?.displayName || user.email?.split("@")[0] || "Pembeli",
@@ -109,7 +128,8 @@ export default function CheckoutScreen() {
         sellerName,
         checkoutItems,
         total,
-        selectedAddress
+        selectedAddress,
+        buyerLocation
       );
       showAlert("Berhasil", "Pesanan berhasil dibuat!", () => {
         router.replace("/orders" as any);

@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
+import useLocationStore from "@/store/location.store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +35,12 @@ function AppLayout() {
     PlusJakartaSans_700Bold,
     ...FontAwesome.font,
   });
+
+  const { fetchLocation } = useLocationStore();
+
+  useEffect(() => {
+    fetchLocation();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded) {

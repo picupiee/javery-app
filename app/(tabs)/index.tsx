@@ -1,7 +1,7 @@
 import ImageWithSkeleton from "@/components/ImageWithSkeleton";
 import ProductCardHome from "@/components/ProductCardHome";
 import SellerCard from "@/components/SellerCard";
-import { useUserLocation } from "@/hooks/useLocation";
+import useLocationStore from "@/store/location.store";
 import {
   formatTimeAgo,
   getRecentPings,
@@ -29,7 +29,7 @@ export default function Home() {
   const [pings, setPings] = useState<Ping[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [productLimit, setProductLimit] = useState(6);
-  const { location: userLocation } = useUserLocation();
+  const { location: userLocation } = useLocationStore();
 
   const fetchData = async () => {
     setRefreshing(true);
