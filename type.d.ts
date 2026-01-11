@@ -9,7 +9,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  stock: number;
+  isAvailable: boolean;
   imageUrl: string;
   ownerUid: string;
   sellerName: string; // Denormalized
@@ -37,7 +37,6 @@ export interface Ping {
 }
 
 export interface MenuItem {
-
   name: string;
   price: number;
   image_url: string;

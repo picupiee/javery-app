@@ -20,7 +20,8 @@ export const createOrder = async (
   items: CartItem[],
   totalAmount: number,
   shippingAddress: Address,
-  buyerLocation?: { latitude: number; longitude: number } | null
+  buyerLocation?: { latitude: number; longitude: number } | null,
+  pickupOrder?: boolean,
 ) => {
   try {
     const ordersRef = collection(db, "orders");
@@ -36,6 +37,7 @@ export const createOrder = async (
       buyerLocation: buyerLocation || null,
       paymentMethod: "cod",
       createdAt: serverTimestamp(),
+      pickupOrder: pickupOrder || false,
       // We should probably include sellerPhoneNumber if we want it in the order snapshot
       // skipping for now unless we fetch it separately or pass it in items.
     };

@@ -54,16 +54,23 @@ const ProductCardHome: React.FC<ProductCardHomeProps> = ({
       onPress={() => router.push(`/product/${item.id}`)}
     >
       <View className="h-36 bg-slate-50 w-full">
-        {item.imageUrl ? (
-          <ImageWithSkeleton
-            source={{ uri: item.imageUrl }}
-            style={{ width: "100%", height: "100%" }}
-            contentFit="cover"
-            transition={500}
-          />
-        ) : (
-          <View className="w-full h-full items-center justify-center">
-            <FontAwesome name="image" size={36} color="#cbd5e1" />
+        <View className={`${!item.isAvailable ? "opacity-65" : ""}`}>
+          {item.imageUrl ? (
+            <ImageWithSkeleton
+              source={{ uri: item.imageUrl }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+              transition={500}
+            />
+          ) : (
+            <View className="w-full h-full items-center justify-center">
+              <FontAwesome name="image" size={36} color="#cbd5e1" />
+            </View>
+          )}
+        </View>
+        {!item.isAvailable && (
+          <View className="absolute top-2 left-2 bg-red-600/90 px-2 py-1 rounded">
+            <Text className="text-[10px] text-white font-bold">Stok Habis</Text>
           </View>
         )}
       </View>

@@ -2,6 +2,7 @@ import GuestPrompt from "@/components/GuestPrompt";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/services/cartService";
 import { getSellerProfile } from "@/services/sellerService";
+import { getProductById } from "@/services/productService";
 import { CartItem } from "@/types";
 import { Seller } from "@/services/sellerService";
 import { FontAwesome } from "@expo/vector-icons";
@@ -21,7 +22,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function CartScreen() {
   const { user } = useAuth();
   const { cartItems, loading, updateQuantity, removeFromCart } = useCart();
-  const [sellerProfiles, setSellerProfiles] = useState<Record<string, Seller>>({});
+  const [sellerProfiles, setSellerProfiles] = useState<Record<string, Seller>>(
+    {}
+  );
+  const [productAvailability, setProductAvailability] = useState<
+    Record<string, boolean>
+  >({});
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
   // Group items by Seller
   const groupedItems = useMemo(() => {
@@ -63,7 +70,55 @@ export default function CartScreen() {
     fetchProfiles();
   }, [groupedItems]);
 
-  const handleCheckout = (sellerUid: string) => {
+  useEffect(() => {
+    const checkAvailability = async () => {
+      setCheckingAvailability(true);
+      const availability: Record<string, boolean> = {};
+
+      try {
+        await Promise.all(
+          cartItems.map(async (item) => {
+            const product = await getProductById(item.id);
+            availability[item.id] = product ? product.isAvailable : false;
+          })
+        );
+        setProductAvailability(availability);
+      } catch (error) {
+        console.error("Error checking availability in cart:", error);
+      } finally {
+        setCheckingAvailability(false);
+      }
+    };
+
+    if (cartItems.length > 0) {
+      checkAvailability();
+    }
+  }, [cartItems]);
+
+  const handleCheckout = async (sellerUid: string) => {
+    const group = groupedItems[sellerUid];
+    if (!group) return;
+
+    // Last second check before proceeding
+    let allAvailable = true;
+    for (const item of group.items) {
+      const product = await getProductById(item.id);
+      if (!product || !product.isAvailable) {
+        allAvailable = false;
+        break;
+      }
+    }
+
+    if (!allAvailable) {
+      import("@/lib/alert").then(({ showAlert }) => {
+        showAlert(
+          "Produk Tidak Tersedia",
+          "Ada produk yang sudah tidak tersedia atau kosong di keranjangmu. Silahkan hapus untuk melanjutkan."
+        );
+      });
+      return;
+    }
+
     // Pass the sellerUid to checkout to know which group to process
     router.push(`/checkout?sellerUid=${sellerUid}`);
   };
@@ -148,9 +203,18 @@ export default function CartScreen() {
                     >
                       {item.productName}
                     </Text>
-                    <Text className="text-primary font-bold">
-                      Rp {item.productPrice.toLocaleString("id-ID")}
-                    </Text>
+                    <View className="flex-row items-center gap-2">
+                      <Text className="text-primary font-bold">
+                        Rp {item.productPrice.toLocaleString("id-ID")}
+                      </Text>
+                      {productAvailability[item.id] === false && (
+                        <View className="bg-red-100 px-2 py-0.5 rounded">
+                          <Text className="text-red-600 text-[10px] font-bold">
+                            Produk Tidak Tersedia
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
 
                   <View className="flex-row items-center justify-between mt-2">
@@ -196,7 +260,10 @@ export default function CartScreen() {
               </View>
               <TouchableOpacity
                 onPress={() => handleCheckout(sellerUid)}
-                className="bg-primary px-6 py-2.5 rounded-lg"
+                disabled={group.items.some(
+                  (item) => productAvailability[item.id] === false
+                )}
+                className={`${group.items.some((item) => productAvailability[item.id] === false) ? "bg-gray-300" : "bg-primary"} px-6 py-2.5 rounded-lg`}
               >
                 <Text className="text-white font-bold">Checkout</Text>
               </TouchableOpacity>

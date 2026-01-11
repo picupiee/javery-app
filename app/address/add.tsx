@@ -1,4 +1,4 @@
-import { showAlert } from "@/lib/alert";
+import { showAlert, showConfirm } from "@/lib/alert";
 import { useAuth } from "@/context/AuthContext";
 import { addAddress } from "@/services/addressService";
 import { FontAwesome } from "@expo/vector-icons";
@@ -47,7 +47,15 @@ export default function AddAddressScreen() {
   };
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user) {
+      showConfirm(
+        "Anda Belum Masuk",
+        "Silahkan masuk terlebih dahulu untuk melanjutkan pesanan",
+        () => {
+          router.push("/(auth)/sign-up");
+        }
+      );
+    }
     if (
       !form.name ||
       !form.recipientName ||
@@ -61,7 +69,7 @@ export default function AddAddressScreen() {
     setLoading(true);
 
     try {
-      const newId = await addAddress(user.uid, form);
+      const newId = await addAddress(user!.uid, form);
 
       if (params.source === "checkout") {
         router.replace({
@@ -100,18 +108,18 @@ export default function AddAddressScreen() {
       <ScrollView className="flex-1 p-6">
         <View className="mb-4">
           <Text className="text-slate-600 font-medium mb-2">Label Alamat</Text>
-          {/* <TextInput
+          <TextInput
             placeholder="Contoh: Rumah, Kantor"
             className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-black"
             value={form.name}
             onChangeText={(t) => setForm({ ...form, name: t })}
-          /> */}
-          <CustomInput
+          />
+          {/* <CustomInput
             label="Label Alamat"
             placeholder="Contoh: Rumah, Kantor"
             value={form.name}
             onChangeText={(t) => setForm({ ...form, name: t })}
-          />
+          /> */}
         </View>
 
         <View className="mb-4">

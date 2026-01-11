@@ -1,17 +1,56 @@
 const {
   onDocumentCreated,
   onDocumentUpdated,
+  onDocumentDeleted,
 } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 const { Expo } = require("expo-server-sdk");
+const cloudinary = require("cloudinary").v2;
 
 admin.initializeApp();
+
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: "dazl8oipc",
+  api_key: "636879112138795",
+  api_secret: "NYSCksSlorzkDb9X8zQxwIVWwAA",
+});
 
 // Set region if necessary, default is us-central1
 setGlobalOptions({ region: "us-central1" });
 
 const expo = new Expo();
+
+/**
+ * Helper to extract Cloudinary Public ID from a URL
+ * Handles versioning (v123...) and folder structures.
+ */
+const getPublicIdFromUrl = (url) => {
+  if (!url || !url.includes("cloudinary.com")) return null;
+
+  // Regex: Finds everything between '/upload/' (optionally skipping /v123/) and the file extension
+  const regex = /\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/;
+  const match = url.match(regex);
+
+  return match ? match[1] : null;
+};
+
+/**
+ * Helper to delete image from Cloudinary
+ */
+const deleteCloudinaryImage = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      invalidate: true,
+    });
+    console.log(`Cloudinary deletion for [${publicId}]:`, result.result);
+    return result;
+  } catch (error) {
+    console.error(`Cloudinary error for [${publicId}]:`, error);
+    throw error;
+  }
+};
 
 exports.sendOrderNotification = onDocumentCreated(
   "orders/{orderId}",
@@ -162,6 +201,38 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
       }
     } catch (error) {
       console.error("Error in sendOrderStatusNotification:", error);
+    }
+  }
+);
+
+exports.deleteProductImage = onDocumentDeleted(
+  "products/{productId}",
+  async (event) => {
+    const data = event.data?.data();
+    const publicId = getPublicIdFromUrl(data?.imageUrl);
+
+    if (publicId) {
+      await deleteCloudinaryImage(publicId);
+    }
+  }
+);
+
+exports.cleanupOldProductImage = onDocumentUpdated(
+  "products/{productId}",
+  async (event) => {
+    const beforeData = event.data.before.data();
+    const afterData = event.data.after.data();
+
+    const oldUrl = beforeData.imageUrl;
+    const newUrl = afterData.imageUrl;
+
+    // Only delete if the URL has changed and the old one existed
+    if (oldUrl && oldUrl !== newUrl) {
+      const publicId = getPublicIdFromUrl(oldUrl);
+      if (publicId) {
+        console.log("Detected image change, removing old asset...");
+        await deleteCloudinaryImage(publicId);
+      }
     }
   }
 );

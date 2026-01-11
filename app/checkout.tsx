@@ -1,5 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { showAlert } from "@/lib/alert";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { getAddresses } from "@/services/addressService";
 import { useCart } from "@/services/cartService";
 import { createOrder } from "@/services/orderService";
@@ -32,7 +34,8 @@ export default function CheckoutScreen() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [loading, setLoading] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
-  const { location: userLocation, loading: locationLoading } = useLocationStore();
+  const { location: userLocation, loading: locationLoading } =
+    useLocationStore();
 
   // Filter items for this seller
   const buyNowItem = params.buyNowItem ? JSON.parse(params.buyNowItem) : null;
@@ -109,12 +112,36 @@ export default function CheckoutScreen() {
 
     setPlacingOrder(true);
     try {
+      // Re-check product availability
+      for (const item of checkoutItems) {
+        const productRef = doc(db, "products", item.id);
+        const productSnap = await getDoc(productRef);
+        if (productSnap.exists()) {
+          const productData = productSnap.data();
+          if (!productData?.isAvailable) {
+            showAlert(
+              "Produk Tidak Tersedia",
+              `Maaf, produk "${item.productName}" sudah tidak tersedia atau kosong.`
+            );
+            setPlacingOrder(false);
+            return;
+          }
+        } else {
+          showAlert(
+            "Produk Tidak Ditemukan",
+            `Maaf, produk "${item.productName}" tidak ditemukan.`
+          );
+          setPlacingOrder(false);
+          return;
+        }
+      }
+
       // Ensure we have coordinates if available, otherwise proceed with null
       const buyerLocation = userLocation
         ? {
-          latitude: userLocation.coords.latitude,
-          longitude: userLocation.coords.longitude,
-        }
+            latitude: userLocation.coords.latitude,
+            longitude: userLocation.coords.longitude,
+          }
         : null;
 
       if (!buyerLocation) {

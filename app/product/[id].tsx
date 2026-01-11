@@ -71,6 +71,10 @@ export default function ProductDetails() {
 
   const handleAddToCart = async () => {
     if (!product) return;
+    if (!product.isAvailable) {
+      showAlert("Pemberitahuan", "Produk tidak tersedia atau kosong");
+      return;
+    }
     setAdding(true);
     try {
       await addToCart({
@@ -98,7 +102,12 @@ export default function ProductDetails() {
   };
 
   const handleBuyNow = async () => {
-    if (!product || isOutOfStock) return;
+    if (!product) return;
+
+    if (!product.isAvailable) {
+      showAlert("Pemberitahuan", "Produk tidak tersedia atau kosong");
+      return;
+    }
 
     const isActive = await isSellerActive(product.sellerUid);
     if (!isActive) {
@@ -158,8 +167,7 @@ export default function ProductDetails() {
     );
   }
 
-  const isUnlimited = product.isUnlimited;
-  const isOutOfStock = !isUnlimited && product.stock === 0;
+  const isAvailable = product.isAvailable;
 
   return (
     <>
@@ -211,29 +219,33 @@ export default function ProductDetails() {
             </View>
 
             <View className="flex-row items-center mb-6">
-              <View className="bg-gray-100 px-3 py-1 rounded-full mr-2">
+              {/* <View className="bg-gray-100 px-3 py-1 rounded-full mr-2">
                 <Text className="text-xs text-gray-600 font-medium">
                   {product.category}
                 </Text>
-              </View>
+              </View> */}
               <View
                 className={`${
-                  isOutOfStock ? "bg-red-100" : "bg-green-100"
+                  !isAvailable ? "bg-red-200" : "bg-green-200"
                 } px-3 py-1 rounded-full`}
               >
                 <Text
                   className={`text-xs ${
-                    isOutOfStock ? "text-red-700" : "text-green-700"
+                    !isAvailable ? "text-red-700" : "text-green-700"
                   } font-medium`}
                 >
-                  Stok: {isUnlimited ? "Tersedia" : product.stock}
+                  {isAvailable ? "Tersedia" : `Tidak Tersedia / Kosong`}
                 </Text>
               </View>
             </View>
 
-            <Text className="text-lg font-bold mb-2">Deskripsi</Text>
+            <Text className="text-lg font-bold mb-2">Tentang Produk</Text>
             <Text className="text-gray-600 font-medium leading-6 mb-8">
-              {product.description || "Tidak ada deskripsi."}
+              {product?.description === "" ? (
+                <Text className="text-gray-400">Tidak ada deskripsi.</Text>
+              ) : (
+                product.description
+              )}
             </Text>
 
             {/* Seller Info */}
@@ -285,9 +297,9 @@ export default function ProductDetails() {
           <View className="flex-row gap-2">
             <TouchableOpacity
               onPress={handleAddToCart}
-              disabled={isOutOfStock || adding}
+              disabled={adding}
               className={` p-2 m-2 justify-center rounded-xl border border-primary-200 ${
-                isOutOfStock || adding
+                !isAvailable || adding
                   ? "bg-gray-50 border-gray-200"
                   : "bg-orange-50"
               }`}
@@ -298,20 +310,20 @@ export default function ProductDetails() {
                 <FontAwesome
                   name="shopping-cart"
                   size={24}
-                  color={isOutOfStock || adding ? "gray" : "#f97316"}
+                  color={!isAvailable || adding ? "gray" : "#f97316"}
                 />
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleBuyNow}
-              disabled={isOutOfStock || adding}
+              disabled={adding}
               className={`flex-[2] m-2 p-4 rounded-xl ${
-                isOutOfStock || adding ? "bg-gray-300" : "bg-primary"
+                !isAvailable || adding ? "bg-gray-300" : "bg-primary"
               }`}
             >
               <Text className="text-white font-bold text-center">
-                {isOutOfStock ? "Stok Habis" : "Beli Sekarang"}
+                {!isAvailable ? "Tidak Tersedia / Kosong" : "Beli Sekarang"}
               </Text>
             </TouchableOpacity>
           </View>

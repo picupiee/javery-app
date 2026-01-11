@@ -82,8 +82,7 @@ export interface Product {
   description: string;
   imageUrl: string;
   category: string;
-  stock: number;
-  isUnlimited?: boolean;
+  isAvailable: boolean;
   createdAt: string;
   updatedAt: string;
   photoURL?: string;
