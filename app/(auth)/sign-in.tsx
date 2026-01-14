@@ -2,8 +2,8 @@ import { showAlert } from "@/lib/alert";
 import useUpdates from "@/hooks/useUpdate";
 import { auth } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link, router } from "expo-router";
+import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -29,7 +29,16 @@ export default function SignIn() {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+      if (!user.emailVerified) {
+        setLoading(false)
+        showAlert("Email Belum Terverifikasi", "Silahkan klik OK untuk memverifikasi email anda", (() => sendEmailVerification(user).then(() => showAlert("Verifikasi Telah Dikirim", "Silahkan cek kotak masuk email anda"))));
+      } else {
+        setLoading(false)
+        router.replace("/(tabs)")
+      }
+      // await signInWithEmailAndPassword(auth, email, password);
       // Navigation is handled by _layout.tsx based on role
     } catch (error: any) {
       showAlert("Gagal Masuk", "Email atau kata sandi salah");
@@ -110,9 +119,8 @@ export default function SignIn() {
             <TouchableOpacity
               onPress={handleSignIn}
               disabled={loading}
-              className={`bg-primary p-4 rounded-xl items-center mb-3 ${
-                loading ? "opacity-70" : ""
-              }`}
+              className={`bg-primary p-4 rounded-xl items-center mb-3 ${loading ? "opacity-70" : ""
+                }`}
             >
               {loading ? (
                 <View className="flex-row items-center">
