@@ -4,7 +4,7 @@ import { auth, db } from "@/lib/firebase";
 import { UserProfile } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
@@ -56,7 +56,8 @@ export default function SignUp() {
       };
 
       await setDoc(doc(db, "users", user.uid), userProfile);
-
+      await sendEmailVerification(user);
+      showAlert("Verifikasi Email Anda", `Halo, ${name}! Silahkan cek kotak masuk email anda untuk memverifikasi email anda.`);
       // Router replace is handled in _layout.tsx
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
@@ -164,9 +165,8 @@ export default function SignUp() {
             <TouchableOpacity
               onPress={handleSignUp}
               disabled={loading}
-              className={`bg-primary p-4 rounded-xl items-center mb-3 ${
-                loading ? "opacity-70" : ""
-              }`}
+              className={`bg-primary p-4 rounded-xl items-center mb-3 ${loading ? "opacity-70" : ""
+                }`}
             >
               {loading ? (
                 <View className="flex-row items-center">

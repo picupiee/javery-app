@@ -34,6 +34,7 @@ export default function SignIn() {
       if (!user.emailVerified) {
         setLoading(false)
         showAlert("Email Belum Terverifikasi", "Silahkan klik OK untuk memverifikasi email anda", (() => sendEmailVerification(user).then(() => showAlert("Verifikasi Telah Dikirim", "Silahkan cek kotak masuk email anda"))));
+        return;
       } else {
         setLoading(false)
         router.replace("/(tabs)")
