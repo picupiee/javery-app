@@ -54,7 +54,7 @@ export default function Account() {
 
   const userName =
     user?.profile?.displayName || user?.email?.split("@")[0] || "Pengguna";
-  const email = user.email || "Email tidak ditemukan";
+  const email = user.email as string;
   const [loading, setLoading] = useState(false);
   const { updateStatus, error, activeCheckAndApplyUpdate } = useUpdates();
 
