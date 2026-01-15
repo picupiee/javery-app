@@ -4,8 +4,6 @@ import { auth, db } from "@/lib/firebase";
 import { UserProfile } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -33,15 +31,14 @@ export default function SignUp() {
     setLoading(true);
     try {
       // 1. Create Auth User
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      const userCredential = await auth.createUserWithEmailAndPassword(
         email,
         password
       );
       const user = userCredential.user;
 
       // 2. Update Display Name
-      await updateProfile(user, { displayName: name });
+      await user.updateProfile({ displayName: name });
 
       // 3. Create Firestore Profile with buyer role
       const userProfile: UserProfile = {
@@ -55,8 +52,8 @@ export default function SignUp() {
         },
       };
 
-      await setDoc(doc(db, "users", user.uid), userProfile);
-      await sendEmailVerification(user);
+      await db.collection("users").doc(user.uid).set(userProfile);
+      await user.sendEmailVerification();
       showAlert("Verifikasi Email Anda", `Halo, ${name}! Silahkan cek kotak masuk email anda untuk memverifikasi email anda.`);
       // Router replace is handled in _layout.tsx
     } catch (error: any) {

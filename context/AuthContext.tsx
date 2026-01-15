@@ -1,7 +1,5 @@
 import { auth, db } from "@/lib/firebase";
 import { AugmentedUser, UserProfile } from "@/types/index";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
@@ -17,10 +15,7 @@ const subscribeToUserProfile = (
   onProfile: (profile: UserProfile | null) => void,
   onError: (error: any) => void
 ) => {
-  const docRef = doc(db, "users", uid);
-
-  const unsubscribe = onSnapshot(
-    docRef,
+  const unsubscribe = db.collection("users").doc(uid).onSnapshot(
     (docSnap) => {
       if (docSnap.exists()) {
         onProfile(docSnap.data() as UserProfile);
@@ -57,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribeAuth = auth.onAuthStateChanged((firebaseUser) => {
       if (unsubscribeProfile) {
         unsubscribeProfile();
         unsubscribeProfile = null;

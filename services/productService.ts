@@ -1,14 +1,14 @@
 import { db } from "@/lib/firebase";
 import { Product } from "@/types";
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 
 export const getFeaturedProducts = async (limitCount: number = 10): Promise<Product[]> => {
   try {
-    const productsRef = collection(db, "products");
+    const snapshot = await db
+      .collection("products")
+      .orderBy("createdAt", "desc")
+      .limit(limitCount)
+      .get();
     
-    const q = query(productsRef, orderBy("createdAt", "desc"), limit(limitCount));
-    
-    const snapshot = await getDocs(q);
     const products: Product[] = [];
     
     snapshot.forEach((doc) => {
@@ -24,10 +24,11 @@ export const getFeaturedProducts = async (limitCount: number = 10): Promise<Prod
 
 export const getProductsBySeller = async (sellerUid: string): Promise<Product[]> => {
   try {
-    const productsRef = collection(db, "products");
-    const q = query(productsRef, where("sellerUid", "==", sellerUid));
+    const snapshot = await db
+      .collection("products")
+      .where("sellerUid", "==", sellerUid)
+      .get();
     
-    const snapshot = await getDocs(q);
     const products: Product[] = [];
     
     snapshot.forEach((doc) => {
@@ -43,8 +44,7 @@ export const getProductsBySeller = async (sellerUid: string): Promise<Product[]>
 
 export const getProductById = async (productId: string): Promise<Product | null> => {
   try {
-    const docRef = doc(db, "products", productId);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await db.collection("products").doc(productId).get();
     
     if (docSnap.exists()) {
       return { id: docSnap.id, ...docSnap.data() } as Product;
@@ -64,9 +64,7 @@ export const searchProducts = async (searchTerm: string): Promise<Product[]> => 
         // For a real app, use Algolia or Typesense.
         // Here we'll fetch all (or a subset) and filter in memory for simplicity in this stage.
         
-        const productsRef = collection(db, "products");
-        const q = query(productsRef, limit(50)); // Limit to avoid fetching too much
-        const snapshot = await getDocs(q);
+        const snapshot = await db.collection("products").limit(50).get();
         
         const products: Product[] = [];
         const lowerTerm = searchTerm.toLowerCase();

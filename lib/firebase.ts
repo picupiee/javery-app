@@ -1,34 +1,37 @@
-// import { getAnalytics } from "firebase/analytics";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { initializeApp } from "firebase/app";
-import {
-  Auth,
-  getAuth,
-  // @ts-ignore
-  getReactNativePersistence,
-  initializeAuth,
-} from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { Platform } from "react-native";
+// New Firebase Config
+import firebase from "@react-native-firebase/app";
+import authModule from "@react-native-firebase/auth";
+import firestoreModule from "@react-native-firebase/firestore";
+import appCheck, { initializeAppCheck } from "@react-native-firebase/app-check";
 
-const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
-};
+// Use the namespaced factory method to bypass 'unknown' type errors
+const appCheckModule = appCheck();
 
-const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
+// 1. Create the provider using the factory method
+const provider = appCheckModule.newReactNativeFirebaseAppCheckProvider();
 
-// Use platform-specific persistence
-let auth: Auth;
-auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
+provider.configure({
+  android: {
+    provider: __DEV__ ? 'debug' : 'playIntegrity',
+    debugToken: 'YOUR_DEBUG_TOKEN', 
+  },
+  apple: {
+    provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback',
+    debugToken: 'YOUR_DEBUG_TOKEN',
+  }
 });
 
-export { auth };
-export const db = getFirestore(app);
+// 2. Initialize App Check
+// Use (firebase.app() as any) to bypass the 'FirebaseApp' assignment error
+// This is necessary because the SDK types currently fail to recognize the native app instance correctly
+initializeAppCheck(firebase.app() as any, {
+  provider: provider,
+  isTokenAutoRefreshEnabled: true,
+});
+
+// 3. Export Native Instances
+export const auth = authModule();
+export const db = firestoreModule();
+
+export default auth;
+

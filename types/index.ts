@@ -1,4 +1,4 @@
-import { User } from "firebase/auth";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 export interface UserProfile {
   uid: string;
@@ -69,7 +69,7 @@ export interface Order {
   completedAt?: any; // Timestamp
 }
 
-export interface AugmentedUser extends User {
+export interface AugmentedUser extends FirebaseAuthTypes.User {
   profile: UserProfile;
 }
 

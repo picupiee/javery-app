@@ -3,7 +3,6 @@ import useUpdates from "@/hooks/useUpdate";
 import { auth } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -29,11 +28,11 @@ export default function SignIn() {
 
     setLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const userCredential = await auth.signInWithEmailAndPassword(email, password)
       const user = userCredential.user
       if (!user.emailVerified) {
         setLoading(false)
-        showAlert("Email Belum Terverifikasi", "Silahkan klik OK untuk memverifikasi email anda", (() => sendEmailVerification(user).then(() => showAlert("Verifikasi Telah Dikirim", "Silahkan cek kotak masuk email anda"))));
+        showAlert("Email Belum Terverifikasi", "Silahkan klik OK untuk memverifikasi email anda", (() => user.sendEmailVerification().then(() => showAlert("Verifikasi Telah Dikirim", "Silahkan cek kotak masuk email anda"))));
         return;
       } else {
         setLoading(false)

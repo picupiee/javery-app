@@ -53,12 +53,12 @@ const useUpdates = () => {
 
         // Prompt user ONLY after successful download
         showConfirm(
-          "Update Ready",
-          "Update has been downloaded. Reload now to install?",
+          "Update Telah Tersedia",
+          "Update telah diunduh. Apakah anda ingin menginstall update ini?",
           () => Updates.reloadAsync(),
           undefined,
-          "Reload",
-          "Later"
+          "Install",
+          "Nanti"
         );
       } else {
         setUpdateStatus("idle");
