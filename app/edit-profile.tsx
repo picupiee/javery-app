@@ -2,6 +2,8 @@ import { showAlert } from "@/lib/alert";
 import { auth, db } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { updateProfile } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -44,10 +46,10 @@ export default function EditProfile() {
 
     try {
       // Update Firebase Auth display name
-      await user.updateProfile({ displayName: name });
+      await updateProfile(user, { displayName: name });
 
       // Update user profile in Firestore
-      await db.collection("users").doc(user.uid).update({
+      await updateDoc(doc(db, "users", user.uid), {
         displayName: name,
       });
 
@@ -110,10 +112,11 @@ export default function EditProfile() {
           <TouchableOpacity
             onPress={handleUpdateProfile}
             disabled={loading || !name.trim()}
-            className={`bg-primary p-4 rounded-xl items-center ${loading || !name.trim()
+            className={`bg-primary p-4 rounded-xl items-center ${
+              loading || !name.trim()
                 ? "opacity-70 bg-slate-400"
                 : "bg-orange-500"
-              }`}
+            }`}
           >
             {loading ? (
               <View className="flex-row items-center">

@@ -2,7 +2,7 @@
   "expo": {
     "name": "javery-app",
     "slug": "javery-app",
-    "version": "1.2.5",
+    "version": "1.2.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "javeryapp",
@@ -30,12 +30,7 @@
         {
           "android": {
             "gradleJvmArgs": "-Xmx2048m -XX:MaxMetaspaceSize=1024m",
-            "buildArchs": [
-              "arm64-v8a"
-            ]
-          },
-          "ios": {
-            "useFrameworks": "static"
+            "buildArchs": ["arm64-v8a"]
           }
         }
       ],

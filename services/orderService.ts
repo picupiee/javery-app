@@ -1,6 +1,16 @@
 import { db } from "@/lib/firebase";
 import { Address, CartItem, Order } from "@/types";
-import firestore from "@react-native-firebase/firestore";
+import {
+    addDoc,
+    collection,
+    doc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
+    where,
+    writeBatch,
+} from "firebase/firestore";
 
 export const createOrder = async (
   buyerUid: string,
@@ -14,7 +24,7 @@ export const createOrder = async (
   pickupOrder?: boolean,
 ) => {
   try {
-    const ordersRef = db.collection("orders");
+    const ordersRef = collection(db, "orders");
     const orderData = {
       buyerUid,
       buyerName,
@@ -26,18 +36,18 @@ export const createOrder = async (
       shippingAddress,
       buyerLocation: buyerLocation || null,
       paymentMethod: "cod",
-      createdAt: firestore.FieldValue.serverTimestamp(),
+      createdAt: serverTimestamp(),
       pickupOrder: pickupOrder || false,
       // We should probably include sellerPhoneNumber if we want it in the order snapshot
       // skipping for now unless we fetch it separately or pass it in items.
     };
 
-    const docRef = await ordersRef.add(orderData);
+    const docRef = await addDoc(ordersRef, orderData);
 
     // Remove items from Cart (batch)
-    const batch = db.batch();
+    const batch = writeBatch(db);
     items.forEach((item) => {
-      const itemRef = db.collection("users").doc(buyerUid).collection("cart").doc(item.id);
+      const itemRef = doc(db, "users", buyerUid, "cart", item.id);
       batch.delete(itemRef);
     });
     await batch.commit();
@@ -54,12 +64,12 @@ export const createOrder = async (
 
 export const getMyOrders = async (buyerUid: string): Promise<Order[]> => {
   try {
-    const snapshot = await db
-      .collection("orders")
-      .where("buyerUid", "==", buyerUid)
-      .orderBy("createdAt", "desc")
-      .get();
-
+    const q = query(
+      collection(db, "orders"),
+      where("buyerUid", "==", buyerUid),
+      orderBy("createdAt", "desc")
+    );
+    const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -72,9 +82,10 @@ export const getMyOrders = async (buyerUid: string): Promise<Order[]> => {
 
 export const getOrderById = async (orderId: string): Promise<Order | null> => {
   try {
-    const docRef = db.collection("orders").doc(orderId);
-    const snapshot = await docRef.get();
-    
+    const docRef = doc(db, "orders", orderId);
+    const snapshot = await import("firebase/firestore").then((mod) =>
+      mod.getDoc(docRef)
+    );
     if (snapshot.exists()) {
       const order = { id: snapshot.id, ...snapshot.data() } as Order;
       // Lazy Update Check
@@ -85,10 +96,12 @@ export const getOrderById = async (orderId: string): Promise<Order | null> => {
 
         if (now - startTime > thirtyMinutes) {
           // Auto-complete
-          await docRef.update({
-            status: "completed",
-            completedAt: firestore.FieldValue.serverTimestamp(),
-          });
+          await import("firebase/firestore").then((mod) =>
+            mod.updateDoc(docRef, {
+              status: "completed",
+              completedAt: mod.serverTimestamp(),
+            })
+          );
           return { ...order, status: "completed" }; // Return updated state locally
         }
       }

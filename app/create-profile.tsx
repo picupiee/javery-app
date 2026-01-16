@@ -2,6 +2,8 @@ import { showAlert } from "@/lib/alert";
 import { auth, db } from "@/lib/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -51,22 +53,20 @@ export default function CreateProfile() {
 
     try {
       // Update Firebase Auth display name
-      await user.updateProfile({ displayName: name });
+      await updateProfile(user, { displayName: name });
 
       // Update user profile in Firestore to add buyer role
-      await db
-        .collection("users")
-        .doc(user.uid)
-        .set(
-          {
-            displayName: name,
-            roles: {
-              buyer: true,
-              seller: true, // Keep seller role if they had it
-            },
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          displayName: name,
+          roles: {
+            buyer: true,
+            seller: true, // Keep seller role if they had it
           },
-          { merge: true }
-        );
+        },
+        { merge: true }
+      );
 
       showAlert("Selamat Datang!", "Profil pembeli berhasil dibuat.", () => {
         router.replace("/");
@@ -135,8 +135,9 @@ export default function CreateProfile() {
           <TouchableOpacity
             onPress={handleCreateProfile}
             disabled={loading}
-            className={`bg-primary p-4 rounded-xl items-center ${loading ? "opacity-70" : ""
-              }`}
+            className={`bg-primary p-4 rounded-xl items-center ${
+              loading ? "opacity-70" : ""
+            }`}
           >
             {loading ? (
               <View className="flex-row items-center">

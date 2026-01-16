@@ -5,6 +5,7 @@ import { Seller } from "@/services/sellerService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -29,10 +30,9 @@ export default function SellerStore() {
       setLoading(true);
       try {
         // Fetch seller info
-        const sellerDoc = await db
-          .collection("sellers")
-          .where("uid", "==", id)
-          .get();
+        const sellerDoc = await getDocs(
+          query(collection(db, "sellers"), where("uid", "==", id))
+        );
 
         if (!sellerDoc.empty) {
           const sellerData = sellerDoc.docs[0].data() as Seller;

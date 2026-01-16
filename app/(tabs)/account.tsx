@@ -54,7 +54,7 @@ export default function Account() {
 
   const userName =
     user?.profile?.displayName || user?.email?.split("@")[0] || "Pengguna";
-  const email = user.email as string;
+  const email = user?.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
   const { updateStatus, error, activeCheckAndApplyUpdate } = useUpdates();
 
@@ -63,7 +63,7 @@ export default function Account() {
 
   const handleCheckUpdate = async () => {
     await activeCheckAndApplyUpdate();
-    if (updateStatus !== "checking") {
+    if (updateStatus === "idle") {
       showAlert("Versi Terbaru", "Aplikasi sudah versi terbaru.");
     }
   };
@@ -176,7 +176,7 @@ export default function Account() {
           )}
 
           <Text className="text-slate-400 text-xs text-center mt-4">
-            Versi Aplikasi 1.2.5
+            Versi Aplikasi 1.2.1
           </Text>
         </View>
 

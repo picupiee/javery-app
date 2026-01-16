@@ -1,8 +1,16 @@
 import { db } from "@/lib/firebase";
 import { Address } from "@/types";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    updateDoc
+} from "firebase/firestore";
 
 const getCollection = (userId: string) =>
-  db.collection("users").doc(userId).collection("addresses");
+  collection(db, "users", userId, "addresses");
 
 export const addAddress = async (
   userId: string,
@@ -13,14 +21,14 @@ export const addAddress = async (
     
     // If set as default, unset others first
     if (address.isDefault) {
-      const allDocs = await colRef.get();
+      const allDocs = await getDocs(colRef);
       const batchPromises = allDocs.docs.map((d) =>
-        d.ref.update({ isDefault: false })
+        updateDoc(d.ref, { isDefault: false })
       );
       await Promise.all(batchPromises);
     }
 
-    const docRef = await colRef.add(address);
+    const docRef = await addDoc(colRef, address);
     return docRef.id;
   } catch (error) {
     console.error("Error adding address:", error);
@@ -31,7 +39,7 @@ export const addAddress = async (
 export const getAddresses = async (userId: string): Promise<Address[]> => {
   try {
     const colRef = getCollection(userId);
-    const snapshot = await colRef.get();
+    const snapshot = await getDocs(colRef);
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -47,8 +55,8 @@ export const deleteAddress = async (
   addressId: string
 ): Promise<void> => {
   try {
-    const docRef = db.collection("users").doc(userId).collection("addresses").doc(addressId);
-    await docRef.delete();
+    const docRef = doc(db, "users", userId, "addresses", addressId);
+    await deleteDoc(docRef);
   } catch (error) {
     console.error("Error deleting address:", error);
     throw new Error("Gagal menghapus alamat.");

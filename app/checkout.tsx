@@ -1,6 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { showAlert } from "@/lib/alert";
 import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { getAddresses } from "@/services/addressService";
 import { useCart } from "@/services/cartService";
 import { createOrder } from "@/services/orderService";
@@ -113,7 +114,8 @@ export default function CheckoutScreen() {
     try {
       // Re-check product availability
       for (const item of checkoutItems) {
-        const productSnap = await db.collection("products").doc(item.id).get();
+        const productRef = doc(db, "products", item.id);
+        const productSnap = await getDoc(productRef);
         if (productSnap.exists()) {
           const productData = productSnap.data();
           if (!productData?.isAvailable) {
@@ -137,9 +139,9 @@ export default function CheckoutScreen() {
       // Ensure we have coordinates if available, otherwise proceed with null
       const buyerLocation = userLocation
         ? {
-          latitude: userLocation.coords.latitude,
-          longitude: userLocation.coords.longitude,
-        }
+            latitude: userLocation.coords.latitude,
+            longitude: userLocation.coords.longitude,
+          }
         : null;
 
       if (!buyerLocation) {

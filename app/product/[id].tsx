@@ -7,6 +7,7 @@ import { isSellerActive } from "@/services/sellerService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -47,16 +48,14 @@ export default function ProductDetails() {
 
   const fetchSellerPhone = async (uid: string) => {
     try {
-      const userDoc = await db.collection("users").doc(uid).get();
+      const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        if (data) {
-          if (data.profile?.phoneNumber) {
-            setSellerPhone(data.profile.phoneNumber);
-          }
-          if (data.photoURL) {
-            setSellerPhoto(data.photoURL);
-          }
+        if (data.profile?.phoneNumber) {
+          setSellerPhone(data.profile.phoneNumber);
+        }
+        if (data.photoURL) {
+          setSellerPhoto(data.photoURL);
         }
       }
     } catch (e) {
@@ -115,7 +114,7 @@ export default function ProductDetails() {
       showAlert(
         "Toko tidak aktif",
         "Toko sedang tidak aktif, silahkan hubungi pemilik toko via WhatsApp atau coba lagi nanti.",
-        () => { }
+        () => {}
       );
       return;
     }
@@ -226,12 +225,14 @@ export default function ProductDetails() {
                 </Text>
               </View> */}
               <View
-                className={`${!isAvailable ? "bg-red-200" : "bg-green-200"
-                  } px-3 py-1 rounded-full`}
+                className={`${
+                  !isAvailable ? "bg-red-200" : "bg-green-200"
+                } px-3 py-1 rounded-full`}
               >
                 <Text
-                  className={`text-xs ${!isAvailable ? "text-red-700" : "text-green-700"
-                    } font-medium`}
+                  className={`text-xs ${
+                    !isAvailable ? "text-red-700" : "text-green-700"
+                  } font-medium`}
                 >
                   {isAvailable ? "Tersedia" : `Tidak Tersedia / Kosong`}
                 </Text>
@@ -297,10 +298,11 @@ export default function ProductDetails() {
             <TouchableOpacity
               onPress={handleAddToCart}
               disabled={adding}
-              className={` p-2 m-2 justify-center rounded-xl border border-primary-200 ${!isAvailable || adding
-                ? "bg-gray-50 border-gray-200"
-                : "bg-orange-50"
-                }`}
+              className={` p-2 m-2 justify-center rounded-xl border border-primary-200 ${
+                !isAvailable || adding
+                  ? "bg-gray-50 border-gray-200"
+                  : "bg-orange-50"
+              }`}
             >
               {adding ? (
                 <ActivityIndicator color="#f97316" />
@@ -316,8 +318,9 @@ export default function ProductDetails() {
             <TouchableOpacity
               onPress={handleBuyNow}
               disabled={adding}
-              className={`flex-[2] m-2 p-4 rounded-xl ${!isAvailable || adding ? "bg-gray-300" : "bg-primary"
-                }`}
+              className={`flex-[2] m-2 p-4 rounded-xl ${
+                !isAvailable || adding ? "bg-gray-300" : "bg-primary"
+              }`}
             >
               <Text className="text-white font-bold text-center">
                 {!isAvailable ? "Tidak Tersedia / Kosong" : "Beli Sekarang"}

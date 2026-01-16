@@ -1,9 +1,17 @@
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { CartItem } from "@/types";
+import {
+    collection,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    setDoc,
+    updateDoc,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-const getCartRef = (userId: string) => db.collection("users").doc(userId).collection("cart");
+const getCartRef = (userId: string) => collection(db, "users", userId, "cart");
 
 export const useCart = () => {
   const { user } = useAuth();
@@ -17,7 +25,8 @@ export const useCart = () => {
       return;
     }
 
-    const unsubscribe = getCartRef(user.uid).onSnapshot(
+    const unsubscribe = onSnapshot(
+      getCartRef(user.uid),
       (snapshot) => {
         const items = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -38,7 +47,7 @@ export const useCart = () => {
   const addToCart = async (item: CartItem) => {
     if (!user) return;
     try {
-      const itemRef = db.collection("users").doc(user.uid).collection("cart").doc(item.id);
+      const itemRef = doc(db, "users", user.uid, "cart", item.id);
       
       // If item exists, update quantity could be handled here or in UI.
       // For now, we overwrite or expect UI to handle 'update'.
@@ -46,7 +55,7 @@ export const useCart = () => {
       // Let's assume we overwrite/set for simplicity OR check existence.
       // Using setDoc with merge: true handles both creation and update of fields if needed.
       
-      await itemRef.set(item);
+      await setDoc(itemRef, item);
     } catch (error) {
       console.error("Error adding to cart:", error);
       throw error;
@@ -56,8 +65,8 @@ export const useCart = () => {
   const removeFromCart = async (itemId: string) => {
     if (!user) return;
     try {
-      const itemRef = db.collection("users").doc(user.uid).collection("cart").doc(itemId);
-      await itemRef.delete();
+      const itemRef = doc(db, "users", user.uid, "cart", itemId);
+      await deleteDoc(itemRef);
     } catch (error) {
       console.error("Error removing from cart:", error);
       throw error;
@@ -67,11 +76,11 @@ export const useCart = () => {
   const updateQuantity = async (itemId: string, quantity: number) => {
     if (!user) return;
     try {
-      const itemRef = db.collection("users").doc(user.uid).collection("cart").doc(itemId);
+      const itemRef = doc(db, "users", user.uid, "cart", itemId);
       if (quantity <= 0) {
-        await itemRef.delete();
+        await deleteDoc(itemRef);
       } else {
-        await itemRef.update({ quantity });
+        await updateDoc(itemRef, { quantity });
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
@@ -84,7 +93,7 @@ export const useCart = () => {
     // We must delete documents one by one.
     if (!user) return;
     const promises = cartItems.map((item) =>
-      db.collection("users").doc(user.uid).collection("cart").doc(item.id).delete()
+      deleteDoc(doc(db, "users", user.uid, "cart", item.id))
     );
     await Promise.all(promises);
   };
