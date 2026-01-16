@@ -1,9 +1,8 @@
 import { showAlert } from "@/lib/alert";
-import useUpdates from "@/hooks/useUpdate";
-import { auth } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { auth } = firebase;
 import { FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -29,7 +28,7 @@ export default function SignIn() {
 
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await auth.signInWithEmailAndPassword(email, password);
       // Navigation is handled by _layout.tsx based on role
     } catch (error: any) {
       showAlert("Gagal Masuk", "Email atau kata sandi salah");

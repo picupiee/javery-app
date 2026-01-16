@@ -1,4 +1,4 @@
-import { CustomInputProps } from "@/type";
+import { CustomInputProps } from "@/types";
 import cn from "clsx";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";

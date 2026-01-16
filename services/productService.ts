@@ -1,20 +1,22 @@
-import { db } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { db } = firebase;
 import { Product } from "@/types";
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 
-export const getFeaturedProducts = async (limitCount: number = 10): Promise<Product[]> => {
+export const getFeaturedProducts = async (
+  limitCount: number = 10
+): Promise<Product[]> => {
   try {
-    const productsRef = collection(db, "products");
-    
-    const q = query(productsRef, orderBy("createdAt", "desc"), limit(limitCount));
-    
-    const snapshot = await getDocs(q);
+    const snapshot = await db
+      .collection("products")
+      .orderBy("createdAt", "desc")
+      .limit(limitCount)
+      .get();
+
     const products: Product[] = [];
-    
     snapshot.forEach((doc) => {
       products.push({ id: doc.id, ...doc.data() } as Product);
     });
-    
+
     return products;
   } catch (error) {
     console.error("Error fetching featured products:", error);
@@ -22,18 +24,20 @@ export const getFeaturedProducts = async (limitCount: number = 10): Promise<Prod
   }
 };
 
-export const getProductsBySeller = async (sellerUid: string): Promise<Product[]> => {
+export const getProductsBySeller = async (
+  sellerUid: string
+): Promise<Product[]> => {
   try {
-    const productsRef = collection(db, "products");
-    const q = query(productsRef, where("sellerUid", "==", sellerUid));
-    
-    const snapshot = await getDocs(q);
+    const snapshot = await db
+      .collection("products")
+      .where("sellerUid", "==", sellerUid)
+      .get();
+
     const products: Product[] = [];
-    
     snapshot.forEach((doc) => {
       products.push({ id: doc.id, ...doc.data() } as Product);
     });
-    
+
     return products;
   } catch (error) {
     console.error(`Error fetching products for seller ${sellerUid}:`, error);
@@ -41,47 +45,55 @@ export const getProductsBySeller = async (sellerUid: string): Promise<Product[]>
   }
 };
 
-export const getProductById = async (productId: string): Promise<Product | null> => {
+export const getProductById = async (
+  productId: string
+): Promise<Product | null> => {
+  console.log(`[productService] Fetching product with ID: ${productId}`);
   try {
-    const docRef = doc(db, "products", productId);
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Product;
+    const docSnap = await db.collection("products").doc(productId).get();
+    const data = docSnap.data();
+    console.log(
+      `[productService] Document data:`,
+      data ? "Data exists" : "No data",
+      `exists property: ${docSnap.exists}`
+    );
+
+    if (data) {
+      const product = { id: docSnap.id, ...data } as Product;
+      console.log(`[productService] Product found: ${product.name}`);
+      return product;
     } else {
+      console.log(`[productService] Product not found for ID: ${productId}`);
       return null;
     }
   } catch (error) {
-    console.error(`Error fetching product ${productId}:`, error);
+    console.error(
+      `[productService] Error fetching product ${productId}:`,
+      error
+    );
     return null;
   }
 };
 
-export const searchProducts = async (searchTerm: string): Promise<Product[]> => {
-    try {
-        // Firestore doesn't support native full-text search. 
-        // We'll implement a basic client-side filter or a simple "startWith" query if applicable.
-        // For a real app, use Algolia or Typesense.
-        // Here we'll fetch all (or a subset) and filter in memory for simplicity in this stage.
-        
-        const productsRef = collection(db, "products");
-        const q = query(productsRef, limit(50)); // Limit to avoid fetching too much
-        const snapshot = await getDocs(q);
-        
-        const products: Product[] = [];
-        const lowerTerm = searchTerm.toLowerCase();
+export const searchProducts = async (
+  searchTerm: string
+): Promise<Product[]> => {
+  try {
+    const snapshot = await db.collection("products").limit(50).get();
 
-        snapshot.forEach((doc) => {
-            const data = doc.data() as Product;
-            if (data.name.toLowerCase().includes(lowerTerm)) {
-                products.push({ ...data, id: doc.id });
-            }
-        });
+    const products: Product[] = [];
+    const lowerTerm = searchTerm.toLowerCase();
 
-        return products;
+    snapshot.forEach((doc) => {
+      const data = doc.data() as Product;
+      if (data.name.toLowerCase().includes(lowerTerm)) {
+        products.push({ ...data, id: doc.id });
+      }
+    });
 
-    } catch (error) {
-        console.error("Error searching products:", error);
-        return [];
-    }
-}
+    return products;
+  } catch (error) {
+    console.error("Error searching products:", error);
+    return [];
+  }
+};

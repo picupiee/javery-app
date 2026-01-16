@@ -3,7 +3,6 @@ import { getOrderById } from "@/services/orderService";
 import { Order } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -46,10 +45,10 @@ export default function OrderDetailScreen() {
   const fetchSellerPhone = async (uid: string) => {
     // Fetch seller profile to get phone number for WhatsApp
     try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        if (data.profile?.phoneNumber) {
+      const userDoc = await db.collection("users").doc(uid).get();
+      const data = userDoc.data();
+      if (data) {
+        if (data?.profile?.phoneNumber) {
           setSellerPhone(data.profile.phoneNumber);
         }
       }

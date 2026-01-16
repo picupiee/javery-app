@@ -5,7 +5,6 @@ import { Seller } from "@/services/sellerService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -30,9 +29,10 @@ export default function SellerStore() {
       setLoading(true);
       try {
         // Fetch seller info
-        const sellerDoc = await getDocs(
-          query(collection(db, "sellers"), where("uid", "==", id))
-        );
+        const sellerDoc = await db
+          .collection("sellers")
+          .where("uid", "==", id)
+          .get();
 
         if (!sellerDoc.empty) {
           const sellerData = sellerDoc.docs[0].data() as Seller;
@@ -125,13 +125,27 @@ export default function SellerStore() {
                       borderRadius={32}
                     />
                   ) : (
-                    <FontAwesome name="shopping-bag" size={28} color="#f97316" />
+                    <FontAwesome
+                      name="shopping-bag"
+                      size={28}
+                      color="#f97316"
+                    />
                   )}
                 </View>
                 {seller?.storeStatus.isOpen ? (
-                  <FontAwesome name="circle" size={18} color="#58e421ff" className="absolute top-0 right-4" />
+                  <FontAwesome
+                    name="circle"
+                    size={18}
+                    color="#58e421ff"
+                    className="absolute top-0 right-4"
+                  />
                 ) : (
-                  <FontAwesome name="circle" size={18} color="#ff2a2aff" className="absolute top-1 right-4" />
+                  <FontAwesome
+                    name="circle"
+                    size={18}
+                    color="#ff2a2aff"
+                    className="absolute top-1 right-4"
+                  />
                 )}
               </View>
               <View className="flex-1">
@@ -141,23 +155,28 @@ export default function SellerStore() {
                 <View>
                   <Text className="text-slate-600 text-sm leading-5 font-medium">
                     {seller?.storeDescription
-                      ? (isDescriptionExpanded || seller.storeDescription.length <= 160
+                      ? isDescriptionExpanded ||
+                        seller.storeDescription.length <= 160
                         ? seller.storeDescription
-                        : `${seller.storeDescription.substring(0, 160)}...`)
+                        : `${seller.storeDescription.substring(0, 160)}...`
                       : "Deskripsi toko"}
                   </Text>
-                  {seller?.storeDescription && seller.storeDescription.length > 160 && (
-                    <TouchableOpacity
-                      onPress={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                      className="mt-1"
-                    >
-                      <Text className="text-primary font-bold text-xs">
-                        {isDescriptionExpanded ? "Sembunyikan" : "Lebih Lanjut"}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  {seller?.storeDescription &&
+                    seller.storeDescription.length > 160 && (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setIsDescriptionExpanded(!isDescriptionExpanded)
+                        }
+                        className="mt-1"
+                      >
+                        <Text className="text-primary font-bold text-xs">
+                          {isDescriptionExpanded
+                            ? "Sembunyikan"
+                            : "Lebih Lanjut"}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                 </View>
-                {/* Email address removed as requested */}
               </View>
             </View>
           </View>

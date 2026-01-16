@@ -1,40 +1,31 @@
 import { db } from "@/lib/firebase";
-import { Product } from "@/type";
-import {
-    collection,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    where,
-} from "firebase/firestore";
+import { Product } from "@/types";
 
 /**
  * Fetches all products from Firestore
  * @param limitCount Optional limit on number of products to fetch
- * @returns Array of products with seller names included
+ * @returns Array of products
  */
 export const getAllProducts = async (
   limitCount?: number
 ): Promise<Product[]> => {
   try {
-    const productsRef = collection(db, "products");
-    let q = query(productsRef, orderBy("createdAt", "desc"));
-    
+    let query = db.collection("products").orderBy("createdAt", "desc");
+
     if (limitCount) {
-      q = query(q, limit(limitCount));
+      query = query.limit(limitCount);
     }
-    
-    const querySnapshot = await getDocs(q);
+
+    const snapshot = await query.get();
     const products: Product[] = [];
-    
-    querySnapshot.forEach((doc) => {
+
+    snapshot.forEach((doc) => {
       products.push({
         id: doc.id,
         ...doc.data(),
       } as Product);
     });
-    
+
     return products;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -51,23 +42,21 @@ export const getProductsBySeller = async (
   sellerUid: string
 ): Promise<Product[]> => {
   try {
-    const productsRef = collection(db, "products");
-    const q = query(
-      productsRef,
-      where("ownerUid", "==", sellerUid),
-      orderBy("createdAt", "desc")
-    );
-    
-    const querySnapshot = await getDocs(q);
+    const snapshot = await db
+      .collection("products")
+      .where("sellerUid", "==", sellerUid)
+      .orderBy("createdAt", "desc")
+      .get();
+
     const products: Product[] = [];
-    
-    querySnapshot.forEach((doc) => {
+
+    snapshot.forEach((doc) => {
       products.push({
         id: doc.id,
         ...doc.data(),
       } as Product);
     });
-    
+
     return products;
   } catch (error) {
     console.error("Error fetching seller products:", error);

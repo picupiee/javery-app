@@ -1,7 +1,6 @@
-import { auth, db } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { auth, db } = firebase;
 import { AugmentedUser, UserProfile } from "@/types/index";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
@@ -17,25 +16,29 @@ const subscribeToUserProfile = (
   onProfile: (profile: UserProfile | null) => void,
   onError: (error: any) => void
 ) => {
-  const docRef = doc(db, "users", uid);
-
-  const unsubscribe = onSnapshot(
-    docRef,
-    (docSnap) => {
-      if (docSnap.exists()) {
-        onProfile(docSnap.data() as UserProfile);
-      } else {
-        console.log("User profile not found");
-        onProfile(null);
+  return db
+    .collection("users")
+    .doc(uid)
+    .onSnapshot(
+      (docSnap) => {
+        const profileData = docSnap.data();
+        console.log(
+          `[AuthContext] Snapshot for ${uid} has data: ${
+            profileData ? "Yes" : "No"
+          }`
+        );
+        if (profileData) {
+          onProfile(profileData as UserProfile);
+        } else {
+          console.log("User profile not found");
+          onProfile(null);
+        }
+      },
+      (error) => {
+        console.error("Error listening to user profile:", error);
+        onError(error);
       }
-    },
-    (error) => {
-      console.error("Error listening to user profile:", error);
-      onError(error);
-    }
-  );
-
-  return unsubscribe;
+    );
 };
 
 export const useAuth = () => {
@@ -57,7 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribeAuth = auth.onAuthStateChanged((firebaseUser) => {
       if (unsubscribeProfile) {
         unsubscribeProfile();
         unsubscribeProfile = null;
@@ -72,21 +75,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       unsubscribeProfile = subscribeToUserProfile(
         firebaseUser.uid,
         (profileData) => {
+          console.log(
+            `[AuthContext] Profile for ${firebaseUser.uid}: ${
+              profileData ? "Found" : "Not Found"
+            }`
+          );
           if (profileData) {
             const augmentedUser: AugmentedUser = {
-              ...firebaseUser,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              emailVerified: firebaseUser.emailVerified,
+              isAnonymous: firebaseUser.isAnonymous,
+              photoURL: firebaseUser.photoURL,
               profile: profileData,
-            };
+            } as any; // Cast because AugmentedUser extends User and we can't easily mock all methods
             setUser(augmentedUser);
           } else {
             console.warn(
               "Logged in user has no profile data. Waiting for creation..."
             );
-            // Allow user to stay logged in so they can create profile
             const augmentedUser: AugmentedUser = {
-              ...firebaseUser,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              emailVerified: firebaseUser.emailVerified,
+              isAnonymous: firebaseUser.isAnonymous,
+              photoURL: firebaseUser.photoURL,
               profile: null as any,
-            };
+            } as any;
             setUser(augmentedUser);
           }
           setIsLoading(false);

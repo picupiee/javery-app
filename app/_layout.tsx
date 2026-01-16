@@ -77,13 +77,13 @@ function AppLayout() {
         ({ registerForPushNotificationsAsync }) => {
           registerForPushNotificationsAsync().then((token) => {
             if (token) {
-              import("firebase/firestore").then(({ doc, updateDoc }) => {
-                import("@/lib/firebase").then(({ db }) => {
-                  const userRef = doc(db, "users", user.uid);
-                  updateDoc(userRef, { buyerPushToken: token }).catch((err) =>
+              import("@/lib/firebase").then(({ db }) => {
+                db.collection("users")
+                  .doc(user.uid)
+                  .update({ buyerPushToken: token })
+                  .catch((err) =>
                     console.error("Error updating push token:", err)
                   );
-                });
               });
             }
           });

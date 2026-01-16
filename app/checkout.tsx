@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { showAlert } from "@/lib/alert";
-import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import firebase from "@/lib/firebase";
+const { db } = firebase;
 import { getAddresses } from "@/services/addressService";
 import { useCart } from "@/services/cartService";
 import { createOrder } from "@/services/orderService";
@@ -114,10 +114,10 @@ export default function CheckoutScreen() {
     try {
       // Re-check product availability
       for (const item of checkoutItems) {
-        const productRef = doc(db, "products", item.id);
-        const productSnap = await getDoc(productRef);
-        if (productSnap.exists()) {
-          const productData = productSnap.data();
+        const productSnap = await db.collection("products").doc(item.id).get();
+        const productData = productSnap.data();
+
+        if (productData) {
           if (!productData?.isAvailable) {
             showAlert(
               "Produk Tidak Tersedia",
@@ -339,7 +339,9 @@ export default function CheckoutScreen() {
           <TouchableOpacity
             onPress={handlePlaceOrder}
             disabled={placingOrder || !selectedAddress}
-            className={`p-4 rounded-xl items-center mb-8 ${placingOrder || !selectedAddress ? "bg-gray-300" : "bg-primary"}`}
+            className={`p-4 rounded-xl items-center mb-8 ${
+              placingOrder || !selectedAddress ? "bg-gray-300" : "bg-primary"
+            }`}
           >
             {placingOrder ? (
               <ActivityIndicator color="white" />

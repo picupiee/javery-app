@@ -1,11 +1,9 @@
 import { showAlert, showConfirm } from "@/lib/alert";
-import useUpdates from "@/hooks/useUpdate";
-import { auth, db } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { auth, db } = firebase;
 import { UserProfile } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -33,20 +31,19 @@ export default function SignUp() {
     setLoading(true);
     try {
       // 1. Create Auth User
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      const userCredential = await auth.createUserWithEmailAndPassword(
         email,
         password
       );
       const user = userCredential.user;
 
       // 2. Update Display Name
-      await updateProfile(user, { displayName: name });
+      await user?.updateProfile({ displayName: name });
 
       // 3. Create Firestore Profile with buyer role
       const userProfile: UserProfile = {
-        uid: user.uid,
-        email: user.email!,
+        uid: user?.uid || "",
+        email: user?.email || "",
         displayName: name,
         createdAt: new Date().toISOString(),
         roles: {
@@ -55,7 +52,7 @@ export default function SignUp() {
         },
       };
 
-      await setDoc(doc(db, "users", user.uid), userProfile);
+      await db.collection("users").doc(user?.uid).set(userProfile);
 
       // Router replace is handled in _layout.tsx
     } catch (error: any) {

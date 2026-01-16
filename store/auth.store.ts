@@ -1,6 +1,5 @@
 import { auth } from "@/lib/firebase";
 import { User } from "@/type";
-import { signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { create } from "zustand";
 
 type AuthState = {
@@ -31,7 +30,7 @@ const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     set({ isLoading: true });
     try {
-      await firebaseSignOut(auth);
+      await auth.signOut();
     } catch (e) {
       console.log("Logout process error: ", e);
     } finally {
@@ -41,7 +40,7 @@ const useAuthStore = create<AuthState>((set) => ({
 }));
 
 // Set up Firebase auth state listener once
-onAuthStateChanged(auth, (firebaseUser) => {
+auth.onAuthStateChanged((firebaseUser) => {
   if (firebaseUser) {
     // Convert Firebase user to app User type
     const user: User = {
@@ -50,9 +49,17 @@ onAuthStateChanged(auth, (firebaseUser) => {
       email: firebaseUser.email || "",
       avatar: firebaseUser.photoURL || "",
     };
-    useAuthStore.setState({ isAuthenticated: true, user: user, isLoading: false });
+    useAuthStore.setState({
+      isAuthenticated: true,
+      user: user,
+      isLoading: false,
+    });
   } else {
-    useAuthStore.setState({ isAuthenticated: false, user: null, isLoading: false });
+    useAuthStore.setState({
+      isAuthenticated: false,
+      user: null,
+      isLoading: false,
+    });
   }
 });
 

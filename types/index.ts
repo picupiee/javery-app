@@ -1,4 +1,5 @@
-import { User } from "firebase/auth";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
+type User = FirebaseAuthTypes.User;
 
 export interface UserProfile {
   uid: string;
@@ -95,4 +96,27 @@ export interface Ping {
   message: string;
   createdAt: any; // Firestore Timestamp
   photoURL?: string;
+}
+
+export interface CustomButtonProps {
+  onPress?: () => void;
+  title?: string;
+  style?: string;
+  leftIcon?: React.ReactNode;
+  textStyle?: string;
+  isLoading?: boolean;
+}
+
+export interface CustomInputProps {
+  placeholder?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  label: string;
+  secureTextEntry?: boolean;
+  keyboardType?:
+    | "default"
+    | "email-address"
+    | "numeric"
+    | "phone-pad"
+    | "phone-pad";
 }

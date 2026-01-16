@@ -1,13 +1,6 @@
-import { db } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { db } = firebase;
 import { SellerProfile } from "@/types";
-import {
-  collection,
-  getDocs,
-  limit,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
 
 export interface Seller extends SellerProfile {
   // Add any extra fields if needed
@@ -15,14 +8,12 @@ export interface Seller extends SellerProfile {
 
 export const getActiveSellers = async (): Promise<Seller[]> => {
   try {
-    const sellersRef = collection(db, "sellers");
-    // Query for sellers where storeStatus.isOpen is true
-    // Note: This requires an index on `storeStatus.isOpen` if we have many sellers
-    const q = query(sellersRef, where("storeStatus.isOpen", "==", true));
+    const snapshot = await db
+      .collection("sellers")
+      .where("storeStatus.isOpen", "==", true)
+      .get();
 
-    const snapshot = await getDocs(q);
     const sellers: Seller[] = [];
-
     snapshot.forEach((doc) => {
       sellers.push(doc.data() as Seller);
     });
@@ -36,14 +27,12 @@ export const getActiveSellers = async (): Promise<Seller[]> => {
 
 export const isSellerActive = async (uid: string): Promise<boolean> => {
   try {
-    const sellersRef = collection(db, "sellers");
-    const q = query(
-      sellersRef,
-      where("uid", "==", uid),
-      where("storeStatus.isOpen", "==", true)
-    );
+    const snapshot = await db
+      .collection("sellers")
+      .where("uid", "==", uid)
+      .where("storeStatus.isOpen", "==", true)
+      .get();
 
-    const snapshot = await getDocs(q);
     return !snapshot.empty;
   } catch (error) {
     console.error("Error checking seller activity:", error);
@@ -54,30 +43,26 @@ export const isSellerActive = async (uid: string): Promise<boolean> => {
 export const subscribeToActiveSellers = (
   callback: (sellers: Seller[]) => void
 ) => {
-  const sellersRef = collection(db, "sellers");
-  const q = query(sellersRef, where("storeStatus.isOpen", "==", true));
-
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      const sellers: Seller[] = [];
-      snapshot.forEach((doc) => {
-        sellers.push(doc.data() as Seller);
-      });
-      callback(sellers);
-    },
-    (error) => {
-      console.error("Error subscribing to active sellers:", error);
-    }
-  );
-
-  return unsubscribe;
+  return db
+    .collection("sellers")
+    .where("storeStatus.isOpen", "==", true)
+    .onSnapshot(
+      (snapshot) => {
+        const sellers: Seller[] = [];
+        snapshot.forEach((doc) => {
+          sellers.push(doc.data() as Seller);
+        });
+        callback(sellers);
+      },
+      (error) => {
+        console.error("Error subscribing to active sellers:", error);
+      }
+    );
 };
 
 export const getAllSellers = async (): Promise<Seller[]> => {
   try {
-    const sellersRef = collection(db, "sellers");
-    const snapshot = await getDocs(sellersRef);
+    const snapshot = await db.collection("sellers").get();
     const sellers: Seller[] = [];
 
     snapshot.forEach((doc) => {
@@ -90,6 +75,7 @@ export const getAllSellers = async (): Promise<Seller[]> => {
     return [];
   }
 };
+
 const sellerCache: Record<string, Seller> = {};
 
 export const getSellerProfile = async (uid: string): Promise<Seller | null> => {
@@ -98,9 +84,11 @@ export const getSellerProfile = async (uid: string): Promise<Seller | null> => {
   }
 
   try {
-    const sellersRef = collection(db, "sellers");
-    const q = query(sellersRef, where("uid", "==", uid), limit(1));
-    const snapshot = await getDocs(q);
+    const snapshot = await db
+      .collection("sellers")
+      .where("uid", "==", uid)
+      .limit(1)
+      .get();
 
     if (!snapshot.empty) {
       const seller = snapshot.docs[0].data() as Seller;

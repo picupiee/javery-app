@@ -1,34 +1,52 @@
-// import { getAnalytics } from "firebase/analytics";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { initializeApp } from "firebase/app";
-import {
-  Auth,
-  getAuth,
-  // @ts-ignore
-  getReactNativePersistence,
-  initializeAuth,
-} from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { Platform } from "react-native";
+import { getApp } from "@react-native-firebase/app";
+import _auth from "@react-native-firebase/auth";
+import _firestore from "@react-native-firebase/firestore";
+import _appCheck, {
+  ReactNativeFirebaseAppCheckProvider,
+  initializeAppCheck,
+} from "@react-native-firebase/app-check";
 
-const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
-};
+/**
+ * React Native Firebase Initialization
+ *
+ * Note: RNFB automatically initializes the default app using:
+ * - Android: google-services.json
+ * - iOS: GoogleService-Info.plist
+ *
+ * In Expo Managed workflow, this requires the @react-native-firebase/app
+ * config plugin to be present in app.json.
+ */
 
-const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
+// Export auth and firestore instances
+export const auth = _auth();
+export const db = _firestore();
 
-// Use platform-specific persistence
-let auth: Auth;
-auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
+// Initialize AppCheck with React Native Firebase provider
+const rnfbProvider = new ReactNativeFirebaseAppCheckProvider();
+rnfbProvider.configure({
+  android: {
+    provider: __DEV__ ? "debug" : "playIntegrity",
+    debugToken: "8550F0FE-4EF3-45B9-8411-C9A7041A8926",
+  },
 });
 
-export { auth };
-export const db = getFirestore(app);
+try {
+  initializeAppCheck(getApp(), {
+    provider: rnfbProvider,
+    isTokenAutoRefreshEnabled: true,
+  });
+} catch (e) {
+  // Catch already initialized error if any
+  console.log("AppCheck initialization:", e);
+}
+
+export const FIREBASE_AUTH = auth;
+export const FIRESTORE_DB = db;
+
+// Export a default object for convenience
+export default {
+  auth: auth,
+  db: db,
+  appCheck: _appCheck,
+  firestore: _firestore, // Static access for FieldValue, etc.
+};

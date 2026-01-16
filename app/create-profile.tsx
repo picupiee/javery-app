@@ -1,9 +1,8 @@
 import { showAlert } from "@/lib/alert";
-import { auth, db } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { auth, db } = firebase;
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -52,21 +51,33 @@ export default function CreateProfile() {
     setLoading(true);
 
     try {
-      // Update Firebase Auth display name
-      await updateProfile(user, { displayName: name });
-
-      // Update user profile in Firestore to add buyer role
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          displayName: name,
-          roles: {
-            buyer: true,
-            seller: true, // Keep seller role if they had it
-          },
-        },
-        { merge: true }
+      console.log(
+        `[CreateProfile] Creating/Updating profile for UID: ${user?.uid}`
       );
+      // Update Firebase Auth display name
+      await user?.updateProfile({ displayName: name });
+
+      // Fetch existing profile to preserve roles
+      const docSnap = await db.collection("users").doc(user?.uid).get();
+      const existingData = docSnap.data();
+      const existingRoles = existingData?.roles || {};
+
+      await db
+        .collection("users")
+        .doc(user?.uid)
+        .set(
+          {
+            uid: user?.uid,
+            email: user?.email,
+            displayName: name,
+            roles: {
+              ...existingRoles,
+              buyer: true,
+            },
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
 
       showAlert("Selamat Datang!", "Profil pembeli berhasil dibuat.", () => {
         router.replace("/");

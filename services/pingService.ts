@@ -1,102 +1,86 @@
-import { db } from "@/lib/firebase";
+import firebase from "@/lib/firebase";
+const { db } = firebase;
 import { getSellerProfile } from "@/services/sellerService";
 import { Ping } from "@/types";
-import {
-  collection,
-  getDocs,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-  Timestamp,
-  where,
-} from "firebase/firestore";
 
 const PING_VISIBILITY_MS = 1 * 60 * 1000; // 1 minute in milliseconds
 
 /**
  * Subscribe to recent pings (created within last 1 minute)
- * @param callback Function to call with updated pings
- * @param maxLimit Maximum number of pings to fetch
- * @returns Unsubscribe function
  */
 export const subscribeToRecentPings = (
   callback: (pings: Ping[]) => void,
   maxLimit: number = 10
 ) => {
-  // Calculate cutoff time (1 minute ago)
-  const cutoffTime = Timestamp.fromDate(
+  const cutoffTime = firebase.firestore.Timestamp.fromDate(
     new Date(Date.now() - PING_VISIBILITY_MS)
   );
 
-  const pingsQuery = query(
-    collection(db, "pings"),
-    where("createdAt", ">", cutoffTime),
-    orderBy("createdAt", "desc"),
-    limit(maxLimit)
-  );
-
-  const unsubscribe = onSnapshot(
-    pingsQuery,
-    async (snapshot) => {
-      const pings: Ping[] = snapshot.docs.map((doc) => ({
-        sellerUid: doc.data().sellerUid,
-        storeName: doc.data().storeName,
-        message: doc.data().message,
-        createdAt: doc.data().createdAt,
-      }));
-
-      // Fetch photos for each ping
-      const pingsWithPhotos = await Promise.all(
-        pings.map(async (ping) => {
-          const seller = await getSellerProfile(ping.sellerUid);
+  return db
+    .collection("pings")
+    .where("createdAt", ">", cutoffTime)
+    .orderBy("createdAt", "desc")
+    .limit(maxLimit)
+    .onSnapshot(
+      async (snapshot) => {
+        const pings: Ping[] = snapshot.docs.map((doc) => {
+          const data = doc.data();
           return {
-            ...ping,
-            photoURL: seller?.photoURL,
+            sellerUid: data.sellerUid,
+            storeName: data.storeName,
+            message: data.message,
+            createdAt: data.createdAt,
           };
-        })
-      );
+        });
 
-      callback(pingsWithPhotos);
-    },
-    (error) => {
-      console.error("Error subscribing to pings:", error);
-      callback([]);
-    }
-  );
+        // Fetch photos for each ping
+        const pingsWithPhotos = await Promise.all(
+          pings.map(async (ping) => {
+            const seller = await getSellerProfile(ping.sellerUid);
+            return {
+              ...ping,
+              photoURL: seller?.photoURL,
+            };
+          })
+        );
 
-  return unsubscribe;
+        callback(pingsWithPhotos);
+      },
+      (error) => {
+        console.error("Error subscribing to pings:", error);
+        callback([]);
+      }
+    );
 };
 
 /**
  * Manually fetch recent pings (for refresh functionality)
- * @param maxLimit Maximum number of pings to fetch
- * @returns Array of recent pings
  */
 export const getRecentPings = async (
   maxLimit: number = 10
 ): Promise<Ping[]> => {
   try {
-    const cutoffTime = Timestamp.fromDate(
+    const cutoffTime = firebase.firestore.Timestamp.fromDate(
       new Date(Date.now() - PING_VISIBILITY_MS)
     );
 
-    const pingsQuery = query(
-      collection(db, "pings"),
-      where("createdAt", ">", cutoffTime),
-      orderBy("createdAt", "desc"),
-      limit(maxLimit)
-    );
+    const snapshot = await db
+      .collection("pings")
+      .where("createdAt", ">", cutoffTime)
+      .orderBy("createdAt", "desc")
+      .limit(maxLimit)
+      .get();
 
-    const snapshot = await getDocs(pingsQuery);
-    const pings = snapshot.docs.map((doc) => ({
-      sellerUid: doc.data().sellerUid,
-      storeName: doc.data().storeName,
-      message: doc.data().message,
-      createdAt: doc.data().createdAt,
-    }));
+    const pings = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        sellerUid: data.sellerUid,
+        storeName: data.storeName,
+        message: data.message,
+        createdAt: data.createdAt,
+      };
+    });
 
-    // Fetch photos for each ping
     const pingsWithPhotos = await Promise.all(
       pings.map(async (ping) => {
         const seller = await getSellerProfile(ping.sellerUid);
@@ -114,13 +98,8 @@ export const getRecentPings = async (
   }
 };
 
-/**
- * Format timestamp to human-readable "time ago" string
- * @param timestamp Firestore Timestamp
- * @returns Formatted string (e.g., "2 minutes ago")
- */
 export const formatTimeAgo = (timestamp: any): string => {
-  if (!timestamp || !timestamp.toDate) return "Just now";
+  if (!timestamp || typeof timestamp.toDate !== "function") return "Just now";
 
   const date = timestamp.toDate();
   const now = new Date();

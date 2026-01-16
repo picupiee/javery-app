@@ -7,7 +7,6 @@ import { isSellerActive } from "@/services/sellerService";
 import { Product } from "@/types";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -34,12 +33,24 @@ export default function ProductDetails() {
 
   useEffect(() => {
     const fetchProduct = async () => {
+      console.log(
+        `[ProductDetails] Received ID parameter:`,
+        id,
+        `Type: ${typeof id}`
+      );
       if (typeof id === "string") {
+        console.log(`[ProductDetails] Fetching product with ID: ${id}`);
         const data = await getProductById(id);
+        console.log(
+          `[ProductDetails] Fetch result:`,
+          data ? `Found: ${data.name}` : "Not found"
+        );
         setProduct(data);
         if (data?.sellerUid) {
           fetchSellerPhone(data.sellerUid);
         }
+      } else {
+        console.warn(`[ProductDetails] ID is not a string:`, id);
       }
       setLoading(false);
     };
@@ -48,13 +59,13 @@ export default function ProductDetails() {
 
   const fetchSellerPhone = async (uid: string) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        if (data.profile?.phoneNumber) {
+      const userDoc = await db.collection("users").doc(uid).get();
+      const data = userDoc.data();
+      if (data) {
+        if (data?.profile?.phoneNumber) {
           setSellerPhone(data.profile.phoneNumber);
         }
-        if (data.photoURL) {
+        if (data?.photoURL) {
           setSellerPhoto(data.photoURL);
         }
       }
@@ -219,11 +230,6 @@ export default function ProductDetails() {
             </View>
 
             <View className="flex-row items-center mb-6">
-              {/* <View className="bg-gray-100 px-3 py-1 rounded-full mr-2">
-                <Text className="text-xs text-gray-600 font-medium">
-                  {product.category}
-                </Text>
-              </View> */}
               <View
                 className={`${
                   !isAvailable ? "bg-red-200" : "bg-green-200"

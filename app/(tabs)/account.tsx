@@ -52,9 +52,8 @@ export default function Account() {
     return <GuestPrompt screen="Account" />;
   }
 
-  const userName =
-    user?.profile?.displayName || user?.email?.split("@")[0] || "Pengguna";
-  const email = user?.email || "Email tidak ditemukan";
+  const userName = user.displayName;
+  const email = user.email || "Email tidak ditemukan";
   const [loading, setLoading] = useState(false);
   const { updateStatus, error, activeCheckAndApplyUpdate } = useUpdates();
 
@@ -108,7 +107,7 @@ export default function Account() {
           <View className="flex-row items-center mb-4">
             <View className="w-16 h-16 bg-orange-100 rounded-full items-center justify-center mr-4">
               <Text className="text-2xl font-bold text-primary">
-                {userName.charAt(0).toUpperCase()}
+                {userName!.charAt(0).toUpperCase()}
               </Text>
             </View>
             <View className="flex-1">
@@ -162,8 +161,8 @@ export default function Account() {
                 isChecking
                   ? "Memeriksa..."
                   : updateStatus === "ready"
-                    ? "Pembaruan Siap!"
-                    : "Periksa Pembaruan"
+                  ? "Pembaruan Siap!"
+                  : "Periksa Pembaruan"
               }
               onPress={handleCheckUpdate}
             />
