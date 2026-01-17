@@ -106,7 +106,7 @@ export default function CheckoutScreen() {
     if (!user) return;
 
     if (locationLoading) {
-      showAlert("Tunggu Sebentar", "Sedang mengambil lokasi terkini...");
+      showAlert("Mohon Tunggu", "Sedang mengambil lokasi terkini...");
       return;
     }
 

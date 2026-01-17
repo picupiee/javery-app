@@ -54,6 +54,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const logout = async () => {
+    if (user?.uid) {
+      try {
+        return db.collection("users").doc(user.uid).update({
+          buyerPushToken: null,
+        }),
+        console.log("Buyer push token removed successfully");
+      } catch (error) {
+        console.error("Error removing buyer push token:", error);
+      }
+    }
     await auth.signOut();
   };
 
