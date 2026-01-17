@@ -48,7 +48,7 @@ export default function CheckoutScreen() {
       : "Penjual";
   const subtotal = checkoutItems.reduce(
     (sum, item) => sum + item.productPrice * item.quantity,
-    0
+    0,
   );
   // Free shipping for now
   const shippingCost = 0;
@@ -59,7 +59,7 @@ export default function CheckoutScreen() {
       if (user) {
         loadAddresses();
       }
-    }, [user, params.selectedAddressId])
+    }, [user, params.selectedAddressId]),
   );
 
   const loadAddresses = async () => {
@@ -103,7 +103,13 @@ export default function CheckoutScreen() {
       showAlert("Alamat Kosong", "Silakan pilih alamat pengiriman.");
       return;
     }
-    if (!user) return;
+    if (!user) {
+      showAlert(
+        "Tidak dapat membuat pesanan",
+        "Silakan masuk atau daftar terlebih dahulu sebelum membuat pesanan",
+        () => router.replace("/(auth)/sign-in"),
+      );
+    }
 
     if (locationLoading) {
       showAlert("Mohon Tunggu", "Sedang mengambil lokasi terkini...");
@@ -121,7 +127,7 @@ export default function CheckoutScreen() {
           if (!productData?.isAvailable) {
             showAlert(
               "Produk Tidak Tersedia",
-              `Maaf, produk "${item.productName}" sudah tidak tersedia atau kosong.`
+              `Maaf, produk "${item.productName}" sudah tidak tersedia atau kosong.`,
             );
             setPlacingOrder(false);
             return;
@@ -129,7 +135,7 @@ export default function CheckoutScreen() {
         } else {
           showAlert(
             "Produk Tidak Ditemukan",
-            `Maaf, produk "${item.productName}" tidak ditemukan.`
+            `Maaf, produk "${item.productName}" tidak ditemukan.`,
           );
           setPlacingOrder(false);
           return;
@@ -156,7 +162,7 @@ export default function CheckoutScreen() {
         checkoutItems,
         total,
         selectedAddress,
-        buyerLocation
+        buyerLocation,
       );
       showAlert("Berhasil", "Pesanan berhasil dibuat!", () => {
         router.replace("/orders" as any);

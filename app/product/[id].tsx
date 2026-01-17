@@ -1,4 +1,5 @@
 import ImageWithSkeleton from "@/components/ImageWithSkeleton";
+import { useAuth } from "@/context/AuthContext";
 import { showAlert, showConfirm } from "@/lib/alert";
 import { db } from "@/lib/firebase";
 import { useCart } from "@/services/cartService";
@@ -22,6 +23,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProductDetails() {
+  const { user } = useAuth();
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,14 +38,14 @@ export default function ProductDetails() {
       console.log(
         `[ProductDetails] Received ID parameter:`,
         id,
-        `Type: ${typeof id}`
+        `Type: ${typeof id}`,
       );
       if (typeof id === "string") {
         console.log(`[ProductDetails] Fetching product with ID: ${id}`);
         const data = await getProductById(id);
         console.log(
           `[ProductDetails] Fetch result:`,
-          data ? `Found: ${data.name}` : "Not found"
+          data ? `Found: ${data.name}` : "Not found",
         );
         setProduct(data);
         if (data?.sellerUid) {
@@ -103,7 +105,7 @@ export default function ProductDetails() {
         () => router.push("/(tabs)/cart"),
         undefined,
         "Lihat Keranjang",
-        "Lanjut Belanja"
+        "Lanjut Belanja",
       );
     } catch (e) {
       showAlert("Gagal", "Tidak dapat menambahkan ke keranjang.");
@@ -113,6 +115,15 @@ export default function ProductDetails() {
   };
 
   const handleBuyNow = async () => {
+    if (!user) {
+      showAlert(
+        "Tidak dapat membuat pesanan",
+        "Silakan masuk atau daftar terlebih dahulu sebelum membuat pesanan",
+        () => router.replace("/(auth)/sign-in"),
+      );
+      return;
+    }
+
     if (!product) return;
 
     if (!product.isAvailable) {
@@ -125,7 +136,7 @@ export default function ProductDetails() {
       showAlert(
         "Toko tidak aktif",
         "Toko sedang tidak aktif, silahkan hubungi pemilik toko via WhatsApp atau coba lagi nanti.",
-        () => {}
+        () => {},
       );
       return;
     }

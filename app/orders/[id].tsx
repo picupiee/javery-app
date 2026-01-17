@@ -138,6 +138,7 @@ export default function OrderDetailScreen() {
                 </Text>
               </TouchableOpacity>
             )}
+            
           </View>
 
           {/* Items */}

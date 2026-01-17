@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const subscribeToUserProfile = (
   uid: string,
   onProfile: (profile: UserProfile | null) => void,
-  onError: (error: any) => void
+  onError: (error: any) => void,
 ) => {
   return db
     .collection("users")
@@ -25,7 +25,7 @@ const subscribeToUserProfile = (
         console.log(
           `[AuthContext] Snapshot for ${uid} has data: ${
             profileData ? "Yes" : "No"
-          }`
+          }`,
         );
         if (profileData) {
           onProfile(profileData as UserProfile);
@@ -37,7 +37,7 @@ const subscribeToUserProfile = (
       (error) => {
         console.error("Error listening to user profile:", error);
         onError(error);
-      }
+      },
     );
 };
 
@@ -56,9 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (user?.uid) {
       try {
-        return db.collection("users").doc(user.uid).update({
+        await db.collection("users").doc(user.uid).update({
           buyerPushToken: null,
-        }),
+        });
         console.log("Buyer push token removed successfully");
       } catch (error) {
         console.error("Error removing buyer push token:", error);
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log(
             `[AuthContext] Profile for ${firebaseUser.uid}: ${
               profileData ? "Found" : "Not Found"
-            }`
+            }`,
           );
           if (profileData) {
             const augmentedUser: AugmentedUser = {
@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(augmentedUser);
           } else {
             console.warn(
-              "Logged in user has no profile data. Waiting for creation..."
+              "Logged in user has no profile data. Waiting for creation...",
             );
             const augmentedUser: AugmentedUser = {
               uid: firebaseUser.uid,
@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         (error) => {
           console.error("Error during profile subscription:", error);
           setIsLoading(false);
-        }
+        },
       );
     });
 
