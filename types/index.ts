@@ -31,6 +31,7 @@ export interface SellerProfile {
   createdAt: string;
   photoURL?: string;
   storeLocation?: { latitude: number; longitude: number } | null;
+  deliveryMethod?: "delivery" | "pickup";
 }
 
 export interface Address {

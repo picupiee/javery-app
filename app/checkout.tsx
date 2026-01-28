@@ -18,8 +18,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getActiveSellers, isSellerActive } from "@/services/sellerService";
+import { getActiveSellers, isSellerActive, getSellerProfile } from "@/services/sellerService";
 import useLocationStore from "@/store/location.store";
+import { SellerProfile } from "@/types";
 
 export default function CheckoutScreen() {
   const params = useLocalSearchParams<{
@@ -36,6 +37,7 @@ export default function CheckoutScreen() {
   const [placingOrder, setPlacingOrder] = useState(false);
   const { location: userLocation, loading: locationLoading } =
     useLocationStore();
+  const [sellerProfile, setSellerProfile] = useState<SellerProfile | null>(null);
 
   // Filter items for this seller
   const buyNowItem = params.buyNowItem ? JSON.parse(params.buyNowItem) : null;
@@ -58,6 +60,7 @@ export default function CheckoutScreen() {
     useCallback(() => {
       if (user) {
         loadAddresses();
+        loadSellerProfile();
       }
     }, [user, params.selectedAddressId]),
   );
@@ -93,13 +96,20 @@ export default function CheckoutScreen() {
     }
   };
 
+  const loadSellerProfile = async () => {
+    if (sellerUid) {
+      const profile = await getSellerProfile(sellerUid);
+      setSellerProfile(profile);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     const isActive = await isSellerActive(sellerUid);
     if (!isActive) {
       showAlert("Penjual Tidak Aktif", "Penjual ini tidak menerima pesanan");
       return;
     }
-    if (!selectedAddress) {
+    if (!selectedAddress && sellerProfile?.deliveryMethod !== 'pickup') {
       showAlert("Alamat Kosong", "Silakan pilih alamat pengiriman.");
       return;
     }
@@ -109,6 +119,7 @@ export default function CheckoutScreen() {
         "Silakan masuk atau daftar terlebih dahulu sebelum membuat pesanan",
         () => router.replace("/(auth)/sign-in"),
       );
+      return;
     }
 
     if (locationLoading) {
@@ -145,14 +156,25 @@ export default function CheckoutScreen() {
       // Ensure we have coordinates if available, otherwise proceed with null
       const buyerLocation = userLocation
         ? {
-            latitude: userLocation.coords.latitude,
-            longitude: userLocation.coords.longitude,
-          }
+          latitude: userLocation.coords.latitude,
+          longitude: userLocation.coords.longitude,
+        }
         : null;
 
       if (!buyerLocation) {
         console.warn("User location not available at checkout");
       }
+
+      const finalAddress = sellerProfile?.deliveryMethod === 'pickup'
+        ? {
+          id: 'pickup',
+          name: 'Pickup at Store',
+          recipientName: user.displayName || 'Buyer',
+          phoneNumber: user.phoneNumber || '',
+          fullAddress: `Ambil di Toko: ${sellerProfile.storeName}`,
+          isDefault: false
+        }
+        : selectedAddress!;
 
       await createOrder(
         user.uid,
@@ -161,13 +183,15 @@ export default function CheckoutScreen() {
         sellerName,
         checkoutItems,
         total,
-        selectedAddress,
+        finalAddress,
         buyerLocation,
+        sellerProfile?.deliveryMethod === 'pickup'
       );
       showAlert("Berhasil", "Pesanan berhasil dibuat!", () => {
         router.replace("/orders" as any);
       });
     } catch (error) {
+      console.error(error);
       showAlert("Gagal", "Terjadi kesalahan saat membuat pesanan.");
     } finally {
       setPlacingOrder(false);
@@ -203,65 +227,90 @@ export default function CheckoutScreen() {
       >
         {/* Address Section */}
         <View className="bg-white p-4 mb-3">
-          <Text className="font-bold text-lg mb-2">Alamat Pengiriman</Text>
-          {loading ? (
-            <ActivityIndicator />
-          ) : addresses.length === 0 ? (
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/address/add",
-                  params: {
-                    source: buyNowItem ? "buyNow" : "checkout",
-                    sellerUid,
-                    buyNowItem: buyNowItem
-                      ? JSON.stringify(buyNowItem)
-                      : undefined,
-                  },
-                })
-              }
-              className="bg-orange-50 p-4 rounded-xl border border-dashed border-primary items-center"
-            >
-              <Text className="text-primary font-bold">+ Tambah Alamat</Text>
-            </TouchableOpacity>
-          ) : (
-            <View>
-              {selectedAddress ? (
-                <View className="border border-primary-100 bg-orange-50 p-4 rounded-xl">
-                  <Text className="font-bold text-slate-800">
-                    {selectedAddress.name} • {selectedAddress.recipientName}
-                  </Text>
-                  <Text className="text-slate-600 mt-1">
-                    {selectedAddress.phoneNumber}
-                  </Text>
-                  <Text className="text-slate-500 text-sm mt-1">
-                    {selectedAddress.fullAddress}
-                  </Text>
-                </View>
-              ) : (
-                <Text>Pilih alamat...</Text>
-              )}
+          <Text className="font-bold text-lg mb-2">
+            {sellerProfile?.deliveryMethod === 'pickup' ? 'Lokasi Pengambilan' : 'Alamat Pengiriman'}
+          </Text>
 
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: "/address",
-                    params: {
-                      source: buyNowItem ? "buyNow" : "checkout",
-                      sellerUid,
-                      buyNowItem: buyNowItem
-                        ? JSON.stringify(buyNowItem)
-                        : undefined,
-                    },
-                  })
-                }
-                className="mt-3"
-              >
-                <Text className="text-primary font-bold text-center">
-                  Ganti Alamat
+          {sellerProfile?.deliveryMethod === 'pickup' ? (
+            <View className="border border-primary-100 bg-orange-50 p-4 rounded-xl">
+              <Text className="font-bold text-slate-800">
+                Ambil di Toko: {sellerProfile.storeName}
+              </Text>
+              <Text className="text-slate-600 mt-1">
+                {sellerProfile.storeDescription}
+              </Text>
+              {sellerProfile.storeLocation && (
+                <Text className="text-slate-500 text-sm mt-1">
+                  Lat: {sellerProfile.storeLocation.latitude.toFixed(4)}, Long: {sellerProfile.storeLocation.longitude.toFixed(4)}
                 </Text>
-              </TouchableOpacity>
+              )}
+              <View className="mt-2 flex-row items-center">
+                <FontAwesome name="map-marker" size={14} color="#f97316" className="mr-2" />
+                <Text className="text-primary text-sm font-medium ml-2">Lokasi Penjual</Text>
+              </View>
             </View>
+          ) : (
+            <>
+              {loading ? (
+                <ActivityIndicator />
+              ) : addresses.length === 0 ? (
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push({
+                      pathname: "/address/add",
+                      params: {
+                        source: buyNowItem ? "buyNow" : "checkout",
+                        sellerUid,
+                        buyNowItem: buyNowItem
+                          ? JSON.stringify(buyNowItem)
+                          : undefined,
+                      },
+                    })
+                  }
+                  className="bg-orange-50 p-4 rounded-xl border border-dashed border-primary items-center"
+                >
+                  <Text className="text-primary font-bold">+ Tambah Alamat</Text>
+                </TouchableOpacity>
+              ) : (
+                <View>
+                  {selectedAddress ? (
+                    <View className="border border-primary-100 bg-orange-50 p-4 rounded-xl">
+                      <Text className="font-bold text-slate-800">
+                        {selectedAddress.name} • {selectedAddress.recipientName}
+                      </Text>
+                      <Text className="text-slate-600 mt-1">
+                        {selectedAddress.phoneNumber}
+                      </Text>
+                      <Text className="text-slate-500 text-sm mt-1">
+                        {selectedAddress.fullAddress}
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text>Pilih alamat...</Text>
+                  )}
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      router.push({
+                        pathname: "/address",
+                        params: {
+                          source: buyNowItem ? "buyNow" : "checkout",
+                          sellerUid,
+                          buyNowItem: buyNowItem
+                            ? JSON.stringify(buyNowItem)
+                            : undefined,
+                        },
+                      })
+                    }
+                    className="mt-3"
+                  >
+                    <Text className="text-primary font-bold text-center">
+                      Ganti Alamat
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
           )}
         </View>
 
@@ -293,10 +342,10 @@ export default function CheckoutScreen() {
             </View>
             <View>
               <Text className="font-bold text-slate-800">
-                Bayar Ditempat (COD)
+                {sellerProfile?.deliveryMethod == "pickup" ? "Bayar Tunai" : "Bayar Ditempat (COD)"}
               </Text>
               <Text className="text-xs text-slate-500">
-                Bayar tunai saat pesanan sampai
+                {sellerProfile?.deliveryMethod == "pickup" ? "Bayar ditempat Penjual" : "Bayar tunai saat pesanan sampai"}
               </Text>
             </View>
           </View>
@@ -344,10 +393,9 @@ export default function CheckoutScreen() {
 
           <TouchableOpacity
             onPress={handlePlaceOrder}
-            disabled={placingOrder || !selectedAddress}
-            className={`p-4 rounded-xl items-center mb-8 ${
-              placingOrder || !selectedAddress ? "bg-gray-300" : "bg-primary"
-            }`}
+            disabled={placingOrder || (!selectedAddress && sellerProfile?.deliveryMethod !== 'pickup')}
+            className={`p-4 rounded-xl items-center mb-8 ${placingOrder || (!selectedAddress && sellerProfile?.deliveryMethod !== 'pickup') ? "bg-gray-300" : "bg-primary"
+              }`}
           >
             {placingOrder ? (
               <ActivityIndicator color="white" />
