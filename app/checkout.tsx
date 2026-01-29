@@ -12,6 +12,7 @@ import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -232,22 +233,14 @@ export default function CheckoutScreen() {
           </Text>
 
           {sellerProfile?.deliveryMethod === 'pickup' ? (
-            <View className="border border-primary-100 bg-orange-50 p-4 rounded-xl">
+            <View className="flex-row items-center justify-between border border-primary-100 bg-orange-50 p-4 rounded-xl">
               <Text className="font-bold text-slate-800">
                 Ambil di Toko: {sellerProfile.storeName}
               </Text>
-              <Text className="text-slate-600 mt-1">
-                {sellerProfile.storeDescription}
-              </Text>
-              {sellerProfile.storeLocation && (
-                <Text className="text-slate-500 text-sm mt-1">
-                  Lat: {sellerProfile.storeLocation.latitude.toFixed(4)}, Long: {sellerProfile.storeLocation.longitude.toFixed(4)}
-                </Text>
-              )}
-              <View className="mt-2 flex-row items-center">
-                <FontAwesome name="map-marker" size={14} color="#f97316" className="mr-2" />
-                <Text className="text-primary text-sm font-medium ml-2">Lokasi Penjual</Text>
-              </View>
+              <Pressable onPress={() => router.push(`https://www.google.com/maps/search/?api=1&query=${sellerProfile!.storeLocation!.latitude}%2C${sellerProfile!.storeLocation!.longitude}`)} className="flex-row items-center gap-2">
+                <Text className="text-primary text-sm font-semibold underline antialiased">Lokasi Penjual</Text>
+                <FontAwesome name="map-marker" size={26} color="#f97316" className="animate-bounce" />
+              </Pressable>
             </View>
           ) : (
             <>
@@ -405,6 +398,6 @@ export default function CheckoutScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }

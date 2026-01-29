@@ -86,7 +86,7 @@ exports.sendOrderNotification = onDocumentCreated(
 
       if (!pushToken || !Expo.isExpoPushToken(pushToken)) {
         console.error(
-          `Seller ${sellerUid} has no valid sellerPushToken (token: ${pushToken})`
+          `Seller ${sellerUid} has no valid sellerPushToken (token: ${pushToken})`,
         );
         return;
       }
@@ -95,8 +95,8 @@ exports.sendOrderNotification = onDocumentCreated(
         {
           to: pushToken,
           sound: "default",
-          title: "New Order Received!",
-          body: `You have a new order from ${buyerName} for Rp ${totalAmount.toLocaleString()}`,
+          title: "Ada Pesanan Baru!",
+          body: `Anda mendapatkan pesanan baru dari ${buyerName} sebesar Rp ${totalAmount.toLocaleString()}`,
           data: { orderId: event.params.orderId },
         },
       ];
@@ -113,7 +113,7 @@ exports.sendOrderNotification = onDocumentCreated(
     } catch (error) {
       console.error("Error sending notification:", error);
     }
-  }
+  },
 );
 
 exports.sendOrderStatusNotification = onDocumentUpdated(
@@ -130,14 +130,15 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
 
     const buyerUid = newData.buyerUid;
     const newStatus = newData.status;
+    const isPickup = newData.pickupOrder === true;
 
     if (!buyerUid) {
       console.log("No buyerUid in order");
       return;
     }
 
-    let title = "Order Status Update";
-    let body = `Your order status has been updated to ${newStatus}`;
+    let title = "Status Pesanan Anda";
+    let body = `Pesanan anda saat ini: ${newStatus}`;
 
     // Customize message based on status
     switch (newStatus) {
@@ -146,12 +147,22 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
         body = "Penjual sedang menyiapkan pesanan Anda.";
         break;
       case "delivering":
-        title = "Pesanan Diantar";
-        body = "Pesanan Anda sedang dalam perjalanan.";
+        if (isPickup) {
+          title = "Siap Diambil";
+          body = "Pesanan Anda sudah siap untuk diambil di toko.";
+        } else {
+          title = "Pesanan Diantar";
+          body = "Pesanan Anda sedang dalam perjalanan.";
+        }
         break;
       case "completed":
-        title = "Pesanan Selesai";
-        body = "Pesanan telah sampai. Selamat menikmati!";
+        if (isPickup) {
+          title = "Pesanan Selesai";
+          body = "Terima kasih telah mengambil pesanan Anda.";
+        } else {
+          title = "Pesanan Selesai";
+          body = "Pesanan telah sampai. Selamat menikmati!";
+        }
         break;
       case "cancelled":
         title = "Pesanan Dibatalkan";
@@ -176,7 +187,7 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
 
       if (!pushToken || !Expo.isExpoPushToken(pushToken)) {
         console.log(
-          `Buyer ${buyerUid.charAt(5).trim() + "..."} has no valid buyerPushToken (token: ${pushToken.charAt(5).trim() + "..."})`
+          `Buyer ${buyerUid.charAt(5).trim() + "..."} has no valid buyerPushToken (token: ${pushToken.charAt(5).trim() + "..."})`,
         );
         return;
       }
@@ -202,7 +213,7 @@ exports.sendOrderStatusNotification = onDocumentUpdated(
     } catch (error) {
       console.error("Error in sendOrderStatusNotification:", error);
     }
-  }
+  },
 );
 
 exports.deleteProductImage = onDocumentDeleted(
@@ -214,7 +225,7 @@ exports.deleteProductImage = onDocumentDeleted(
     if (publicId) {
       await deleteCloudinaryImage(publicId);
     }
-  }
+  },
 );
 
 exports.cleanupOldProductImage = onDocumentUpdated(
@@ -234,5 +245,5 @@ exports.cleanupOldProductImage = onDocumentUpdated(
         await deleteCloudinaryImage(publicId);
       }
     }
-  }
+  },
 );
